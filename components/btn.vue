@@ -24,4 +24,32 @@ function handleClick() {
 }
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+@import "@/assets/var.less";
+
+.btn {
+  border-radius: 50px;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: .65rem;
+  padding: 12px 25px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all .2s ease;
+
+  &:hover {
+    box-shadow: 0 2px 1px rgba(0, 0, 0, .2);
+  }
+
+  &.with-bg--primary {
+    background: @primaryl;
+    color: @primaryt;
+  }
+
+  &.without-bg--primary {
+    background: transparent;
+    color: @primaryt;
+  }
+}
+</style>
