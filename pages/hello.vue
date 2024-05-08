@@ -60,6 +60,7 @@
       </section>
     </div>
   </div>
+  <login-modal/>
 </template>
 
 <style lang="less" scoped>
@@ -79,6 +80,7 @@
     align-items: center;
     justify-content: center;
     gap: 20px;
+    padding: 20px 0;
   }
 }
 
@@ -93,6 +95,7 @@ section {
 }
 
 .section__here_you_can {
+  margin-top: 0;
   .card-grid {
     display: grid;
     grid-template: "a a b" "c d d";
@@ -121,4 +124,5 @@ section {
 import {mdiCreationOutline, mdiCurrencyUsdOff, mdiCursorDefaultGestureOutline, mdiLaunch} from "@mdi/js";
 import CardContent from "~/components/card-content.vue";
 import CardBgText from "~/components/card-bg-text.vue";
+import LoginModal from "~/components/login-modal.vue";
 </script>

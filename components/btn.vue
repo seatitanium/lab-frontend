@@ -39,18 +39,19 @@ function handleClick() {
   transition: all .2s ease;
   .font-family--default;
 
-  &:hover {
-    box-shadow: 0 2px 1px rgba(0, 0, 0, .2);
-  }
 
   &.with-bg--primary {
-    background: @primaryll;
+    background-color: @primaryll;
     color: @primaryt;
   }
 
   &.without-bg--primary {
-    background: transparent;
+    background-color: transparent;
     color: @primaryt;
+
+    &.hover--dim:hover {
+      background-color: rgba(0, 0, 0, .1);
+    }
   }
 }
 </style>
