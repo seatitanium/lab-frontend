@@ -1,9 +1,10 @@
 @import "assets/fonts/ibm-plex-mono/font.css";
 @import "assets/fonts/ibm-plex-sans/font.css";
+@import "var";
 
 body {
   margin: 0;
-  font-family: 'IBM Plex Sans', ui-sans-serif, 'PingFang SC', '微软雅黑', sans-serif;
+  .font-family--default;
 }
 
 .container {
@@ -30,4 +31,8 @@ body {
 
 .textaligncenter {
   text-align: center;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 16px 0;
 }

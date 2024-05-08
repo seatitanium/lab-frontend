@@ -37,13 +37,14 @@ function handleClick() {
   font-size: 15px;
   cursor: pointer;
   transition: all .2s ease;
+  .font-family--default;
 
   &:hover {
     box-shadow: 0 2px 1px rgba(0, 0, 0, .2);
   }
 
   &.with-bg--primary {
-    background: @primaryl;
+    background: @primaryll;
     color: @primaryt;
   }
 
