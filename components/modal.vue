@@ -13,6 +13,21 @@
 
 <script lang="ts" setup>
 const model = defineModel();
+const props = defineProps({
+  allowEsc: {
+    type: Boolean,
+    default: true
+  }
+})
+
+function keypressListener(e: KeyboardEvent) {
+  if (e.key == "Escape" && props.allowEsc) {
+    model.value = false;
+  }
+}
+
+onMounted(() => window.addEventListener('keydown', keypressListener));
+onUnmounted(() => window.removeEventListener('keydown', keypressListener));
 </script>
 
 <style lang="less">
