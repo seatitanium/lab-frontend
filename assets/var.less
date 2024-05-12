@@ -4,6 +4,69 @@
 @primaryt: #004d40;
 @navbar-height: 60px;
 
+:root {
+  --casual: 0;
+  --wght: 400;
+  --slnt: 0;
+  --mono: 0;
+}
+
 .font-family--default {
-  font-family: 'IBM Plex Sans', ui-sans-serif, 'PingFang SC', '微软雅黑', sans-serif;
+  font-family: 'Recursive', ui-sans-serif, 'PingFang SC', '微软雅黑', sans-serif;
+}
+
+.font-family--default-V {
+  font-family: 'Recursive Variable', ui-sans-serif, 'PingFang SC', '微软雅黑', sans-serif;
+}
+
+.hover--dim {
+  &:hover {
+    filter: brightness(90%);
+  }
+}
+
+.hover--dropShadow {
+  &:hover {
+    box-shadow: 0 2px 1px rgba(0, 0, 0, .2);
+  }
+}
+
+.textshadow--default {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, .5);
+}
+
+@keyframes ModalIn--default {
+  0% {
+    transform: scale(.9) translate(-50%, -50%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1) translate(-50%, -50%);
+    opacity: 1;
+  }
+}
+
+@keyframes ModalIn--up {
+  0% {
+    transform: translateY(calc(-50% + 30px)) translateX(-50%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes ModalIn--down {
+  0% {
+    transform: translateY(calc(-50% - 30px)) translateX(-50%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }

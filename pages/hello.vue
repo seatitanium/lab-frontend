@@ -10,10 +10,10 @@
         </div>
 
         <div class="apply">
-          <btn class="with-bg--primary">立即体验
+          <btn @click="StateLoginModal = true" class="with-bg--primary hover--dropShadow">立即体验
             <icon :path="mdiCreationOutline"/>
           </btn>
-          <btn class="without-bg--primary" href="https://seati.cc">了解 Seati
+          <btn class="without-bg--primary hover--dim" href="https://seati.cc">了解 Seati
             <icon :path="mdiLaunch"/>
           </btn>
         </div>
@@ -60,14 +60,27 @@
       </section>
     </div>
   </div>
-  <login-modal/>
+  <login-modal v-model="StateLoginModal"/>
 </template>
+
+<script setup lang="ts">
+import {mdiCreationOutline, mdiCurrencyUsdOff, mdiCursorDefaultGestureOutline, mdiLaunch} from "@mdi/js";
+import CardContent from "~/components/card-content.vue";
+import CardBgText from "~/components/card-bg-text.vue";
+import LoginModal from "~/components/login-modal.vue";
+
+const StateLoginModal = ref(false);
+</script>
 
 <style lang="less" scoped>
 .hello-card {
   .primary {
     h1 {
       font-size: 60px;
+
+      em {
+        font-variation-settings: 'CASL' 1, 'slnt' -15;
+      }
     }
 
     p {
@@ -119,10 +132,3 @@ section {
   }
 }
 </style>
-
-<script setup lang="ts">
-import {mdiCreationOutline, mdiCurrencyUsdOff, mdiCursorDefaultGestureOutline, mdiLaunch} from "@mdi/js";
-import CardContent from "~/components/card-content.vue";
-import CardBgText from "~/components/card-bg-text.vue";
-import LoginModal from "~/components/login-modal.vue";
-</script>

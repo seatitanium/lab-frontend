@@ -1,10 +1,16 @@
 @import "assets/fonts/ibm-plex-mono/font.css";
 @import "assets/fonts/ibm-plex-sans/font.css";
+@import "assets/fonts/recursive/font.css";
 @import "var";
 
 body {
   margin: 0;
-  .font-family--default;
+  .font-family--default-V;
+}
+
+em {
+  font-style: normal;
+  font-variation-settings: 'slnt' -15;
 }
 
 .container {
@@ -35,16 +41,4 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   margin: 16px 0;
-}
-
-.hover--dim {
-  &:hover {
-    filter: brightness(90%);
-  }
-}
-
-.hover--dropShadow {
-  &:hover {
-    box-shadow: 0 2px 1px rgba(0, 0, 0, .2);
-  }
 }

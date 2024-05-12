@@ -1,8 +1,13 @@
 <template>
-  <div class="modal-overlay">
-    <div class="modal">
-      <slot/>
-    </div>
+  <div class="modal-group">
+    <Transition name="modal-trans">
+      <div v-if="model" class="modal">
+        <slot/>
+      </div>
+    </Transition>
+    <Transition name="overlay-trans">
+      <div v-if="model" class="modal-overlay"></div>
+    </Transition>
   </div>
 </template>
 
@@ -11,12 +16,55 @@ const model = defineModel();
 </script>
 
 <style lang="less">
+@import "@/assets/var.less";
+
+.overlay-trans-enter-active {
+  animation: ModalInOverlay .3s ease;
+}
+
+.overlay-trans-leave-active {
+  animation: ModalInOverlay .2s ease reverse;
+  animation-delay: .25s;
+}
+
+.modal-trans-enter-active {
+  animation: ModalIn--default .25s ease;
+}
+
+.animation--Up .modal-trans-enter-active {
+  animation: ModalIn--up .25s ease;
+}
+
+.animation--Down .modal-trans-enter-active {
+  animation: ModalIn--down .25s ease;
+}
+
+.modal-trans-leave-active {
+  animation: ModalIn--default .25s ease reverse;
+}
+
+.animation--Up .modal-trans-leave-active {
+  animation: ModalIn--up .25s ease reverse;
+}
+
+.animation--Down .modal-trans-leave-active {
+  animation: ModalIn--down .25s ease reverse;
+}
+
+
+@keyframes ModalInOverlay {
+  0% {
+    background-color: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0);
+  }
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
-  max-width: 100%; // prevent scroll width from causing x-overflow 24.5.8
+  max-width: 100%; // prevent scrollbar width from causing x-overflow 24.5.8
   height: 100vh;
   overflow: hidden;
   z-index: 300;
@@ -25,22 +73,18 @@ const model = defineModel();
   justify-content: center;
   transition: all .2s ease;
   background: rgba(0, 0, 0, 0);
+}
 
-  &.transparent {
-    pointer-events: none;
+.without-bg .modal-overlay {
+  pointer-events: none;
+}
 
-    .modal {
-      pointer-events: auto;
-    }
-  }
+.with-bg--blurred .modal-overlay {
+  backdrop-filter: blur(8px);
+}
 
-  &.blurred {
-    backdrop-filter: blur(10px);
-  }
-
-  &.darken {
-    background: rgba(0, 0, 0, .4);
-  }
+.with-bg--darken .modal-overlay {
+  background: rgba(0, 0, 0, .6);
 }
 
 .modal-overlay.w400 .modal {
@@ -66,5 +110,11 @@ const model = defineModel();
   max-width: 700px;
   padding: 40px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transform-origin: 0 0;
+  z-index: 400;
 }
 </style>
