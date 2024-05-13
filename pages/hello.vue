@@ -10,7 +10,7 @@
         </div>
 
         <div class="apply">
-          <btn @click="StateLoginModal = true" class="with-bg--primary hover--dropShadow">立即体验
+          <btn @click="stateLoginModal = true" class="with-bg--primary hover--dropShadow">立即体验
             <icon :path="mdiCreationOutline"/>
           </btn>
           <btn class="without-bg--primary hover--dim" href="https://seati.cc">了解 Seati
@@ -22,7 +22,8 @@
       <section class="section__here_you_can">
         <div class="card-grid">
           <img style="grid-area: a" src="@/assets/images/2023-07-20_01.06.06.jpg"/>
-          <card style="grid-area: b" class="with-bg--primary">
+          <card @mouseenter="stateKaifangScreen = true" @mouseleave="stateKaifangScreen = false" style="grid-area: b"
+                class="with-bg--primary">
             <card-title>开放</card-title>
             <card-content>
               <p>Lab 是一个开放的平台。所有注册过的玩家可以在这里零距离体验服务器的管理功能，尽情发挥主观能动性。</p>
@@ -60,7 +61,14 @@
       </section>
     </div>
   </div>
-  <login-modal v-model="StateLoginModal"/>
+  <login-modal v-model="stateLoginModal"/>
+  <screen id="kaifang-screen" class="with-bg--darken" v-model="stateKaifangScreen">
+    <div class="home-screen-text">
+      <img :src="kaifangScreenCurrentTextImage" alt="kaifang"/>
+      <img :class="{emphasis: kaifangScreenCurrentTextEmphasis}" v-if="kaifangScreenCurrentTextEmphasis"
+           :src="kaifangScreenCurrentTextImage" alt="kaifang-emphasis"/>
+    </div>
+  </screen>
 </template>
 
 <script setup lang="ts">
@@ -68,11 +76,84 @@ import {mdiCreationOutline, mdiCurrencyUsdOff, mdiCursorDefaultGestureOutline, m
 import CardContent from "~/components/card-content.vue";
 import CardBgText from "~/components/card-bg-text.vue";
 import LoginModal from "~/components/login-modal.vue";
+import anime from "animejs";
 
-const StateLoginModal = ref(false);
+const stateLoginModal = ref(false);
+const stateKaifangScreen = ref(false);
+const stateMianfeiScreen = ref(false);
+const stateBianjieScreen = ref(false);
+const kaifangScreenCurrentTextImage = ref('');
+const kaifangScreenCurrentTextEmphasis = ref(false);
+
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function switchState(target: boolean[], pos1: number, pos2: number) {
+  target[pos1] = false;
+  target[pos2] = true;
+}
+
+function* genPic(type: string, maximum = 4) {
+  for (let i of Array(maximum).keys()) {
+    yield getImageURL(type, i + 1);
+  }
+}
+
+function getImageURL(type: string, index: number) {
+  return new URL(`../assets/images/hello/${type}/${index}.svg`, import.meta.url).href;
+}
+
+watch(stateKaifangScreen, async v => {
+  if (v) {
+    const gen = genPic('kaifang');
+    kaifangScreenCurrentTextImage.value = gen.next().value || '';
+    await sleep(70);
+    kaifangScreenCurrentTextImage.value = gen.next().value || '';
+    await sleep(70);
+    kaifangScreenCurrentTextImage.value = gen.next().value || '';
+    await sleep(70);
+    kaifangScreenCurrentTextImage.value = gen.next().value || '';
+    kaifangScreenCurrentTextEmphasis.value = true;
+  }
+})
+
+watch(kaifangScreenCurrentTextImage, v => console.log(v))
 </script>
 
 <style lang="less" scoped>
+@keyframes EmphasisScale {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.home-screen-text {
+  max-width: 300px;
+  position: relative;
+
+  img {
+    width: 100%;
+
+    &.emphasis {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform: translateX(50%) translateY(50%);
+      animation: EmphasisScale .6s ease;
+      animation-delay: .3s;
+      opacity: 0;
+      animation-fill-mode: forwards;
+    }
+  }
+}
+
 .hello-card {
   .primary {
     h1 {
@@ -109,6 +190,7 @@ section {
 
 .section__here_you_can {
   margin-top: 0;
+
   .card-grid {
     display: grid;
     grid-template: "a a b" "c d d";
