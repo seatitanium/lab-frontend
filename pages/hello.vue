@@ -63,10 +63,20 @@
   </div>
   <login-modal v-model="stateLoginModal"/>
   <screen id="kaifang-screen" class="with-bg--darken" v-model="stateKaifangScreen">
-    <div class="home-screen-text">
-      <img :src="kaifangScreenCurrentTextImage" alt="kaifang"/>
-      <img :class="{emphasis: kaifangScreenCurrentTextEmphasis}" v-if="kaifangScreenCurrentTextEmphasis"
-           :src="kaifangScreenCurrentTextImage" alt="kaifang-emphasis"/>
+    <screen-content flex-vertical flex-center>
+      <div class="home-screen-text">
+        <img :src="kaifangScreenCurrentTextImage" alt="kaifang"/>
+        <img :class="{emphasis: kaifangScreenCurrentTextEmphasis}" v-if="kaifangScreenCurrentTextEmphasis"
+             :src="kaifangScreenCurrentTextImage" alt="kaifang-emphasis"/>
+      </div>
+      <typewriter v-if="kaifangScreenDescription" class="typewriter--no-cursor" :type-interval="10">
+        <p>我们不仅开放了<strong>大多数 API</strong>，还编写了<strong>相关文档</strong>。网站的可个性化程度也在不断提高。</p>
+        <p>在保证 Seati <strong>公平、安全</strong>运行的前提下的<strong>大部分</strong>权限，也都被分配到了玩家手中。</p>
+        <p>除此之外，我们还广泛收集所有人——不仅是玩家，更可能是同好，是路人——的建议，随时<strong>对各种灵活创新的想法敞开胸怀</strong>。</p>
+      </typewriter>
+    </screen-content>
+    <div class="bg-open">
+      <open-bg ref="kaifangScreenBackgroundSvg"/>
     </div>
   </screen>
 </template>
@@ -77,6 +87,8 @@ import CardContent from "~/components/card-content.vue";
 import CardBgText from "~/components/card-bg-text.vue";
 import LoginModal from "~/components/login-modal.vue";
 import anime from "animejs";
+import OpenBg from '~/assets/images/hello/open.svg?component';
+import typewriter from "typewriter-vue/src/components/Typewriter.vue";
 
 const stateLoginModal = ref(false);
 const stateKaifangScreen = ref(false);
@@ -84,6 +96,8 @@ const stateMianfeiScreen = ref(false);
 const stateBianjieScreen = ref(false);
 const kaifangScreenCurrentTextImage = ref('');
 const kaifangScreenCurrentTextEmphasis = ref(false);
+const kaifangScreenDescription = ref(false);
+const kaifangScreenBackgroundSvg = ref(null);
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -115,11 +129,57 @@ watch(stateKaifangScreen, async v => {
     await sleep(70);
     kaifangScreenCurrentTextImage.value = gen.next().value || '';
     kaifangScreenCurrentTextEmphasis.value = true;
+    if (kaifangScreenBackgroundSvg.value !== null) {
+      anime({
+        // @ts-ignore
+        targets: kaifangScreenBackgroundSvg.value.$el,
+        opacity: [0, 1],
+        easing: 'linear',
+        duration: 100
+      })
+      anime({
+        // @ts-ignore
+        targets: kaifangScreenBackgroundSvg.value.$el.querySelectorAll('path'),
+        strokeDashoffset: [anime.setDashoffset, 0],
+        easing: 'easeInCirc',
+        duration: 1500,
+        delay: 500
+      })
+    }
+    await sleep(1500);
+    kaifangScreenDescription.value = true;
+  } else {
+    kaifangScreenCurrentTextEmphasis.value = false;
   }
 })
-
-watch(kaifangScreenCurrentTextImage, v => console.log(v))
 </script>
+
+<style lang="less" scoped>
+@import "@/assets/var.less";
+
+#kaifang-screen {
+  font-size: 32px;
+  line-height: 1.5;
+  color: #bbb;
+
+  strong {
+    color: white;
+    border-bottom: 6px solid @primary;
+  }
+
+  .bg-open svg {
+    opacity: 0;
+    fill: transparent;
+    height: 100vh;
+    position: absolute;
+    stroke: rgba(@primaryl, .07);
+    stroke-width: 1px;
+    top: 50%;
+    transform: translateY(-50%) translateX(50%);
+    right: 50%;
+  }
+}
+</style>
 
 <style lang="less" scoped>
 @keyframes EmphasisScale {
