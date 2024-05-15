@@ -33,7 +33,7 @@ const model = defineModel();
 
 .screen-overlay {
   &.with-bg--darken {
-    background: rgba(0, 0, 0, .6);
+    background: rgba(0, 0, 0, .7);
     color: white;
   }
 

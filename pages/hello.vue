@@ -34,7 +34,8 @@
             </card-bg-text>
           </card>
 
-          <card style="grid-area: c" class="with-bg--blue">
+          <card @mouseenter="stateMianfeiScreen = true" @mouseleave="stateMianfeiScreen = false" style="grid-area: c"
+                class="with-bg--blue">
             <card-title>
               免费
             </card-title>
@@ -46,7 +47,7 @@
             </card-bg-icon>
           </card>
 
-          <card style="grid-area: d" class="with-bg--green">
+          <card @mouseenter="stateBianjieScreen = true" @mouseleave="stateBianjieScreen = false" style="grid-area: d" class="with-bg--green">
             <card-title>便捷</card-title>
             <card-content>
               <p>简明而有力的用户界面与功能设计，使得任何具有基础能力的玩家得以迅速上手
@@ -70,13 +71,43 @@
              :src="kaifangScreenCurrentTextImage" alt="kaifang-emphasis"/>
       </div>
       <typewriter v-if="kaifangScreenDescription" class="typewriter--no-cursor" :type-interval="10">
-        <p>我们不仅开放了<strong>大多数 API</strong>，还编写了<strong>相关文档</strong>。网站的可个性化程度也在不断提高。</p>
+        <p>我们不仅开放了<strong>大多数 API</strong>，还编写了<strong>相关文档</strong>。网站的可个性化程度也在不断提高。
+        </p>
         <p>在保证 Seati <strong>公平、安全</strong>运行的前提下的<strong>大部分</strong>权限，也都被分配到了玩家手中。</p>
-        <p>除此之外，我们还广泛收集所有人——不仅是玩家，更可能是同好，是路人——的建议，随时<strong>对各种灵活创新的想法敞开胸怀</strong>。</p>
+        <p>除此之外，我们愿意广泛收集<strong>所有人</strong>——不仅是玩家，更可能是同好，甚至是路人——的建议，来让 Seati 变得更好。
+        </p>
       </typewriter>
     </screen-content>
-    <div class="bg-open">
+    <div class="bg-kaifang">
       <open-bg ref="kaifangScreenBackgroundSvg"/>
+    </div>
+  </screen>
+  <screen id="mianfei-screen" class="with-bg--darken" v-model="stateMianfeiScreen">
+    <screen-content flex-vertical flex-center>
+      <div class="home-screen-text">
+        <img :src="getImageURL('mianfei', 4)" alt="mianfei"/>
+      </div>
+      <typewriter class="typewriter--no-cursor" :type-interval="10">
+        <p>无论是 Lab 还是 Seati 均为免费性质，这是一个<strong>不以盈利为目的的业余兴趣项目</strong>。</p>
+        <p>当然，我们仍然接受自愿的捐助，这一过程将保持<strong>公开透明</strong>，我们会专门<strong>编写页面</strong>记录这方面的内容。</p>
+      </typewriter>
+    </screen-content>
+    <div class="bg-mianfei">
+      <icon :path="mdiCurrencyUsdOff"/>
+    </div>
+  </screen>
+  <screen id="bianjie-screen" class="with-bg--darken" v-model="stateBianjieScreen">
+    <screen-content flex-vertical flex-center>
+      <div class="home-screen-text">
+        <img :src="getImageURL('bianjie', 4)" alt="bianjie"/>
+      </div>
+      <typewriter class="typewriter--no-cursor" :type-interval="10">
+        <p>Lab 的设计标准倾向于将<strong>没必要的繁杂隐去</strong>、<strong>有必要的繁杂放在幕后</strong>，而将最为有效且直观的内容放在眼前<strong>触手可及</strong>的位置。</p>
+        <p>我们希望<strong>无论哪种</strong>计算机水平的玩家都能够轻松愉悦、无障碍地使用 Lab，理解 Lab 与 Seati 服务器的紧密联系。</p>
+      </typewriter>
+    </screen-content>
+    <div class="bg-bianjie">
+      <icon :path="mdiCursorDefaultGestureOutline"/>
     </div>
   </screen>
 </template>
@@ -157,27 +188,44 @@ watch(stateKaifangScreen, async v => {
 <style lang="less" scoped>
 @import "@/assets/var.less";
 
-#kaifang-screen {
+#mianfei-screen, #kaifang-screen, #bianjie-screen {
   font-size: 32px;
   line-height: 1.5;
   color: #bbb;
 
   strong {
-    color: white;
-    border-bottom: 6px solid @primary;
+    color: @primaryl;
   }
+}
 
-  .bg-open svg {
-    opacity: 0;
-    fill: transparent;
+.bg-mianfei, .bg-bianjie {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 320;
+  white-space: nowrap;
+  display: flex;
+
+  svg {
+    width: 100vw;
     height: 100vh;
-    position: absolute;
-    stroke: rgba(@primaryl, .07);
-    stroke-width: 1px;
-    top: 50%;
-    transform: translateY(-50%) translateX(50%);
-    right: 50%;
+    transform: skew(-6deg);
+    color: rgba(@primaryl, .1);
   }
+}
+
+.bg-kaifang svg {
+  opacity: 0;
+  fill: transparent;
+  height: 100vh;
+  position: absolute;
+  stroke: rgba(@primaryl, .07);
+  stroke-width: 1px;
+  top: 50%;
+  transform: translateY(-50%) translateX(50%);
+  right: 50%;
 }
 </style>
 

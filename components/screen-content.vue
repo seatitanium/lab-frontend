@@ -8,7 +8,8 @@
 </script>
 <style scoped lang="less">
 .screen-content {
-  max-width: 60%;
+  z-index: 400;
+  max-width: 50%;
   &[flex], &[flex-horizontal] {
     display: flex;
 
