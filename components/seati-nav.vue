@@ -3,12 +3,16 @@
     <nav class="navbar">
       <div class="container">
         <div class="logo--navbar">
-          <img src="~/assets/icons/seati/seati.svg"/>
+          <logo-svg/>
         </div>
       </div>
     </nav>
   </header>
 </template>
+
+<script lang="ts" setup>
+import LogoSvg from '~/assets/icons/seati/seati.svg?component';
+</script>
 
 <style lang="less">
 @import "@/assets/var";
@@ -27,7 +31,7 @@
 }
 
 .logo--navbar {
-  img {
+  svg {
     height: calc(.5 * @navbar-height);
   }
 }

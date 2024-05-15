@@ -4,7 +4,7 @@
       <div class="footer-cols">
         <div class="first col">
           <div class="logo--footer">
-            <img src="~/assets/icons/seati/seati-white.svg"/>
+            <logo-svg/>
           </div>
           <div class="footer-text">
             <p>Lab 是 Seati 玩家用于合理控制 Seati 服务器和查看各项状态或指标的网页端面板工具。</p>
@@ -16,10 +16,14 @@
   </footer>
 </template>
 
+<script lang="ts" setup>
+import LogoSvg from '~/assets/icons/seati/seati-white.svg?component';
+</script>
+
 <style lang="less" scoped>
 
 .logo--footer {
-  img {
+  svg {
     width: 30%;
   }
 }
