@@ -1,26 +1,35 @@
 <template>
-    <button @click="handleClick" class="btn">
-        <slot />
-    </button>
+  <button @click="handleClick" :class="{loading, disabled}" class="btn">
+    <slot v-if="!loading"/>
+    <circle-spinner size="20px" v-else/>
+  </button>
 </template>
 
 <script lang="ts" setup>
 const props = defineProps({
-    href: {
-        type: String,
-        default: ""
-    },
-    newWindow: {
-        type: Boolean,
-        default: true
-    }
+  href: {
+    type: String,
+    default: ""
+  },
+  newWindow: {
+    type: Boolean,
+    default: true
+  },
+  loading: {
+    type: Boolean,
+    default: false
+  },
+  disabled: {
+    type: Boolean,
+    default: false
+  }
 })
 
 function handleClick() {
-    if (props.href === "") return;
+  if (props.href === "") return;
 
-    if (props.newWindow) window.open(props.href);
-    else location.href = props.href;
+  if (props.newWindow) window.open(props.href);
+  else location.href = props.href;
 }
 </script>
 
@@ -37,8 +46,12 @@ function handleClick() {
   font-size: 15px;
   cursor: pointer;
   transition: all .2s ease;
+  min-width: 80px;
   .font-family--default;
 
+  &.loading {
+    justify-content: center;
+  }
 
   &.with-bg--primary {
     background-color: @primaryll;

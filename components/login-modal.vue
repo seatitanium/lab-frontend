@@ -15,16 +15,20 @@
     </modal-content>
     <modal-actions class="right">
       <btn class="without-bg--primary hover--dim" @click="model = false">关闭</btn>
-      <btn class="with-bg--primary hover--dim">登录</btn>
+      <btn class="with-bg--primary hover--dim" :loading="loginLoading" @click="login">登录</btn>
     </modal-actions>
   </modal>
 </template>
 
 <script lang="ts" setup>
-
 import {mdiArrowRight} from "@mdi/js";
 
 const model = defineModel();
+const loginLoading = ref(false);
+
+function login() {
+  loginLoading.value = true;
+}
 </script>
 
 <style lang="less" scoped>

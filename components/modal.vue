@@ -6,7 +6,9 @@
       </div>
     </Transition>
     <Transition name="overlay-trans">
-      <div v-if="model" class="modal-overlay"></div>
+      <div v-if="model" class="modal-overlay">
+        <slot name="overlay"/>
+      </div>
     </Transition>
   </div>
 </template>
@@ -99,7 +101,7 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
 }
 
 .with-bg--darken .modal-overlay {
-  background: rgba(0, 0, 0, .6);
+  background: rgba(0, 0, 0, .7);
 }
 
 .modal-overlay.w400 .modal {
