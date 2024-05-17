@@ -21,8 +21,11 @@
 
       <section class="section__here_you_can">
         <div class="card-grid">
-          <img style="grid-area: a" src="@/assets/images/2023-07-20_01.06.06.jpg"/>
-          <card @mouseenter="stateKaifangScreen = true" @mouseleave="stateKaifangScreen = false" style="grid-area: b"
+          <img :class="{card1Animation: card1Visible}" ref="card1" style="grid-area: a"
+               src="@/assets/images/2023-07-20_01.06.06.jpg"/>
+          <card :class="{card2Animation: card2Visible}" ref="card2" @mouseenter="stateKaifangScreen = true"
+                @mouseleave="stateKaifangScreen = false"
+                style="grid-area: b"
                 class="with-bg--primary">
             <card-title>开放</card-title>
             <card-content>
@@ -34,7 +37,9 @@
             </card-bg-text>
           </card>
 
-          <card @mouseenter="stateMianfeiScreen = true" @mouseleave="stateMianfeiScreen = false" style="grid-area: c"
+          <card :class="{card3Animation: card3Visible}" ref="card3" @mouseenter="stateMianfeiScreen = true"
+                @mouseleave="stateMianfeiScreen = false"
+                style="grid-area: c"
                 class="with-bg--blue">
             <card-title>
               免费
@@ -47,7 +52,9 @@
             </card-bg-icon>
           </card>
 
-          <card @mouseenter="stateBianjieScreen = true" @mouseleave="stateBianjieScreen = false" style="grid-area: d" class="with-bg--green">
+          <card :class="{card4Animation: card4Visibile}" ref="card4" @mouseenter="stateBianjieScreen = true"
+                @mouseleave="stateBianjieScreen = false"
+                style="grid-area: d" class="with-bg--green">
             <card-title>便捷</card-title>
             <card-content>
               <p>简明而有力的用户界面与功能设计，使得任何具有基础能力的玩家得以迅速上手
@@ -89,7 +96,8 @@
       </div>
       <typewriter class="typewriter--no-cursor" :type-interval="10">
         <p>无论是 Lab 还是 Seati 均为免费性质，这是一个<strong>不以盈利为目的的业余兴趣项目</strong>。</p>
-        <p>当然，我们仍然接受自愿的捐助，这一过程将保持<strong>公开透明</strong>，我们会专门<strong>编写页面</strong>记录这方面的内容。</p>
+        <p>当然，我们仍然接受自愿的捐助，这一过程将保持<strong>公开透明</strong>，我们会专门<strong>编写页面</strong>记录这方面的内容。
+        </p>
       </typewriter>
     </screen-content>
     <div class="bg-mianfei">
@@ -102,8 +110,10 @@
         <img :src="getImageURL('bianjie', 4)" alt="bianjie"/>
       </div>
       <typewriter class="typewriter--no-cursor" :type-interval="10">
-        <p>Lab 的设计标准倾向于将<strong>没必要的繁杂隐去</strong>、<strong>有必要的繁杂放在幕后</strong>，而将最为有效且直观的内容放在眼前<strong>触手可及</strong>的位置。</p>
-        <p>我们希望<strong>无论哪种</strong>计算机水平的玩家都能够轻松愉悦、无障碍地使用 Lab，理解 Lab 与 Seati 服务器的紧密联系。</p>
+        <p>Lab 的设计标准倾向于将<strong>没必要的繁杂隐去</strong>、<strong>有必要的繁杂放在幕后</strong>，而将最为有效且直观的内容放在眼前<strong>触手可及</strong>的位置。
+        </p>
+        <p>我们希望<strong>无论哪种</strong>计算机水平的玩家都能够轻松愉悦、无障碍地使用 Lab，理解 Lab 与 Seati 服务器的紧密联系。
+        </p>
       </typewriter>
     </screen-content>
     <div class="bg-bianjie">
@@ -120,6 +130,7 @@ import LoginModal from "~/components/login-modal.vue";
 import anime from "animejs";
 import OpenBg from '~/assets/images/hello/open.svg?component';
 import typewriter from "typewriter-vue/src/components/Typewriter.vue";
+import {useElementVisibility} from "@vueuse/core";
 
 const stateLoginModal = ref(false);
 const stateKaifangScreen = ref(false);
@@ -129,6 +140,14 @@ const kaifangScreenCurrentTextImage = ref('');
 const kaifangScreenCurrentTextEmphasis = ref(false);
 const kaifangScreenDescription = ref(false);
 const kaifangScreenBackgroundSvg = ref(null);
+
+const [card1, card2, card3, card4] = [ref(null), ref(null), ref(null), ref(null)];
+const [card1Visible, card2Visible, card3Visible, card4Visibile] = [
+  useElementVisibility(card1),
+  useElementVisibility(card2),
+  useElementVisibility(card3),
+  useElementVisibility(card4)
+]
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -184,6 +203,80 @@ watch(stateKaifangScreen, async v => {
   }
 })
 </script>
+
+<style lang="less" scoped>
+@keyframes Card1 {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes Card2 {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes Card3 {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes Card4 {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+[class*="Animation"] {
+  animation-fill-mode: forwards;
+  animation-play-state: running
+}
+
+@cardAnimationDuration: .7s;
+@cardAnimationFunction: cubic-bezier(.61,0,.32,1.04);
+
+.card1Animation {
+  animation: Card1 @cardAnimationDuration @cardAnimationFunction;
+}
+
+.card2Animation {
+  animation: Card2 @cardAnimationDuration @cardAnimationFunction;
+}
+
+.card3Animation {
+  animation: Card3 @cardAnimationDuration @cardAnimationFunction;
+}
+
+.card4Animation {
+  animation: Card4 @cardAnimationDuration @cardAnimationFunction;
+}
+</style>
 
 <style lang="less" scoped>
 @import "@/assets/var.less";
@@ -303,6 +396,10 @@ section {
     display: grid;
     grid-template: "a a b" "c d d";
     grid-gap: 20px;
+
+    > img:not([class*="Animation"]), > .card:not([class*="Animation"]) {
+      opacity: 0;
+    }
 
     img {
       display: block;

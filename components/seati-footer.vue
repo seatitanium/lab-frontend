@@ -31,6 +31,8 @@ import LogoSvg from '~/assets/icons/seati/seati-white.svg?component';
 footer {
   background: #212121;
   color: white;
+  z-index: 100;
+  position: relative;
 
   .container {
     padding: 32px 0;
