@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="uuid-4a9ad3fe-9353-4924-b706-a4a35affd11f" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 41.5 97">
+    <defs>
+        <style>
+            .uuid-8e204b00-32a4-4b9c-9077-0776eba77ed6{fill:#fff;stroke:#000;stroke-miterlimit:10;stroke-width:5px;}
+        </style>
+    </defs>
+    <g id="uuid-693dcc04-1838-4a1b-9594-fb1ff4548cfc">
+        <path class="uuid-8e204b00-32a4-4b9c-9077-0776eba77ed6"
+              d="m0,94.5h24c8.28,0,15-6.72,15-15V17.5c0-8.28-6.72-15-15-15H0"/>
+    </g>
+</svg>

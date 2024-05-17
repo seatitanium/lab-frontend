@@ -4,8 +4,8 @@
     <modal-content>
       <p>Lab 的功能需要与你的服务器账号关联，登录后即可畅享所有功能。</p>
       <form class="login-form">
-        <textfield bg-text placeholder="用户名"/>
-        <textfield bg-text type="password" placeholder="密码"/>
+        <textfield required bg-text placeholder="用户名"/>
+        <textfield required bg-text type="password" placeholder="密码"/>
       </form>
       <div tabindex="0" class="register__now">
         还没有账号？<br/>

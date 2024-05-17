@@ -5,10 +5,21 @@
     <div class="textfield-bg-text" v-if="bgText && !!placeholder">
       {{ placeholder }}
     </div>
+    <div v-if="actualProblem !== ''" class="hover-notice-wrap">
+      <notice-head/>
+      <div class="hover-notice" :style="`background: url('${getURL('assets/images/textfield/notice-text-bg.svg')}')`">
+        {{ actualProblem }}
+      </div>
+      <notice-tail/>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import NoticeHead from '~/assets/images/textfield/notice-head.svg?component';
+import NoticeTail from '~/assets/images/textfield/notice-tail.svg?component';
+import getURL from "~/utils/getURL";
+
 const model = defineModel();
 const props = defineProps({
   placeholder: {
@@ -35,14 +46,31 @@ const props = defineProps({
   bgText: {
     type: Boolean,
     default: false
+  },
+  problem: {
+    type: String,
+    default: ""
+  },
+  required: {
+    type: Boolean,
+    default: false
   }
 })
 
 const hasValue = ref(false);
+const actualProblem = ref(props.problem);
 
 watch(model, v => {
   hasValue.value = v !== "" && v !== undefined;
 });
+
+watch(hasValue, v => {
+  if (!v && props.required) {
+    actualProblem.value = '这里必填。'
+  } else {
+    actualProblem.value = '';
+  }
+})
 </script>
 
 <style lang="less">
@@ -90,5 +118,51 @@ watch(model, v => {
   font-weight: bold;
   transition: all .1s ease-in;
   pointer-events: none;
+}
+
+@keyframes HoverNotice {
+  0% {
+    transform: rotate(0deg) translateX(2px) rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg) translateX(2px) rotate(-360deg);
+  }
+}
+
+@keyframes HoverNoticeAppear {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.hover-notice-wrap {
+  position: absolute;
+  top: 8px;
+  right: -16px;
+  display: flex;
+  align-items: stretch;
+  filter: drop-shadow(0 4px 3px rgba(0, 0, 0, .3));
+  animation: HoverNotice 2.2s linear .4s infinite, HoverNoticeAppear .3s ease;
+  transform-origin: center;
+
+  svg {
+    height: 40px;
+  }
+
+  .hover-notice {
+    margin-right: -1px;
+    margin-left: -1px;
+    display: flex;
+    align-items: center;
+  }
 }
 </style>
