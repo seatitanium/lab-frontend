@@ -7,7 +7,7 @@
     </div>
     <div v-if="actualProblem !== ''" class="hover-notice-wrap">
       <notice-head/>
-      <div class="hover-notice" :style="`background: url('${getURL('assets/images/textfield/notice-text-bg.svg')}')`">
+      <div class="hover-notice" style="background: url('/images/textfield/notice-text-bg.svg')">
         {{ actualProblem }}
       </div>
       <notice-tail/>
