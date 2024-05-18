@@ -3,10 +3,10 @@
     <modal-title>登录</modal-title>
     <modal-content>
       <p>Lab 的功能需要与你的服务器账号关联，登录后即可畅享所有功能。</p>
-      <fields ref="loginForm" class="login-form">
+      <form class="login-form">
         <textfield v-model:tempProblem="usernameTempProblem" v-model:input="username" required bg-text placeholder="用户名"/>
         <textfield v-model:tempProblem="passwordTempProblem" v-model:input="password" required bg-text type="password" placeholder="密码"/>
-      </fields>
+      </form>
       <div tabindex="0" class="register__now">
         还没有账号？<br/>
         <h2>现在就注册一个</h2>
@@ -15,7 +15,7 @@
     </modal-content>
     <modal-actions class="right">
       <btn class="without-bg--primary hover--dim" @click="model = false">关闭</btn>
-      <btn class="with-bg--primary hover--dim" :loading="loginLoading" @click="login" :disable="!formValid">登录</btn>
+      <btn class="with-bg--primary hover--dim" :loading="loginLoading" @click="login" :disabled="!formValid">登录</btn>
     </modal-actions>
   </modal>
 </template>
@@ -28,7 +28,6 @@ import {BackendCodes} from "~/consts";
 
 const model = defineModel();
 const loginLoading = ref(false);
-const loginForm = ref<VerifyForm>(null);
 
 const username = ref('');
 const usernameTempProblem = ref('');
@@ -36,12 +35,11 @@ const password = ref('');
 const passwordTempProblem = ref('');
 
 const formValid = computed(() => {
-  if (loginForm.value !== null) return loginForm.value.getValidity();
-  return false;
+  return username.value !== '' && password.value !== '';
 });
 
 async function login() {
-  if (!formValid) return;
+  if (!formValid.value) return;
 
   loginLoading.value = true;
 
