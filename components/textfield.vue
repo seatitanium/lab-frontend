@@ -16,11 +16,12 @@
 </template>
 
 <script lang="ts" setup>
-import NoticeHead from '~/assets/images/textfield/notice-head.svg?component';
-import NoticeTail from '~/assets/images/textfield/notice-tail.svg?component';
-import getURL from "~/utils/getURL";
+import NoticeHead from 'public/images/textfield/notice-head.svg?component';
+import NoticeTail from 'public/images/textfield/notice-tail.svg?component';
 
-const model = defineModel();
+const model = defineModel({
+  type: String
+});
 const props = defineProps({
   placeholder: {
     type: String
@@ -54,14 +55,27 @@ const props = defineProps({
   required: {
     type: Boolean,
     default: false
+  },
+  regexProblem: {
+    type: String,
+    default: ""
+  },
+  regex: {
+    type: String,
+    default: ""
   }
 })
 
 const hasValue = ref(false);
+const regexPassed = ref(false);
 const actualProblem = ref(props.problem);
 
 watch(model, v => {
   hasValue.value = v !== "" && v !== undefined;
+  if (props.regex !== "") {
+    const regex = new RegExp(props.regex);
+    regexPassed.value = regex.test(v || '');
+  }
 });
 
 watch(hasValue, v => {
@@ -70,6 +84,22 @@ watch(hasValue, v => {
   } else {
     actualProblem.value = '';
   }
+})
+
+watch(regexPassed, v => {
+  if (!v) {
+    actualProblem.value = props.regexProblem;
+  } else {
+    actualProblem.value = '';
+  }
+})
+
+function isValid() {
+  return (!props.required || (props.required && hasValue.value)) && (props.regex === '' || (props.regex !== '' && regexPassed.value));
+}
+
+defineExpose({
+  isValid
 })
 </script>
 

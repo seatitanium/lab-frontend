@@ -9,5 +9,13 @@ export default defineNuxtConfig({
         plugins: [
             svgLoader()
         ]
+    },
+    nitro: {
+        devProxy: {
+            '/api': {
+                target: 'http://localhost:4567/',
+                changeOrigin: true
+            }
+        }
     }
 });

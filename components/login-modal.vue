@@ -3,10 +3,10 @@
     <modal-title>登录</modal-title>
     <modal-content>
       <p>Lab 的功能需要与你的服务器账号关联，登录后即可畅享所有功能。</p>
-      <form class="login-form">
-        <textfield required bg-text placeholder="用户名"/>
-        <textfield required bg-text type="password" placeholder="密码"/>
-      </form>
+      <fields ref="loginForm" class="login-form">
+        <textfield v-model="username" required bg-text placeholder="用户名"/>
+        <textfield v-model="password" required bg-text type="password" placeholder="密码"/>
+      </fields>
       <div tabindex="0" class="register__now">
         还没有账号？<br/>
         <h2>现在就注册一个</h2>
@@ -15,19 +15,46 @@
     </modal-content>
     <modal-actions class="right">
       <btn class="without-bg--primary hover--dim" @click="model = false">关闭</btn>
-      <btn class="with-bg--primary hover--dim" :loading="loginLoading" @click="login">登录</btn>
+      <btn class="with-bg--primary hover--dim" :loading="loginLoading" @click="login" :disable="!formValid">登录</btn>
     </modal-actions>
   </modal>
 </template>
 
 <script lang="ts" setup>
 import {mdiArrowRight} from "@mdi/js";
+import {useLocalStorage} from "@vueuse/core";
+import post from "~/utils/post";
 
 const model = defineModel();
 const loginLoading = ref(false);
+const loginForm = ref<VerifyForm>(null);
 
-function login() {
+const username = ref('');
+const password = ref('');
+
+const formValid = computed(() => {
+  if (loginForm.value !== null) return loginForm.value.getValidity();
+  return false;
+});
+
+async function login() {
+  if (!formValid) return;
+
   loginLoading.value = true;
+
+  const result = await post<LoginResp>('/api/auth/login', {
+    username: username.value,
+    password: password.value
+  });
+
+  loginLoading.value = false;
+
+  if (result.code === 0) {
+    const token = useLocalStorage('tisea-auth-token', '');
+    token.value = result.data;
+  } else {
+    console.log(result)
+  }
 }
 </script>
 

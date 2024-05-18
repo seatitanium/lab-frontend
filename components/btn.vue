@@ -26,6 +26,7 @@ const props = defineProps({
 })
 
 function handleClick() {
+  if (props.disabled) return;
   if (props.href === "") return;
 
   if (props.newWindow) window.open(props.href);
@@ -51,6 +52,17 @@ function handleClick() {
 
   &.loading {
     justify-content: center;
+  }
+
+  &.disabled {
+    background-color: #f5f5f5 !important;
+    cursor: not-allowed;
+    color: #757575 !important;
+
+    &.hover--dim:hover {
+      background-color: #f5f5f5 !important;
+      filter: none !important;
+    }
   }
 
   &.with-bg--primary {
