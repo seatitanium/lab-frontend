@@ -54,7 +54,9 @@ async function login() {
 
   if (result.code === BackendCodes.OK) {
     const token = useLocalStorage('tisea-auth-token', '');
-    token.value = result.data;
+    const username = useLocalStorage('tisea-auth-username', '');
+    token.value = result.data.token;
+    username.value = result.data.username;
   } else {
     console.log(result)
     if (result.code === BackendCodes.TargetNotExist) {
