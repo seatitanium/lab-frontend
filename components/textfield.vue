@@ -19,9 +19,15 @@
 import NoticeHead from 'public/images/textfield/notice-head.svg?component';
 import NoticeTail from 'public/images/textfield/notice-tail.svg?component';
 
-const model = defineModel({
+const model = defineModel('input', {
+  required: true,
   type: String
 });
+
+const tempProblem = defineModel('tempProblem', {
+  type: String
+});
+
 const props = defineProps({
   placeholder: {
     type: String
@@ -70,7 +76,12 @@ const hasValue = ref(false);
 const regexPassed = ref(false);
 const actualProblem = ref(props.problem);
 
+watch(() => tempProblem.value, v => {
+  actualProblem.value = v || '';
+})
+
 watch(model, v => {
+  if (actualProblem.value === tempProblem.value) tempProblem.value = '';
   hasValue.value = v !== "" && v !== undefined;
   if (props.regex !== "") {
     const regex = new RegExp(props.regex);

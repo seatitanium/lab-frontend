@@ -4,8 +4,8 @@
     <modal-content>
       <p>Lab 的功能需要与你的服务器账号关联，登录后即可畅享所有功能。</p>
       <fields ref="loginForm" class="login-form">
-        <textfield v-model="username" required bg-text placeholder="用户名"/>
-        <textfield v-model="password" required bg-text type="password" placeholder="密码"/>
+        <textfield v-model:tempProblem="usernameTempProblem" v-model:input="username" required bg-text placeholder="用户名"/>
+        <textfield v-model:tempProblem="passwordTempProblem" v-model:input="password" required bg-text type="password" placeholder="密码"/>
       </fields>
       <div tabindex="0" class="register__now">
         还没有账号？<br/>
@@ -24,13 +24,16 @@
 import {mdiArrowRight} from "@mdi/js";
 import {useLocalStorage} from "@vueuse/core";
 import post from "~/utils/post";
+import {BackendCodes} from "~/consts";
 
 const model = defineModel();
 const loginLoading = ref(false);
 const loginForm = ref<VerifyForm>(null);
 
 const username = ref('');
+const usernameTempProblem = ref('');
 const password = ref('');
+const passwordTempProblem = ref('');
 
 const formValid = computed(() => {
   if (loginForm.value !== null) return loginForm.value.getValidity();
@@ -49,11 +52,18 @@ async function login() {
 
   loginLoading.value = false;
 
-  if (result.code === 0) {
+  if (result.code === BackendCodes.OK) {
     const token = useLocalStorage('tisea-auth-token', '');
     token.value = result.data;
   } else {
     console.log(result)
+    if (result.code === BackendCodes.TargetNotExist) {
+      usernameTempProblem.value = '这个用户名不存在。';
+    }
+
+    if (result.code === BackendCodes.AuthenticationFailed) {
+      passwordTempProblem.value = '请检查密码是否正确。';
+    }
   }
 }
 </script>
