@@ -35,7 +35,7 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
 
 <style lang="less" scoped>
 
-@keyframes Wiggle {
+@keyframes RotateInPlace {
   0% {
     transform: rotate(0deg) translateX(2px) rotate(0deg);
   }
@@ -45,7 +45,7 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
   }
 }
 
-@keyframes Appear {
+@keyframes PopAppear {
   0% {
     transform: scale(1) translateX(2px);
   }
@@ -77,7 +77,7 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
     border-radius: 20px;
     padding: 20px;
     cursor: pointer;
-    animation: Wiggle 2.2s linear .4s infinite, Appear .3s ease;
+    animation: RotateInPlace 2.2s linear .4s infinite, PopAppear .3s ease;
     transform: translateX(2px);
   }
 }

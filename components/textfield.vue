@@ -161,7 +161,7 @@ defineExpose({
   pointer-events: none;
 }
 
-@keyframes HoverNotice {
+@keyframes RotateInPlace {
   0% {
     transform: rotate(0deg) translateX(2px) rotate(0deg);
   }
@@ -171,7 +171,7 @@ defineExpose({
   }
 }
 
-@keyframes HoverNoticeAppear {
+@keyframes PopAppear {
   0% {
     transform: scale(1) translateX(2px);
   }
@@ -192,7 +192,7 @@ defineExpose({
   display: flex;
   align-items: stretch;
   filter: drop-shadow(0 4px 3px rgba(0, 0, 0, .3));
-  animation: HoverNotice 2.2s linear .4s infinite, HoverNoticeAppear .3s ease;
+  animation: RotateInPlace 2.2s linear .4s infinite, PopAppear .3s ease;
   transform-origin: center;
   transform: translateX(2px);
 
