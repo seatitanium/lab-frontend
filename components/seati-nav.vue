@@ -2,7 +2,7 @@
   <header>
     <nav class="navbar">
       <div class="container">
-        <div class="logo--navbar">
+        <div @click="setLocation('/')" class="logo--navbar">
           <logo-svg/>
         </div>
       </div>
@@ -12,6 +12,8 @@
 
 <script lang="ts" setup>
 import LogoSvg from '~/assets/icons/seati/seati.svg?component';
+import setLocation from "~/utils/setLocation";
+
 </script>
 
 <style lang="less">
@@ -31,6 +33,8 @@ import LogoSvg from '~/assets/icons/seati/seati.svg?component';
 }
 
 .logo--navbar {
+  cursor: pointer;
+
   svg {
     height: calc(.5 * @navbar-height);
   }
