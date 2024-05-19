@@ -13,6 +13,9 @@
         <card-bg-icon>
           <icon :path="x.icon"/>
         </card-bg-icon>
+        <card-right-top>
+          v{{ x.version }}
+        </card-right-top>
       </card>
     </div>
   </div>
@@ -25,14 +28,18 @@
         在获取关键信息的时候出现了一些问题，导致页面无法正常运作。
       </p>
       <p>
-        单击「重试」立即刷新页面。如果问题仍然存在，单击「错误信息」查看内部错误信息，将其传达给网站的维护者。
+        单击「<strong>重试</strong>」立即刷新页面。
+      </p>
+      <p>
+        如果问题仍然存在，单击「<strong>错误信息</strong>」按钮查看内部错误信息，然后单击弹出的信息复制，将其传达给维护者以得到支持。
       </p>
     </modal-content>
-    <modal-actions>
-      <btn>错误信息</btn>
-      <btn>查看</btn>
+    <modal-actions class="right">
+      <btn class="without-bg--primary hover--dim" @click="errorInformationPopup = true">错误信息</btn>
+      <btn class="with-bg--primary hover--dim" @click="$router.go(0)">重试</btn>
     </modal-actions>
   </modal>
+  <anywhere-popup v-model="errorInformationPopup" :content="errorInformationContent"/>
 </template>
 
 <script lang="ts" setup>
@@ -46,7 +53,8 @@ interface SiteFunction {
   description: string,
   icon: string,
   model?: Ref<boolean>,
-  href?: string
+  href?: string,
+  version: string
 }
 
 let user = reactive<User>({
@@ -64,19 +72,22 @@ const indexFunctions: SiteFunction[] = [
     title: '服务器',
     description: '查看服务器状态与玩家在线情况，管理服务器的启停。此外还可探索在线聊天等更多功能。',
     icon: mdiServer,
-    href: '/instance'
+    href: '/instance',
+    version: '0.1.0'
   },
   {
     title: '财务',
     description: '查看 Seati 公开的财务信息以及服务器、OSS 等阿里云服务的消费状况',
     icon: mdiAbacus,
-    href: '/bill'
+    href: '/bill',
+    version: '0.1.0'
   },
   {
     title: '文档',
     description: '更进一步了解 Lab 平台用法以及周围 API 注解，推荐有一定理解力与技术力的用户参考',
     icon: mdiBook,
-    href: '/doc'
+    href: '/doc',
+    version: '0.1.0'
   }
 ]
 
@@ -87,11 +98,14 @@ function handleSiteFunctionClick(func: SiteFunction) {
 
 const username = getUsername();
 const someProblemModal = ref(false);
+const errorInformationPopup = ref(false);
+const errorInformationContent = ref('');
 
 async function initUser() {
   const userResult = await get<UserResp>(`/api/user/profile/${username.value}`);
   if (userResult.code !== BackendCodes.OK) {
     someProblemModal.value = true;
+    errorInformationContent.value = JSON.stringify(userResult);
   } else {
     Object.assign(user, userResult.data)
   }
