@@ -173,15 +173,15 @@ defineExpose({
 
 @keyframes HoverNoticeAppear {
   0% {
-    transform: scale(1);
+    transform: scale(1) translateX(2px);
   }
 
   50% {
-    transform: scale(1.1);
+    transform: scale(1.1) translateX(2px);
   }
 
   100% {
-    transform: scale(1);
+    transform: scale(1) translateX(2px);
   }
 }
 
@@ -194,6 +194,7 @@ defineExpose({
   filter: drop-shadow(0 4px 3px rgba(0, 0, 0, .3));
   animation: HoverNotice 2.2s linear .4s infinite, HoverNoticeAppear .3s ease;
   transform-origin: center;
+  transform: translateX(2px);
 
   svg {
     height: 40px;
