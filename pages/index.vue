@@ -18,6 +18,114 @@
         </card-right-top>
       </card>
     </div>
+    <div class="index-term-description">
+    </div>
+    <div class="index-term-information">
+      <card>
+        <card-right-top>
+          <div class="badges">
+            <div class="badge preset--forge">Forge</div>
+            <div class="badge preset--online">正版验证
+              <icon :path="mdiCheck"/>
+            </div>
+            <div class="badge preset--mcje">
+              <DukeWaving/>
+              Java 版
+            </div>
+          </div>
+        </card-right-top>
+        <card-title>当前周目</card-title>
+        <card-content>
+          <div class="term-title">
+            <div class="term-name">
+              <img src="~/assets/images/term-logo.png"/>
+              <div class="right">
+                <div class="main">All the Mods 9 <small>ATM9</small></div>
+                <div class="sub">整合包 / 2022 / ATMTeam</div>
+              </div>
+            </div>
+          </div>
+          <h2>简介</h2>
+          <div class="term-description">
+            <p>ATM9 has over 400 mods and countless quests and a built in proper endgame. Can you craft the ATM Star? Do
+              you dare take on the Gregstar?</p>
+            <p>All the Mods started out as a private pack for just a few friends of mine that turned into something
+              others wanted to play! It has all the basics that most other "big name" packs include but with a nice mix
+              of some of newer or lesser-known mods as well.
+            </p>
+            <p>In All the Mods 9 we will continue the tradition adding many new mods while going for more stability.</p>
+            <p> Does "All the Mods" really contain ALL THE MODS? No, of course not.</p>
+          </div>
+          <h2>版本与配置</h2>
+          <div class="term-versions">
+            <div class="term-version">
+              <div class="icon">
+                <MCJELogoFull/>
+              </div>
+              <div class="number">
+                1.20.1
+              </div>
+            </div>
+            <div class="term-version">
+              <div class="icon">
+                <ForgeLogoFull/>
+              </div>
+              <div class="number">
+                40.0.12
+              </div>
+            </div>
+            <div class="term-version">
+              <div class="icon" style="transform: translateY(-10px)">
+                <JavaLogoHorizontal/>
+              </div>
+              <div class="number">
+                21
+              </div>
+            </div>
+          </div>
+
+          <div class="term-conditions">
+            <div class="condition" v-for="x in [WindowsPCRecommendedSetupList, WindowsLaptopRecommendedSetupList, MacAppleSiliconRecommendedSetupList]">
+              <div class="title">{{ x.title }}</div>
+              <div class="row">
+                <div class="col1">
+                  <div class="col1-row">
+                    <icon :path="mdiMemory"/>
+                    分配 RAM
+                  </div>
+                  <div class="col1-row">
+                    <icon :path="mdiCubeOutline"/>
+                    CPU
+                  </div>
+                  <div class="col1-row">
+                    <icon :path="mdiMonitor"/>
+                    光影显示卡
+                  </div>
+                  <div class="col1-row">
+                    <icon :path="x.title.includes('Mac') ? mdiApple : mdiMicrosoft"/>
+                    操作系统
+                  </div>
+                </div>
+                <div class="col2">
+                  <div class="col2-row">
+                    {{ x.items.memory }} GiB
+                  </div>
+                  <div class="col2-row">
+                    {{ x.items.cpu }}
+                  </div>
+                  <div class="col2-row">
+                    {{ x.items.gpu || 'N/A'}}
+                  </div>
+                  <div class="col2-row">
+                    {{ x.items.system || 'N/A'}}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </card-content>
+      </card>
+    </div>
   </div>
   <modal v-model="someProblemModal" :allow-esc="false" class="with-bg--blurred with-bg--darken">
     <modal-title>
@@ -46,7 +154,21 @@
 import getUsername from "~/utils/getUsername";
 import {BackendCodes} from "~/consts";
 import type {Ref} from "vue";
-import {mdiAbacus, mdiBook, mdiServer} from "@mdi/js";
+import {
+  mdiAbacus, mdiApple,
+  mdiBook,
+  mdiCheck,
+  mdiCpu64Bit,
+  mdiCubeOutline,
+  mdiMemory, mdiMicrosoft,
+  mdiMicrosoftWindows,
+  mdiMonitor,
+  mdiServer
+} from "@mdi/js";
+import ForgeLogoFull from '~/assets/icons/forge-logo-full.svg'
+import MCJELogoFull from '~/assets/icons/mcje-full.svg'
+import DukeWaving from '~/assets/icons/duke-waving.svg'
+import JavaLogoHorizontal from '~/assets/icons/java-horizontal.svg'
 
 interface SiteFunction {
   title: string,
@@ -55,6 +177,16 @@ interface SiteFunction {
   model?: Ref<boolean>,
   href?: string,
   version: string
+}
+
+interface RecommendedSetupList {
+  title: string,
+  items: {
+    memory: string | number,
+    cpu: string,
+    gpu?: string,
+    system?: string
+  }
 }
 
 let user = reactive<User>({
@@ -66,6 +198,36 @@ let user = reactive<User>({
   createdAt: 0,
   updatedAt: 0
 });
+
+const WindowsPCRecommendedSetupList: RecommendedSetupList = {
+  title: 'Windows 台式机',
+  items: {
+    memory: 8,
+    cpu: '近三年，中配',
+    system: '10, 11',
+    gpu: 'GTX 1060'
+  }
+}
+
+const WindowsLaptopRecommendedSetupList: RecommendedSetupList = {
+  title: 'Windows 笔记本',
+  items: {
+    memory: 8,
+    cpu: '近三年，中配',
+    system: '10, 11',
+    gpu: 'GTX 1070 Laptop'
+  }
+}
+
+const MacAppleSiliconRecommendedSetupList: RecommendedSetupList = {
+  title: 'Mac (Apple Silicon)',
+  items: {
+    memory: 8,
+    cpu: 'Apple M1 Pro',
+    system: '13, 14',
+    gpu: 'Apple M3 Max'
+  }
+}
 
 const indexFunctions: SiteFunction[] = [
   {
@@ -115,6 +277,149 @@ onMounted(() => {
   initUser();
 })
 </script>
+
+<style lang="less" scoped>
+.term-title {
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .term-name {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+
+    > img {
+      object-fit: fill;
+      width: 80px;
+      height: 80px;
+      border-radius: 10px;
+    }
+
+    .right {
+      .main {
+        font-size: 40px;
+        font-weight: bold;
+
+        small {
+          font-size: 25px;
+          font-weight: 500;
+        }
+      }
+
+      .sub {
+        font-size: 20px;
+      }
+    }
+  }
+}
+
+.index-term-information {
+  .badges {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .badge {
+      border-radius: 10px;
+      padding: 5px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+
+      svg {
+        height: 20px;
+      }
+
+      &.preset--forge {
+        background: #1e2d41;
+        color: white;
+      }
+
+      &.preset--online {
+        background: #e8f5e9;
+        color: #4caf50;
+      }
+
+      &.preset--mcje {
+        gap: 8px;
+        border: 1px solid rgba(0, 0, 0, .2);
+      }
+    }
+  }
+}
+
+.term-versions {
+  display: flex;
+  align-items: stretch;
+  gap: 30px;
+
+  .term-version {
+    width: 33.33%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: 100px;
+
+    .number {
+      font-size: 30px;
+      text-align: center;
+      border: 1.5px solid rgba(0, 0, 0, .1);
+      padding: 10px;
+      line-height: 1;
+      border-radius: 10px;
+    }
+
+    .icon {
+      height: 80%;
+      text-align: center;
+
+      svg {
+        height: 100%;
+        width: 80%;
+      }
+    }
+  }
+}
+
+.term-conditions {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+
+  .condition {
+    width: 33.33%;
+    border: 1px solid rgba(0, 0, 0, .2);
+    padding: 16px;
+    border-radius: 10px;
+
+    .title {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 16px;
+    }
+
+    .row {
+      display: flex;
+      align-items: flex-start;
+      gap: 32px;
+
+      .col1 .col1-row, .col2 .col2-row {
+        height: 30px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .col1 .col1-row {
+        font-weight: bold;
+      }
+    }
+  }
+}
+</style>
 
 <style lang="less" scoped>
 .index-title {
