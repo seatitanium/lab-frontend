@@ -8,7 +8,16 @@ export default defineNuxtConfig({
     vite: {
         plugins: [
             svgLoader()
-        ]
+        ],
+      vue: {
+            template: {
+                compilerOptions: {
+                    isCustomElement: (tag) => {
+                        return ['slim'].includes(tag)
+                    }
+                }
+            }
+      }
     },
     nitro: {
         devProxy: {
@@ -17,5 +26,5 @@ export default defineNuxtConfig({
                 changeOrigin: true
             }
         }
-    }
+    },
 });
