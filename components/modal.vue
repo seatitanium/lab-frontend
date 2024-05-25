@@ -6,7 +6,7 @@
       </div>
     </Transition>
     <Transition name="overlay-trans">
-      <div v-if="model" class="modal-overlay">
+      <div v-if="model" class="modal-overlay" @click="model = !allowEsc">
         <slot name="overlay"/>
       </div>
     </Transition>
@@ -73,6 +73,38 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
   0% {
     background-color: rgba(0, 0, 0, 0);
     backdrop-filter: blur(0);
+  }
+}
+
+.describe .modal {
+
+  max-width: 450px;
+
+  .modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    svg, img {
+      height: 150px;
+      width: auto;
+      margin: 16px 0;
+      max-width: 70%;
+    }
+
+    h2 {
+      font-size: 28px;
+      text-align: center;
+    }
+
+    p {
+      text-align: center;
+      margin: 8px 0;
+    }
+  }
+
+  .modal-actions {
+    justify-content: center;
   }
 }
 
