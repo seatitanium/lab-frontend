@@ -42,6 +42,7 @@ function handleClick() {
   border: none;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: .65rem;
   padding: 12px 25px;
   font-size: 15px;
