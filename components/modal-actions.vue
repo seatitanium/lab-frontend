@@ -10,6 +10,7 @@
   align-items: center;
   gap: 15px;
   padding-top: 32px;
+  z-index: 100;
 
   &.right {
     justify-content: flex-end;
