@@ -71,6 +71,10 @@ function handleClick() {
     color: @primaryt;
   }
 
+  &.with-border {
+    border: 1px solid rgba(0, 0, 0, .21);
+  }
+
   &.without-bg--primary {
     background-color: transparent;
     color: @primaryt;
