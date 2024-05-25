@@ -15,6 +15,10 @@
   overflow: hidden;
   z-index: 10;
 
+  &.equalp {
+    padding: 32px;
+  }
+
   &[class*="with-bg"] {
     border: none;
   }
