@@ -4,129 +4,152 @@
       <h1>欢迎，{{ user.nickname || user.username }}</h1>
       <p>选择下列功能之一，单击以跳转到相关页面以进行操作。这些功能在不断的更新中。</p>
     </div>
-    <div class="index-functions">
-      <card v-for="x in indexFunctions" @click="handleSiteFunctionClick(x)">
-        <card-title>{{ x.title }}</card-title>
-        <card-content>
-          <p>{{ x.description }}</p>
-        </card-content>
-        <card-bg-icon>
-          <icon :path="x.icon"/>
-        </card-bg-icon>
-        <card-right-top>
-          v{{ x.version }}
-        </card-right-top>
-      </card>
-    </div>
-    <div class="index-term-description">
-    </div>
-    <div class="index-term-information">
-      <card>
-        <card-right-top>
-          <div class="badges">
-            <div class="badge preset--forge">Forge</div>
-            <div class="badge preset--online">正版验证
-              <icon :path="mdiCheck"/>
-            </div>
-            <div class="badge preset--mcje">
-              <DukeWaving/>
-              Java 版
-            </div>
-          </div>
-        </card-right-top>
-        <card-title>当前周目</card-title>
-        <card-content>
-          <div class="term-title">
-            <div class="term-name">
-              <img src="~/assets/images/term-logo.png"/>
-              <div class="right">
-                <div class="main">All the Mods 9 <small>ATM9</small></div>
-                <div class="sub">整合包 / 2022 / ATMTeam</div>
+    <section>
+      <div class="index-functions">
+        <card class="equalp" v-for="x in indexFunctions" @click="handleSiteFunctionClick(x)">
+          <card-title>{{ x.title }}</card-title>
+          <card-content>
+            <p>{{ x.description }}</p>
+          </card-content>
+          <card-bg-icon>
+            <icon :path="x.icon"/>
+          </card-bg-icon>
+          <card-right-top>
+            v{{ x.version }}
+          </card-right-top>
+        </card>
+      </div>
+    </section>
+    <section>
+      <div class="index-term-information">
+        <card class="equalp">
+          <card-right-top>
+            <div class="badges">
+              <div class="badge preset--online" @click="descOnlineModal = true">正版验证
+                <icon :path="mdiCheck"/>
+              </div>
+              <div class="badge preset--mcje" @click="descJavaModal = true">
+                <DukeWaving/>
+                Java 版
               </div>
             </div>
-          </div>
-          <h2>简介</h2>
-          <div class="term-description">
-            <p>ATM9 has over 400 mods and countless quests and a built in proper endgame. Can you craft the ATM Star? Do
-              you dare take on the Gregstar?</p>
-            <p>All the Mods started out as a private pack for just a few friends of mine that turned into something
-              others wanted to play! It has all the basics that most other "big name" packs include but with a nice mix
-              of some of newer or lesser-known mods as well.
-            </p>
-            <p>In All the Mods 9 we will continue the tradition adding many new mods while going for more stability.</p>
-            <p> Does "All the Mods" really contain ALL THE MODS? No, of course not.</p>
-          </div>
-          <h2>版本与配置</h2>
-          <div class="term-versions">
-            <div class="term-version">
-              <div class="icon">
-                <MCJELogoFull/>
-              </div>
-              <div class="number">
-                1.20.1
-              </div>
+          </card-right-top>
+          <card-content>
+            <div class="left">
+              <img src="~/assets/images/terms/st13.png"/>
             </div>
-            <div class="term-version">
-              <div class="icon">
-                <ForgeLogoFull/>
+            <div class="right">
+              <div class="term-title">
+                <div class="main">当前周目<img src="~/assets/images/terms/st13.png"/></div>
+                <div class="sub">
+                  <icon :path="mdiCardsPlaying"/>
+                  进行中 · {{ termTimeDelta }}
+                </div>
               </div>
-              <div class="number">
-                40.0.12
-              </div>
-            </div>
-            <div class="term-version">
-              <div class="icon" style="transform: translateY(-10px)">
-                <JavaLogoHorizontal/>
-              </div>
-              <div class="number">
-                21
-              </div>
-            </div>
-          </div>
-
-          <div class="term-conditions">
-            <div class="condition" v-for="x in [WindowsPCRecommendedSetupList, WindowsLaptopRecommendedSetupList, MacAppleSiliconRecommendedSetupList]">
-              <div class="title">{{ x.title }}</div>
-              <div class="row">
-                <div class="col1">
-                  <div class="col1-row">
+              <div class="term-information">
+                <ul>
+                  <li>
+                    <icon :path="mdiMinecraft"/>
+                    Minecraft
+                    <slim>Java 1.20.1</slim>
+                  </li>
+                  <li>
+                    <icon :path="mdiAnvil"/>
+                    Forge
+                    <slim>24.9.2</slim>
+                  </li>
+                  <li>
                     <icon :path="mdiMemory"/>
-                    分配 RAM
-                  </div>
-                  <div class="col1-row">
-                    <icon :path="mdiCubeOutline"/>
-                    CPU
-                  </div>
-                  <div class="col1-row">
-                    <icon :path="mdiMonitor"/>
-                    光影显示卡
-                  </div>
-                  <div class="col1-row">
-                    <icon :path="x.title.includes('Mac') ? mdiApple : mdiMicrosoft"/>
-                    操作系统
-                  </div>
-                </div>
-                <div class="col2">
-                  <div class="col2-row">
-                    {{ x.items.memory }} GiB
-                  </div>
-                  <div class="col2-row">
-                    {{ x.items.cpu }}
-                  </div>
-                  <div class="col2-row">
-                    {{ x.items.gpu || 'N/A'}}
-                  </div>
-                  <div class="col2-row">
-                    {{ x.items.system || 'N/A'}}
-                  </div>
+                    分配内存
+                    <slim>8GiB 或以上</slim>
+                  </li>
+                  <li>
+                    <icon :path="mdiLanguageJava"/>
+                    Java
+                    <slim>21 或以上</slim>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </card-content>
+        </card>
+      </div>
+    </section>
+    <section>
+      <div class="index-pack-information">
+        <card class="equalp">
+          <card-right-top>
+            <div class="badges">
+              <div class="badge preset--forge" @click="descForgeModal = true">Forge</div>
+            </div>
+          </card-right-top>
+          <card-content>
+            <div class="pack-title">
+              <div class="pack-name">
+                <img class="pack-logo" src="../assets/images/pack-logo.png"/>
+                <div class="right">
+                  <div class="main">All the Mods 9 <small>ATM9</small></div>
+                  <div class="sub">整合包 / 2022 / ATMTeam</div>
                 </div>
               </div>
             </div>
-          </div>
-        </card-content>
-      </card>
-    </div>
+            <div class="pack-description">
+              <p>ATM9 has over 400 mods and countless quests and a built in proper endgame. Can you craft the ATM Star?
+                Do
+                you dare take on the Gregstar?</p>
+              <p>All the Mods started out as a private pack for just a few friends of mine that turned into something
+                others wanted to play! It has all the basics that most other "big name" packs include but with a nice
+                mix
+                of some of newer or lesser-known mods as well.
+              </p>
+              <p>In All the Mods 9 we will continue the tradition adding many new mods while going for more
+                stability.</p>
+              <p> Does "All the Mods" really contain ALL THE MODS? No, of course not.</p>
+            </div>
+          </card-content>
+          <modal-actions style="position: absolute;bottom: 32px; right: 32px;" class="nopadding absolute">
+            <btn class="without-bg--primary hover--dim">在 CurseForge 上了解更多
+              <icon :path="mdiLaunch"/>
+            </btn>
+          </modal-actions>
+        </card>
+      </div>
+    </section>
   </div>
+  <modal v-model="descForgeModal" class="with-bg--darken describe">
+    <modal-content>
+      <ForgeLogoFull/>
+      <h2>此整合包使用 Forge 作为加载器</h2>
+      <p>Minecraft 模组具有多种加载器，如 Forge、Fabric 和
+        Quilt，不同的加载器之间的模组一般不互通，除非作者专门制作相应版本。</p>
+      <p>此整合包使用的是 Forge 加载器。</p>
+    </modal-content>
+    <modal-actions>
+      <btn class="with-bg--primary hover--dim" @click="descForgeModal = false">确定</btn>
+    </modal-actions>
+  </modal>
+  <modal v-model="descJavaModal" class="with-bg--darken describe">
+    <modal-content>
+      <DukeWaving/>
+      <h2>支持 Minecraft Java 版</h2>
+      <p>Java 版是众多 Minecraft 版本之一，也是较为流行的版本，有别于基岩版、网易版等。本周目服务器支持 Java 版进入。</p>
+    </modal-content>
+    <modal-actions>
+      <btn class="with-bg--primary hover--dim" @click="descJavaModal = false">确定</btn>
+    </modal-actions>
+  </modal>
+  <modal v-model="descOnlineModal" class="with-bg--darken describe">
+    <modal-content>
+      <icon color="#4caf50" :path="mdiCheckAll"/>
+      <h2>正版验证开启</h2>
+      <p>服务器已经开启了正版验证，以保障玩家权利和质量。</p>
+      <p>这代表着在进入服务器之前，你的客户端将自动连接至 MOJANG 的服务器来检查你的账号是否为正版。</p>
+    </modal-content>
+    <modal-actions>
+      <btn class="with-bg--primary hover--dim" @click="descOnlineModal = false">确定</btn>
+      <btn class="without-bg--primary hover--dim" href="https://www.minecraft.net/">购买正版</btn>
+    </modal-actions>
+  </modal>
   <modal v-model="someProblemModal" :allow-esc="false" class="with-bg--blurred with-bg--darken">
     <modal-title>
       出现了一些问题
@@ -155,20 +178,21 @@ import getUsername from "~/utils/getUsername";
 import {BackendCodes} from "~/consts";
 import type {Ref} from "vue";
 import {
-  mdiAbacus, mdiApple,
-  mdiBook,
-  mdiCheck,
+  mdiAbacus, mdiAnvil, mdiApple,
+  mdiBook, mdiCardsPlaying,
+  mdiCheck, mdiCheckAll,
   mdiCpu64Bit,
-  mdiCubeOutline,
+  mdiCubeOutline, mdiDownload, mdiLanguageJava, mdiLaunch,
   mdiMemory, mdiMicrosoft,
-  mdiMicrosoftWindows,
-  mdiMonitor,
+  mdiMicrosoftWindows, mdiMinecraft,
+  mdiMonitor, mdiPlayCircle, mdiPlayCircleOutline,
   mdiServer
 } from "@mdi/js";
 import ForgeLogoFull from '~/assets/icons/forge-logo-full.svg'
 import MCJELogoFull from '~/assets/icons/mcje-full.svg'
 import DukeWaving from '~/assets/icons/duke-waving.svg'
 import JavaLogoHorizontal from '~/assets/icons/java-horizontal.svg'
+import getDateMessageFrom from "~/utils/getDateMessageFrom";
 
 interface SiteFunction {
   title: string,
@@ -177,16 +201,6 @@ interface SiteFunction {
   model?: Ref<boolean>,
   href?: string,
   version: string
-}
-
-interface RecommendedSetupList {
-  title: string,
-  items: {
-    memory: string | number,
-    cpu: string,
-    gpu?: string,
-    system?: string
-  }
 }
 
 let user = reactive<User>({
@@ -198,36 +212,6 @@ let user = reactive<User>({
   createdAt: 0,
   updatedAt: 0
 });
-
-const WindowsPCRecommendedSetupList: RecommendedSetupList = {
-  title: 'Windows 台式机',
-  items: {
-    memory: 8,
-    cpu: '近三年，中配',
-    system: '10, 11',
-    gpu: 'GTX 1060'
-  }
-}
-
-const WindowsLaptopRecommendedSetupList: RecommendedSetupList = {
-  title: 'Windows 笔记本',
-  items: {
-    memory: 8,
-    cpu: '近三年，中配',
-    system: '10, 11',
-    gpu: 'GTX 1070 Laptop'
-  }
-}
-
-const MacAppleSiliconRecommendedSetupList: RecommendedSetupList = {
-  title: 'Mac (Apple Silicon)',
-  items: {
-    memory: 8,
-    cpu: 'Apple M1 Pro',
-    system: '13, 14',
-    gpu: 'Apple M3 Max'
-  }
-}
 
 const indexFunctions: SiteFunction[] = [
   {
@@ -260,8 +244,14 @@ function handleSiteFunctionClick(func: SiteFunction) {
 
 const username = getUsername();
 const someProblemModal = ref(false);
+const descForgeModal = ref(false);
+const descOnlineModal = ref(false);
+const descJavaModal = ref(false);
 const errorInformationPopup = ref(false);
 const errorInformationContent = ref('');
+
+const termBgn = '2024-05-01';
+const termTimeDelta = ref(getDateMessageFrom(new Date(termBgn)));
 
 async function initUser() {
   const userResult = await get<UserResp>(`/api/user/profile/${username.value}`);
@@ -275,17 +265,97 @@ async function initUser() {
 
 onMounted(() => {
   initUser();
+
+  setInterval(() => {
+    termTimeDelta.value = getDateMessageFrom(new Date(termBgn));
+  }, 1000)
 })
 </script>
 
 <style lang="less" scoped>
-.term-title {
 
+section {
+  padding: 16px 0;
+
+  &:nth-of-type(1) {
+    padding-top: 0;
+  }
+
+  &:last-of-type {
+    padding-bottom: 0;
+  }
+}
+
+.index-term-information {
+  .card-content-container {
+    display: flex;
+    gap: 32px;
+  }
+
+  .left {
+    width: 30%;
+
+    img {
+      width: 100%;
+      border-radius: 20px;
+    }
+  }
+
+  .right {
+    width: 70%;
+
+    .term-information {
+      padding: 16px 0;
+
+      ul {
+        padding: 0;
+
+        li {
+          list-style: none;
+          font-size: 32px;
+          line-height: 1.8;
+          display: flex;
+          align-items: center;
+          gap: 16px;
+
+          svg {
+            height: 30px;
+            width: 30px;
+          }
+        }
+      }
+    }
+
+    .term-title {
+      .sub {
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .main {
+        font-size: 40px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: bold;
+
+        img {
+          height: 45px;
+          border-radius: 10px;
+        }
+      }
+    }
+  }
+}
+
+.pack-title {
   display: flex;
   flex-direction: column;
   gap: 16px;
 
-  .term-name {
+  .pack-name {
     display: flex;
     gap: 16px;
     align-items: center;
@@ -301,6 +371,8 @@ onMounted(() => {
       .main {
         font-size: 40px;
         font-weight: bold;
+        line-height: 1.2;
+        margin-bottom: 10px;
 
         small {
           font-size: 25px;
@@ -310,114 +382,53 @@ onMounted(() => {
 
       .sub {
         font-size: 20px;
+        line-height: 1;
       }
     }
   }
-}
 
-.index-term-information {
-  .badges {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-
-    .badge {
-      border-radius: 10px;
-      padding: 5px 10px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-
-      svg {
-        height: 20px;
-      }
-
-      &.preset--forge {
-        background: #1e2d41;
-        color: white;
-      }
-
-      &.preset--online {
-        background: #e8f5e9;
-        color: #4caf50;
-      }
-
-      &.preset--mcje {
-        gap: 8px;
-        border: 1px solid rgba(0, 0, 0, .2);
-      }
-    }
+  .pack-logo {
+    box-shadow: 0 3px 0 rgba(0, 0, 0, .1);
   }
 }
 
-.term-versions {
-  display: flex;
-  align-items: stretch;
-  gap: 30px;
-
-  .term-version {
-    width: 33.33%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    max-height: 100px;
-
-    .number {
-      font-size: 30px;
-      text-align: center;
-      border: 1.5px solid rgba(0, 0, 0, .1);
-      padding: 10px;
-      line-height: 1;
-      border-radius: 10px;
-    }
-
-    .icon {
-      height: 80%;
-      text-align: center;
-
-      svg {
-        height: 100%;
-        width: 80%;
-      }
-    }
-  }
-}
-
-.term-conditions {
+.badges {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 16px;
 
-  .condition {
-    width: 33.33%;
-    border: 1px solid rgba(0, 0, 0, .2);
-    padding: 16px;
+  .badge {
     border-radius: 10px;
+    padding: 5px 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
 
-    .title {
-      font-size: 22px;
-      font-weight: bold;
-      margin-bottom: 16px;
+    svg {
+      height: 20px;
     }
 
-    .row {
-      display: flex;
-      align-items: flex-start;
-      gap: 32px;
+    &.preset--forge {
+      background: #1e2d41;
+      color: white;
+    }
 
-      .col1 .col1-row, .col2 .col2-row {
-        height: 30px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
+    &.preset--online {
+      background: #e8f5e9;
+      color: #4caf50;
+    }
 
-      .col1 .col1-row {
-        font-weight: bold;
-      }
+    &.preset--mcje {
+      gap: 8px;
+      border: 1px solid rgba(0, 0, 0, .2);
     }
   }
+}
+
+
+.pack-description {
+  padding: 16px 0;
 }
 </style>
 
@@ -438,7 +449,7 @@ onMounted(() => {
 .index-functions {
   display: flex;
   align-items: stretch;
-  gap: 16px;
+  gap: 32px;
 
   > * {
     cursor: pointer;
