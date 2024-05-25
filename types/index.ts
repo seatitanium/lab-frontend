@@ -10,6 +10,8 @@ declare global {
 
     type UserResp = Resp<User>
 
+    type Dict<T> = {[prop: string]: T}
+
     interface Resp<T> {
         code: number,
         msg: string,
