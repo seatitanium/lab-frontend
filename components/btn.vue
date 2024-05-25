@@ -1,7 +1,7 @@
 <template>
-  <button @click="handleClick" :class="{loading, disabled}" class="btn">
+  <button @click="handleClick" :class="{loading, disabled, small}" class="btn">
     <slot v-if="!loading"/>
-    <circle-spinner size="20px" v-else/>
+    <circle-spinner :size="`${small ? 10 : 20}px`" v-else/>
   </button>
 </template>
 
@@ -20,6 +20,10 @@ const props = defineProps({
     default: false
   },
   disabled: {
+    type: Boolean,
+    default: false
+  },
+  small: {
     type: Boolean,
     default: false
   }
@@ -50,6 +54,16 @@ function handleClick() {
   transition: all .2s ease;
   min-width: 80px;
   .font-family--default;
+
+  &.small {
+    padding: 6px 16px;
+    font-size: 12px;
+    gap: 2px;
+
+    svg {
+      height: 15px;
+    }
+  }
 
   &.loading {
     justify-content: center;
