@@ -19,6 +19,14 @@
     padding: 32px;
   }
 
+  &.narrow {
+    padding: 16px;
+  }
+
+  &.without-border {
+    border: none;
+  }
+
   &[class*="with-bg"] {
     border: none;
   }
