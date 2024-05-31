@@ -80,6 +80,15 @@ function handleClick() {
     }
   }
 
+  &.medium {
+    padding: 8px 16px;
+    font-size: 14px;
+
+    &:not(.icon) svg {
+      width: 20px;
+    }
+  }
+
   &.small {
     padding: 2px 10px;
     font-size: 12px;
@@ -108,6 +117,11 @@ function handleClick() {
   &.with-bg--primary {
     background-color: @primaryll;
     color: @primaryt;
+  }
+
+  &.with-bg--primaryDark {
+    background-color: #009688;
+    color: white;
   }
 
   &.with-border {
