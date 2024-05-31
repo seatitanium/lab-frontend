@@ -66,3 +66,17 @@ slim {
 .nopadding {
   padding: 0 !important;
 }
+
+[class^='page-'] {
+  section {
+    padding: 16px 0;
+
+    &:nth-of-type(1) {
+      padding-top: 0;
+    }
+
+    &:last-of-type {
+      padding-bottom: 0;
+    }
+  }
+}

@@ -278,18 +278,6 @@ onMounted(() => {
   padding: 32px 0;
 }
 
-section {
-  padding: 16px 0;
-
-  &:nth-of-type(1) {
-    padding-top: 0;
-  }
-
-  &:last-of-type {
-    padding-bottom: 0;
-  }
-}
-
 .index-term-information {
   .card-content-container {
     display: flex;
