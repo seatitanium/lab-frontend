@@ -36,7 +36,7 @@
           </card-right-top>
           <card-content>
             <div class="left">
-              <img src="~/assets/images/terms/st13.png"/>
+              <img src="~/assets/images/2023-07-20_01.08.34.jpg"/>
             </div>
             <div class="right">
               <div class="term-title">
@@ -180,12 +180,12 @@ import type {Ref} from "vue";
 import {
   mdiAbacus, mdiAnvil, mdiApple,
   mdiBook, mdiCardsPlaying,
-  mdiCheck, mdiCheckAll,
+  mdiCheck, mdiCheckAll, mdiClose,
   mdiCpu64Bit,
-  mdiCubeOutline, mdiDownload, mdiLanguageJava, mdiLaunch,
+  mdiCubeOutline, mdiDownload, mdiHelpCircleOutline, mdiInformationOutline, mdiLanguageJava, mdiLaunch,
   mdiMemory, mdiMicrosoft,
   mdiMicrosoftWindows, mdiMinecraft,
-  mdiMonitor, mdiPlayCircle, mdiPlayCircleOutline,
+  mdiMonitor, mdiMore, mdiPlayCircle, mdiPlayCircleOutline,
   mdiServer
 } from "@mdi/js";
 import ForgeLogoFull from '~/assets/icons/forge-logo-full.svg'
@@ -274,6 +274,10 @@ onMounted(() => {
 
 <style lang="less" scoped>
 
+.page-index {
+  padding: 32px 0;
+}
+
 section {
   padding: 16px 0;
 
@@ -297,6 +301,8 @@ section {
 
     img {
       width: 100%;
+      height: 100%;
+      object-fit: cover;
       border-radius: 20px;
     }
   }
@@ -318,7 +324,7 @@ section {
           align-items: center;
           gap: 16px;
 
-          svg {
+          > svg {
             height: 30px;
             width: 30px;
           }
@@ -389,6 +395,7 @@ section {
 
   .pack-logo {
     box-shadow: 0 3px 0 rgba(0, 0, 0, .1);
+    object-fit: cover;
   }
 }
 
@@ -434,7 +441,7 @@ section {
 
 <style lang="less" scoped>
 .index-title {
-  padding: 32px 0;
+  padding-bottom: 32px;
 
   h1 {
     font-size: 40px;
