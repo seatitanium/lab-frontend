@@ -1,5 +1,5 @@
 <template>
-  <button @click="handleClick" :class="{loading, disabled, small}" class="btn">
+  <button @click="handleClick" :class="{loading, disabled, small, icon}" class="btn">
     <slot v-if="!loading"/>
     <circle-spinner :size="`${small ? 10 : 20}px`" v-else/>
   </button>
@@ -24,6 +24,10 @@ const props = defineProps({
     default: false
   },
   small: {
+    type: Boolean,
+    default: false
+  },
+  icon: {
     type: Boolean,
     default: false
   }
@@ -55,13 +59,34 @@ function handleClick() {
   min-width: 80px;
   .font-family--default;
 
-  &.small {
-    padding: 6px 16px;
-    font-size: 12px;
-    gap: 2px;
+  &.icon:not(html) {
+    min-width: unset;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    &.small {
+      width: 30px;
+      height: 30px;
+    }
 
     svg {
-      height: 15px;
+      height: 50%;
+    }
+
+    &.full {
+      svg {
+        height: 100%;
+      }
+    }
+  }
+
+  &.small {
+    padding: 2px 10px;
+    font-size: 12px;
+    gap: 4px;
+
+    &:not(.icon) svg {
+      width: 15px;
     }
   }
 
