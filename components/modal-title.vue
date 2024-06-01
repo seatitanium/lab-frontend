@@ -7,5 +7,6 @@
 <style lang="less">
 h1.modal-title {
   margin: 0;
+  font-size: 28px;
 }
 </style>
