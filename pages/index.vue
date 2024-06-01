@@ -254,7 +254,7 @@ const termBgn = '2024-05-01';
 const termTimeDelta = ref(getDateMessageFrom(new Date(termBgn)));
 
 async function initUser() {
-  const userResult = await get<UserResp>(`/api/user/profile/${username.value}`);
+  const userResult = await get<User>(`/api/user/profile/${username.value}`);
   if (userResult.code !== BackendCodes.OK) {
     someProblemModal.value = true;
     errorInformationContent.value = JSON.stringify(userResult);

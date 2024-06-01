@@ -1,7 +1,7 @@
 import {useLocalStorage} from "@vueuse/core";
 
-export default async function <T>(url: string, body: object): Promise<T> {
-    return await $fetch<T>(url, {
+export default async function <T>(url: string, body: object): Promise<Resp<T>> {
+    return await $fetch<Resp<T>>(url, {
         method: 'post',
         body,
         ignoreResponseError: true,

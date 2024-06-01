@@ -43,7 +43,7 @@ async function login() {
 
   loginLoading.value = true;
 
-  const result = await post<LoginResp>('/api/auth/login', {
+  const result = await post<LoginRes>('/api/auth/login', {
     username: username.value,
     password: password.value
   });
