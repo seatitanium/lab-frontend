@@ -8,6 +8,11 @@
 @import "@/assets/var.less";
 
 .metabar-item {
+  font-size: 14px;
+  svg {
+    height: 16px;
+    width: 16px;
+  }
 
   &, .left, .right, .center {
     display: flex;
@@ -15,7 +20,7 @@
   }
 
   .left {
-    gap: 8px;
+    gap: 4px;
     font-weight: 500;
     color: @primaryd;
     &::after {
@@ -28,7 +33,7 @@
     gap: 8px;
   }
 
-  gap: 8px;
+  gap: 4px;
   line-height: 1.2;
 }
 </style>

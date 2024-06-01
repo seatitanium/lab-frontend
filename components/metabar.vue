@@ -8,6 +8,6 @@
 .metabar {
   display: flex;
   flex-direction: row;
-  gap: 16px;
+  gap: 14px;
 }
 </style>
