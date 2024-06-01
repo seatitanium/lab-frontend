@@ -69,7 +69,7 @@ slim {
 
 [class^='page-'] {
   section {
-    padding: 16px 0;
+    padding: 8px 0;
 
     &:nth-of-type(1) {
       padding-top: 0;
@@ -77,6 +77,44 @@ slim {
 
     &:last-of-type {
       padding-bottom: 0;
+    }
+  }
+}
+
+
+.badges {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  .badge {
+    border-radius: 10px;
+    padding: 5px 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+
+    svg {
+      height: 20px;
+    }
+
+    img {
+      height: 20px;
+      width: 20px;
+    }
+
+    background: white;
+    border: 1px solid rgba(0, 0, 0, .2);
+
+    &.preset--forge {
+      background: #1e2d41;
+      color: white;
+    }
+
+    &.preset--online {
+      background: #e8f5e9;
+      color: #4caf50;
     }
   }
 }

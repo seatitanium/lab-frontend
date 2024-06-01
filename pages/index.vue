@@ -387,40 +387,6 @@ onMounted(() => {
   }
 }
 
-.badges {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-
-  .badge {
-    border-radius: 10px;
-    padding: 5px 10px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
-
-    svg {
-      height: 20px;
-    }
-
-    &.preset--forge {
-      background: #1e2d41;
-      color: white;
-    }
-
-    &.preset--online {
-      background: #e8f5e9;
-      color: #4caf50;
-    }
-
-    &.preset--mcje {
-      gap: 8px;
-      border: 1px solid rgba(0, 0, 0, .2);
-    }
-  }
-}
-
 
 .pack-description {
   padding: 16px 0;
