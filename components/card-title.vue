@@ -1,13 +1,13 @@
 <template>
-  <h1 class="card-title">
+  <h2 class="card-title">
     <slot/>
-  </h1>
+  </h2>
 </template>
 
 <style lang="less">
 @import "@/assets/var";
 
-h1.card-title {
+h2.card-title {
   font-size: 32px;
   display: flex;
   align-items: center;
@@ -19,17 +19,6 @@ h1.card-title {
   svg {
     width: 32px;
     height: 32px;
-  }
-
-  &.display {
-    font-size: 18px;
-    font-weight: 500;
-    color: @primaryd;
-
-    svg {
-      width: 20px;
-      height: 20px;
-    }
   }
 }
 </style>
