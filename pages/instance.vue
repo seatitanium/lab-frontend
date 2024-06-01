@@ -27,19 +27,19 @@
     <section class="section__inst_control">
       <card class="narrow without-border">
         <card-content class="server-actions">
-          <btn class="with-bg--primaryDark hover--dropShadow">
+          <btn class="with-bg--primaryDark hover--dropShadow" @click="actionToConfirm = 'start'; modalConfirm = true;">
             <icon :path="mdiCreationOutline"/>
             开启服务器
           </btn>
-          <btn class="with-bg--white hover--dim">
+          <btn class="with-bg--white hover--dim" @click="actionToConfirm = 'reboot'; modalConfirm = true;">
             <icon :path="mdiRestart"/>
             重启
           </btn>
-          <btn class="with-bg--white hover--dim">
+          <btn class="with-bg--white hover--dim" @click="actionToConfirm = 'stop'; modalConfirm = true;">
             <icon :path="mdiClose"/>
             关机
           </btn>
-          <btn class="with-bg--white hover--dim">
+          <btn class="with-bg--white hover--dim" @click="actionToConfirm = 'stop_force'; modalConfirm = true;">
             <icon :path="mdiCloseOctagonOutline"/>
             强制停机
           </btn>
@@ -131,15 +131,15 @@
         </card-content>
         <card-right-top>
           <div class="badges">
-            <div class="badge">
+            <div class="badge" @click="modalDebianDesc = true">
               <DebianLogo/>
               Debian 12
             </div>
-            <div class="badge">
+            <div class="badge" @click="modalJavaDesc = true">
               <DukeWaving/>
               OpenJDK 17 JRE
             </div>
-            <div class="badge">
+            <div class="badge" @click="modalCpuDesc = true">
               <img draggable="false" src="~/assets/icons/intel-xeon.png"/>
               Platinum 6462C
             </div>
@@ -148,6 +148,47 @@
       </card>
     </section>
   </div>
+  <modal v-model="modalDebianDesc" class="with-bg--darken describe">
+    <modal-content>
+      <DebianLogo/>
+      <h1>Debian 12</h1>
+      <p>服务器采用 Debian 12 操作系统</p>
+    </modal-content>
+    <modal-actions>
+      <btn class="with-bg--primary hover--dim" @click="modalDebianDesc = false">确定</btn>
+    </modal-actions>
+  </modal>
+  <modal v-model="modalJavaDesc" class="with-bg--darken describe">
+    <modal-content>
+      <DukeWaving/>
+      <h1>OpenJDK 17 JRE</h1>
+      <p>服务器通过 OpenJDK 17 JRE 来运行 Minecraft 服务端</p>
+    </modal-content>
+    <modal-actions>
+      <btn class="with-bg--primary hover--dim" @click="modalJavaDesc = false">确定</btn>
+    </modal-actions>
+  </modal>
+  <modal v-model="modalCpuDesc" class="with-bg--darken describe">
+    <modal-content>
+      <img src="~/assets/icons/intel-xeon.png"/>
+      <h1>Intel Xeon&reg; Platinum</h1>
+      <p>服务器采用英特尔至强处理器（型号为 Intel Xeon Platinum 6462C）作为 CPU 运载 Minecraft 服务端</p>
+    </modal-content>
+    <modal-actions>
+      <btn class="with-bg--primary hover--dim" @click="modalCpuDesc = false">确定</btn>
+    </modal-actions>
+  </modal>
+  <modal v-model="modalConfirm" class="with-bg--darken">
+    <modal-title>确认操作</modal-title>
+    <modal-content>
+      <p>确定要<strong>{{ getActionName() }}</strong>服务器吗？</p>
+      <p v-if="actionToConfirm === 'stop_force'">强制关闭服务器将忽略服务器目前的状态，直接执行断电操作，存在数据丢失的风险。单击确定之前，请确保已经做好数据备份工作。</p>
+    </modal-content>
+    <modal-actions class="right">
+      <btn class="with-bg--primary hover--dim" @click="confirmAction()">确定</btn>
+      <btn class="without-bg--primary hover--dim" @click="modalConfirm = false">取消</btn>
+    </modal-actions>
+  </modal>
 </template>
 <script setup lang="ts">
 import {
@@ -186,6 +227,8 @@ interface Message {
   time: string
 }
 
+type InstanceAction = 'start' | 'reboot' | 'stop' | 'stop_force';
+
 let instantMessages = ref<Message[]>([])
 const instantMessageString = ref('');
 const instantMessageToSend = ref('');
@@ -205,6 +248,27 @@ const instanceInformation = reactive<DescribeInstanceRes>({
   }
 });
 const isInstanceExist = computed(() => instanceInformation.retrieved.exist)
+const modalDebianDesc = ref(false);
+const modalJavaDesc = ref(false);
+const modalCpuDesc = ref(false);
+const modalConfirm = ref(false);
+const actionToConfirm = ref<OrEmpty<InstanceAction>>('')
+
+function getActionName() {
+  return {
+    'start': '启动',
+    'reboot': '重启',
+    'stop': '关闭',
+    'stop_force': '强制关闭',
+    '': '??'
+  }[actionToConfirm.value];
+}
+
+function confirmAction() {
+  switch (actionToConfirm.value) {
+
+  }
+}
 
 onMounted(async () => {
   username.value = getUsername().value;

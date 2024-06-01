@@ -410,7 +410,7 @@ onMounted(() => {
 .index-functions {
   display: flex;
   align-items: stretch;
-  gap: 32px;
+  gap: 16px;
 
   > * {
     cursor: pointer;
