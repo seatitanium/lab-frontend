@@ -18,4 +18,11 @@
     right: 32px;
   }
 }
+
+.narrow {
+  .card-right-top {
+    top: 16px;
+    right: 16px;
+  }
+}
 </style>
