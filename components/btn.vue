@@ -128,6 +128,15 @@ function handleClick() {
     border: 1px solid rgba(0, 0, 0, .21);
   }
 
+  &.with-bg--white {
+    background: white;
+    color: @primaryt;
+
+    &.hover--dim:hover {
+      background-color: rgba(244, 244, 244);
+    }
+  }
+
   &.without-bg--primary {
     background-color: transparent;
     color: @primaryt;
