@@ -107,6 +107,7 @@ function handleClick() {
     background-color: #f5f5f5 !important;
     cursor: not-allowed;
     color: #757575 !important;
+    pointer-events: none;
 
     &.hover--dim:hover {
       background-color: #f5f5f5 !important;

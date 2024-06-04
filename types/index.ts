@@ -42,4 +42,12 @@ declare global {
             status: OrEmpty<InstanceStatus>
         }
     }
+
+    interface GetLastInvokeRes {
+        status: 'Pending' | 'Running' | 'Success',
+        content: string,
+        errorInfo: string,
+        startTime: string,
+        finishedTime: string
+    }
 }

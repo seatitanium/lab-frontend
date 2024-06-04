@@ -27,19 +27,23 @@
     <section class="section__inst_control">
       <card class="narrow without-border">
         <card-content class="server-actions">
-          <btn class="with-bg--primaryDark hover--dropShadow" @click="actionToConfirm = 'start'; modalConfirm = true;">
+          <btn class="with-bg--primaryDark hover--dropShadow"
+               @click="actionToConfirm = isInstanceExist ? 'start' : 'create'; modalConfirm = true;">
             <icon :path="mdiCreationOutline"/>
-            开启服务器
+            {{ isInstanceExist ? '开启' : '创建并开启' }}
           </btn>
-          <btn class="with-bg--white hover--dim" @click="actionToConfirm = 'reboot'; modalConfirm = true;">
+          <btn :class="{disabled: !isInstanceExist}" class="with-bg--white hover--dim"
+               @click="actionToConfirm = 'reboot'; modalConfirm = true;">
             <icon :path="mdiRestart"/>
             重启
           </btn>
-          <btn class="with-bg--white hover--dim" @click="actionToConfirm = 'stop'; modalConfirm = true;">
+          <btn :class="{disabled: !isInstanceExist}" class="with-bg--white hover--dim"
+               @click="actionToConfirm = 'stop'; modalConfirm = true;">
             <icon :path="mdiClose"/>
             关机
           </btn>
-          <btn class="with-bg--white hover--dim" @click="actionToConfirm = 'stop_force'; modalConfirm = true;">
+          <btn :class="{disabled: !isInstanceExist}" class="with-bg--white hover--dim"
+               @click="actionToConfirm = 'stop_force'; modalConfirm = true;">
             <icon :path="mdiCloseOctagonOutline"/>
             强制停机
           </btn>
@@ -94,18 +98,21 @@
           实例信息
         </card-label>
         <card-content>
-          <h2 class="value">{{ instanceInformation.local.instance_id }}
-            <btn class="small with-border without-bg--primary">单击复制
+          <h2 class="value">
+            {{
+              isInstanceExist ? instanceInformation.local.instance_id : '暂未创建'
+            }}
+            <btn v-if="isInstanceExist" class="small with-border without-bg--primary">单击复制
               <icon :path="mdiClipboardTextOutline"/>
             </btn>
           </h2>
-          <metabar>
+          <metabar v-if="isInstanceExist">
             <metabar-item>
               <span class="left">
                 <icon :path="mdiClockPlusOutline"/>创建时间
               </span>
               <span class="right">
-                {{ instanceInformation.retrieved.creation_time }}
+                {{ formatTimeString(instanceInformation.retrieved.creation_time) }}
               </span>
             </metabar-item>
             <metabar-item>
@@ -125,12 +132,17 @@
               </span>
             </metabar-item>
           </metabar>
-          <div class="screenfetch-result">
+          <div class="screenfetch-result" v-if="isInstanceExist">
             <div class="screenfetch-result-content" v-text="screenfetchResult"/>
+          </div>
+          <div class="instance-not-exist" v-else>
+            <p>
+              暂时没有活跃的实例，因此没有相关的信息可供显示。要创建并启动一个实例，请单击控制栏的「<strong>创建并启动</strong>」按钮。
+            </p>
           </div>
         </card-content>
         <card-right-top>
-          <div class="badges">
+          <div class="badges" v-if="isInstanceExist">
             <div class="badge" @click="modalDebianDesc = true">
               <DebianLogo/>
               Debian 12
@@ -182,11 +194,34 @@
     <modal-title>确认操作</modal-title>
     <modal-content>
       <p>确定要<strong>{{ getActionName() }}</strong>服务器吗？</p>
-      <p v-if="actionToConfirm === 'stop_force'">强制关闭服务器将忽略服务器目前的状态，直接执行断电操作，存在数据丢失的风险。单击确定之前，请确保已经做好数据备份工作。</p>
+      <p v-if="actionToConfirm === 'stop_force'">
+        强制关闭服务器将忽略服务器目前的状态，直接执行断电操作，存在数据丢失的风险。单击确定之前，请确保已经做好数据备份工作。</p>
     </modal-content>
     <modal-actions class="right">
-      <btn class="with-bg--primary hover--dim" @click="confirmAction()">确定</btn>
+      <btn class="with-bg--primary hover--dim" @click="confirmAction()" :loading="confirmActionLoading" :disabled="confirmActionLoading">确定</btn>
       <btn class="without-bg--primary hover--dim" @click="modalConfirm = false">取消</btn>
+    </modal-actions>
+  </modal>
+  <modal v-model="modalDeploy" class="with-bg--darken equalp">
+    <modal-title>部署结果</modal-title>
+    <modal-content>
+      <p v-if="deployTime > 1">{{deployTime}}s</p>
+      <div class="deploy-results" v-if="isCreatingInstance" v-text="deployResult"/>
+      <p v-else>暂无部署结果。</p>
+    </modal-content>
+    <modal-actions class="right">
+      <btn class="without-bg--primary hover--dim" @click="modalDeploy = false">关闭</btn>
+    </modal-actions>
+  </modal>
+  <modal v-model="modalOK" class="with-bg--darken equalp">
+    <modal-title>成功</modal-title>
+    <modal-content>
+      <p v-if="isCreatingInstance">实例已经创建。实例在正常工作之前，需要经过 2~5 分钟的部署，请耐心等待。</p>
+      <p v-else>你的操作已经成功执行。</p>
+    </modal-content>
+    <modal-actions>
+      <btn class="with-bg--primary hover--dim" @click="modalOK = false">关闭</btn>
+      <btn class="without-bg--primary hover--dim" @click="modalOK = false; modalDeploy = true">查看部署进度</btn>
     </modal-actions>
   </modal>
 </template>
@@ -211,6 +246,8 @@ import {BackendCodes} from "~/consts";
 import DebianLogo from '~/assets/icons/debian.svg';
 import DukeWaving from '~/assets/icons/duke-waving.svg'
 import IntelXeonLogo from '~/assets/icons/intel-xeon.svg'
+import sleep from "~/utils/sleep";
+import formatTimeString from "../utils/formatTimeString";
 
 const onlinePlayers = reactive([
   'Subilan',
@@ -227,13 +264,14 @@ interface Message {
   time: string
 }
 
-type InstanceAction = 'start' | 'reboot' | 'stop' | 'stop_force';
+type InstanceAction = 'start' | 'reboot' | 'stop' | 'stop_force' | 'create';
 
 let instantMessages = ref<Message[]>([])
 const instantMessageString = ref('');
 const instantMessageToSend = ref('');
 const username = ref('')
 const screenfetchResult = ref('')
+const confirmActionLoading = ref(false);
 const instanceInformation = reactive<DescribeInstanceRes>({
   local: {
     instance_id: '',
@@ -248,14 +286,20 @@ const instanceInformation = reactive<DescribeInstanceRes>({
   }
 });
 const isInstanceExist = computed(() => instanceInformation.retrieved.exist)
+const isCreatingInstance = ref(false);
 const modalDebianDesc = ref(false);
 const modalJavaDesc = ref(false);
 const modalCpuDesc = ref(false);
 const modalConfirm = ref(false);
-const actionToConfirm = ref<OrEmpty<InstanceAction>>('')
+const modalDeploy = ref(false);
+const modalOK = ref(false);
+const deployTime = ref(0);
+const deployResult = ref('Waiting for server response...');
+const actionToConfirm = ref<OrEmpty<InstanceAction>>('');
 
 function getActionName() {
   return {
+    'create': '创建并启动',
     'start': '启动',
     'reboot': '重启',
     'stop': '关闭',
@@ -264,29 +308,66 @@ function getActionName() {
   }[actionToConfirm.value];
 }
 
-function confirmAction() {
+async function confirmAction() {
+  confirmActionLoading.value = true;
   switch (actionToConfirm.value) {
-
+    case 'create': {
+      isCreatingInstance.value = true;
+      let result = await get('/api/ecs/create');
+      confirmActionLoading.value = true;
+      if (result.code === BackendCodes.OK) {
+        modalConfirm.value = false;
+        modalOK.value = true;
+        // Just start.
+        startRefreshDeploymentResult().finally();
+      } else {
+        isCreatingInstance.value = false;
+        console.warn(result);
+      }
+      break;
+    }
   }
 }
 
-onMounted(async () => {
-  username.value = getUsername().value;
+async function startRefreshDeploymentResult() {
+  while (true) {
+    const result = await get<GetLastInvokeRes>(`/api/ecs/last-invoke`);
+    if (result.code !== BackendCodes.OK && result.code !== BackendCodes.TargetNotExist) {
+      // TODO: Error Modal
+      console.warn(result);
+      break;
+    }
 
-  const describeInstanceResult = await get<DescribeInstanceRes>('/api/ecs/describe');
+    if (result.code === BackendCodes.TargetNotExist) {
+      deployResult.value = '等待执行中...'
+    } else {
+      deployResult.value = result.data.content;
 
-  if (describeInstanceResult.code === BackendCodes.OK) {
-    Object.assign(instanceInformation, describeInstanceResult.data);
+      if (result.data.status === 'Success') {
+        isCreatingInstance.value = false;
+        break;
+      }
+    }
+
+    deployTime.value++;
+    await sleep(1000);
   }
+}
 
-  instantMessages.value = [{
-    sender: 'Subilan',
-    content: 'wtf',
-    time: '2024-05-30 22:50:39'
-  }]
-  instantMessageString.value = instantMessages.value.map(x => `[${x.time}] ${x.sender}: ${x.content}`).join('\n');
+const describeInstanceResult = await get<DescribeInstanceRes>('/api/ecs/describe');
+if (describeInstanceResult.code === BackendCodes.OK) {
+  Object.assign(instanceInformation, describeInstanceResult.data);
+}
 
-  screenfetchResult.value = `         _,met$$$$$gg.           root@iZwz9c7s2w1jnyokzyz9b7Z
+// Test codes
+instantMessages.value = [{
+  sender: 'Subilan',
+  content: 'wtf',
+  time: '2024-05-30 22:50:39'
+}]
+instantMessageString.value = instantMessages.value.map(x => `[${x.time}] ${x.sender}: ${x.content}`).join('\n');
+
+screenfetchResult.value = `         _,met$$$$$gg.           root@iZwz9c7s2w1jnyokzyz9b7Z
       ,g$$$$$$$$$$$$$$$P.        OS: Debian 12 bookworm
     ,g$$P""       """Y$$.".      Kernel: x86_64 Linux 6.1.0-20-amd64
    ,$$P'              \`$$$.      Packages: 691
@@ -298,13 +379,33 @@ onMounted(async () => {
    Y$$.    \`.\`"Y$$$$P"'
    \`$$b      "-.__
     \`Y$$
-     \`Y$$.
+     \`Y$$.z
        \`$$b.
          \`Y$$b.
             \`"Y$b._
                 \`""""`;
+
+deployResult.value = `         _,met$$$$$gg.           root@iZwz9c7s2w1jnyokzyz`;
+
+onMounted(() => {
+  username.value = getUsername().value;
 })
 </script>
+
+<style lang="less" scoped>
+.deploy-results {
+  white-space: break-spaces;
+  font-variation-settings: 'MONO' 1;
+  background: #212121;
+  color: white;
+  padding: 16px;
+  margin-top: 32px;
+  border-radius: 10px;
+  max-height: 500px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+</style>
 
 <style lang="less" scoped>
 @import "@/assets/var.less";
@@ -327,6 +428,7 @@ h2.value.ip {
 
 .screenfetch-result {
   margin-top: 16px;
+
   .screenfetch-result-content {
     color: white;
     background: #212121;
@@ -364,7 +466,7 @@ h2.value.ip {
 .section__inst_control {
   position: fixed;
   bottom: 5px;
-  width: 40vw;
+  width: 50vw;
   left: 50%;
   transform: translateX(-50%);
   padding: 0;
