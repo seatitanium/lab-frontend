@@ -216,14 +216,26 @@
   <modal v-model="modalOK" class="with-bg--darken equalp">
     <modal-title>成功</modal-title>
     <modal-content>
-      <p v-if="isCreatingInstance">实例已经创建。实例在正常工作之前，需要经过 2~5 分钟的部署，请耐心等待。</p>
-      <p v-else>你的操作已经成功执行。</p>
+      <p>你的操作已经成功执行。</p>
     </modal-content>
     <modal-actions>
       <btn class="with-bg--primary hover--dim" @click="modalOK = false">关闭</btn>
-      <btn class="without-bg--primary hover--dim" @click="modalOK = false; modalDeploy = true">查看部署进度</btn>
     </modal-actions>
   </modal>
+  <modal v-model="modalCreationStarted">
+    <modal-title>成功</modal-title>
+    <modal-content>
+      <p>实例已经创建。实例在正常工作之前，需要经过<strong> 2~5 分钟</strong>的部署，请耐心等待。</p>
+    </modal-content>
+    <modal-actions>
+      <btn class="with-bg--primary hover--dim" @click="modalCreationStarted = false">关闭</btn>
+      <btn class="without-bg--primary hover--dim" @click="modalCreationStarted = false; modalDeploy = true">查看部署进度</btn>
+    </modal-actions>
+  </modal>
+  <error-modal v-model="modalError" :error-information-content="errorInformationContent">
+    <p>在执行部署任务过程中出现了一些问题，导致此过程无法继续运行。</p>
+    <p>单击「<strong>错误信息</strong>」按钮查看内部错误信息，然后单击弹出的信息复制，将其传达给维护者以得到支持。</p>
+  </error-modal>
 </template>
 <script setup lang="ts">
 import {
@@ -285,8 +297,7 @@ const instanceInformation = reactive<DescribeInstanceRes>({
     status: ''
   }
 });
-const isInstanceExist = computed(() => instanceInformation.retrieved.exist)
-const isCreatingInstance = ref(false);
+const isInstanceExist = computed(() => instanceInformation.retrieved.exist);
 const modalDebianDesc = ref(false);
 const modalJavaDesc = ref(false);
 const modalCpuDesc = ref(false);
@@ -312,16 +323,14 @@ async function confirmAction() {
   confirmActionLoading.value = true;
   switch (actionToConfirm.value) {
     case 'create': {
-      isCreatingInstance.value = true;
       let result = await get('/api/ecs/create');
       confirmActionLoading.value = true;
       if (result.code === BackendCodes.OK) {
         modalConfirm.value = false;
-        modalOK.value = true;
-        // Just start.
+        modalCreationStarted.value = true;
+        // Supressing IDE warning for not using await here by adding a `finally` call
         startRefreshDeploymentResult().finally();
       } else {
-        isCreatingInstance.value = false;
         console.warn(result);
       }
       break;
