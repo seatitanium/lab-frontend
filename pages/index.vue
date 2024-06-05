@@ -150,27 +150,17 @@
       <btn class="without-bg--primary hover--dim" href="https://www.minecraft.net/">购买正版</btn>
     </modal-actions>
   </modal>
-  <modal v-model="someProblemModal" :allow-esc="false" class="with-bg--blurred with-bg--darken">
-    <modal-title>
-      出现了一些问题
-    </modal-title>
-    <modal-content>
-      <p>
-        在获取关键信息的时候出现了一些问题，导致页面无法正常运作。
-      </p>
-      <p>
-        单击「<strong>重试</strong>」立即刷新页面。
-      </p>
-      <p>
-        如果问题仍然存在，单击「<strong>错误信息</strong>」按钮查看内部错误信息，然后单击弹出的信息复制，将其传达给维护者以得到支持。
-      </p>
-    </modal-content>
-    <modal-actions class="right">
-      <btn class="without-bg--primary hover--dim" @click="errorInformationPopup = true">错误信息</btn>
-      <btn class="with-bg--primary hover--dim" @click="$router.go(0)">重试</btn>
-    </modal-actions>
-  </modal>
-  <anywhere-popup v-model="errorInformationPopup" :content="errorInformationContent"/>
+  <error-modal v-model="someProblemModal" :error-information-content="errorInformationContent" :retry-func="() => $router.go(0)">
+    <p>
+      在获取关键信息的时候出现了一些问题，导致页面无法正常运作。
+    </p>
+    <p>
+      单击「<strong>重试</strong>」立即刷新页面。
+    </p>
+    <p>
+      如果问题仍然存在，单击「<strong>错误信息</strong>」按钮查看内部错误信息，然后单击弹出的信息复制，将其传达给维护者以得到支持。
+    </p>
+  </error-modal>
 </template>
 
 <script lang="ts" setup>
@@ -193,6 +183,7 @@ import MCJELogoFull from '~/assets/icons/mcje-full.svg'
 import DukeWaving from '~/assets/icons/duke-waving.svg'
 import JavaLogoHorizontal from '~/assets/icons/java-horizontal.svg'
 import getDateMessageFrom from "~/utils/getDateMessageFrom";
+import ErrorModal from "~/components/error-modal.vue";
 
 interface SiteFunction {
   title: string,
@@ -247,7 +238,6 @@ const someProblemModal = ref(false);
 const descForgeModal = ref(false);
 const descOnlineModal = ref(false);
 const descJavaModal = ref(false);
-const errorInformationPopup = ref(false);
 const errorInformationContent = ref('');
 
 const termBgn = '2024-05-01';
