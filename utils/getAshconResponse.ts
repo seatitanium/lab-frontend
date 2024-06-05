@@ -1,3 +1,5 @@
+import getAny from "~/utils/getAny";
+
 interface AshconResponse {
     created_at: null,
     textures: {
@@ -18,5 +20,5 @@ interface AshconResponse {
 }
 
 export default async function(playername: string) {
-    return await get<AshconResponse>(`https://api.ashcon.app/mojang/v2/user/${playername}`, false)
+    return await getAny(`https://api.ashcon.app/mojang/v2/user/${playername}`)
 }

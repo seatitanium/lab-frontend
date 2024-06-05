@@ -13,5 +13,5 @@ const props = defineProps({
   }
 })
 
-const uuid = (await getAshconResponse(props.name))?.uuid;
+const uuid = (await getAshconResponse(props.name)).uuid;
 </script>
