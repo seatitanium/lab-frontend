@@ -47,6 +47,11 @@
             <icon :path="mdiCloseOctagonOutline"/>
             强制停机
           </btn>
+          <btn :class="{disabled: !isInstanceExist}" class="with-bg--white hover--dim"
+               @click="modalDeleteChoice = true">
+            <icon :path="mdiTrashCanOutline"/>
+            删除
+          </btn>
         </card-content>
       </card>
     </section>
@@ -198,16 +203,17 @@
         强制关闭服务器将忽略服务器目前的状态，直接执行断电操作，存在数据丢失的风险。单击确定之前，请确保已经做好数据备份工作。</p>
     </modal-content>
     <modal-actions class="right">
-      <btn class="with-bg--primary hover--dim" @click="confirmAction()" :loading="confirmActionLoading" :disabled="confirmActionLoading">确定</btn>
+      <btn class="with-bg--primary hover--dim" @click="confirmAction()" :loading="confirmActionLoading"
+           :disabled="confirmActionLoading">确定
+      </btn>
       <btn class="without-bg--primary hover--dim" @click="modalConfirm = false">取消</btn>
     </modal-actions>
   </modal>
   <modal v-model="modalDeploy" class="with-bg--darken equalp">
     <modal-title>部署结果</modal-title>
     <modal-content>
-      <p v-if="deployTime > 1">{{deployTime}}s</p>
-      <div class="deploy-results" v-if="isCreatingInstance" v-text="deployResult"/>
-      <p v-else>暂无部署结果。</p>
+      <div class="deploy-results"
+           v-text="deployResult.code === BackendCodes.TargetNotExist ? '等待部署信息返回中...' : deployResult.data.content"/>
     </modal-content>
     <modal-actions class="right">
       <btn class="without-bg--primary hover--dim" @click="modalDeploy = false">关闭</btn>
@@ -216,23 +222,47 @@
   <modal v-model="modalOK" class="with-bg--darken equalp">
     <modal-title>成功</modal-title>
     <modal-content>
-      <p>你的操作已经成功执行。</p>
+      <p>你的操作已经成功执行。部分操作可能存在一定的时间延迟，具体以页面显示信息为准。</p>
     </modal-content>
     <modal-actions>
       <btn class="with-bg--primary hover--dim" @click="modalOK = false">关闭</btn>
     </modal-actions>
   </modal>
-  <modal v-model="modalCreationStarted">
+  <modal v-model="modalInstanceStarted" class="with-bg--darken">
+    <modal-title>成功</modal-title>
+    <modal-content>
+      <p>{{ actionToConfirm === 'reboot' ? '重启' : '开启'}}实例的指令已经成功下达，但是服务器需要<strong> 2~5 分钟</strong>才能完全启动，请耐心等待。</p>
+    </modal-content>
+    <modal-actions>
+      <btn class="with-bg--primary hover--dim" @click="modalInstanceStarted = false">关闭</btn>
+    </modal-actions>
+  </modal>
+  <modal v-model="modalCreationStarted" class="with-bg--darken">
     <modal-title>成功</modal-title>
     <modal-content>
       <p>实例已经创建。实例在正常工作之前，需要经过<strong> 2~5 分钟</strong>的部署，请耐心等待。</p>
     </modal-content>
     <modal-actions>
       <btn class="with-bg--primary hover--dim" @click="modalCreationStarted = false">关闭</btn>
-      <btn class="without-bg--primary hover--dim" @click="modalCreationStarted = false; modalDeploy = true">查看部署进度</btn>
+      <btn class="without-bg--primary hover--dim" @click="modalCreationStarted = false; modalDeploy = true">
+        查看部署进度
+      </btn>
     </modal-actions>
   </modal>
-  <error-modal v-model="modalError" :error-information-content="errorInformationContent">
+  <modal v-model="modalDeleteChoice" class="with-bg--darken">
+    <modal-title>确认删除</modal-title>
+    <modal-content>
+      <p>实例删除以后将不再计费，其系统盘内容将会永久丢失。</p>
+      <p>单击「<strong>删除</strong>」以删除已经停机的实例。若需要删除未停机的实例，请单击「<strong>强制删除</strong>」。</p>
+    </modal-content>
+    <modal-actions class="right">
+      <btn class="with-bg--danger hover--dim" @click="actionToConfirm = 'delete'; modalDeleteChoice = false; modalConfirm = true">删除</btn>
+      <btn class="with-bg--danger hover--dim" @click="actionToConfirm = 'delete_force'; modalDeleteChoice = false; modalConfirm = true">强制删除
+      </btn>
+      <btn class="with-bg--primary hover--dim" @click="modalDeleteChoice = false">取消</btn>
+    </modal-actions>
+  </modal>
+  <error-modal no-retry allow-close v-model="modalError" :error-information-content="errorInformationContent">
     <p>在执行部署任务过程中出现了一些问题，导致此过程无法继续运行。</p>
     <p>单击「<strong>错误信息</strong>」按钮查看内部错误信息，然后单击弹出的信息复制，将其传达给维护者以得到支持。</p>
   </error-modal>
@@ -251,7 +281,7 @@ import {
   mdiMessageTextOutline,
   mdiNavigationVariantOutline,
   mdiRestart,
-  mdiSend
+  mdiSend, mdiTrashCan, mdiTrashCanOutline
 } from "@mdi/js";
 import {getUsername} from "#imports";
 import {BackendCodes} from "~/consts";
@@ -260,6 +290,7 @@ import DukeWaving from '~/assets/icons/duke-waving.svg'
 import IntelXeonLogo from '~/assets/icons/intel-xeon.svg'
 import sleep from "~/utils/sleep";
 import formatTimeString from "../utils/formatTimeString";
+import del from "~/utils/del";
 
 const onlinePlayers = reactive([
   'Subilan',
@@ -276,7 +307,7 @@ interface Message {
   time: string
 }
 
-type InstanceAction = 'start' | 'reboot' | 'stop' | 'stop_force' | 'create';
+type InstanceAction = 'start' | 'reboot' | 'stop' | 'stop_force' | 'create' | 'delete' | 'delete_force';
 
 let instantMessages = ref<Message[]>([])
 const instantMessageString = ref('');
@@ -304,9 +335,18 @@ const modalCpuDesc = ref(false);
 const modalConfirm = ref(false);
 const modalDeploy = ref(false);
 const modalOK = ref(false);
+const modalError = ref(false);
+const modalCreationStarted = ref(false);
+const modalDeleteChoice = ref(false);
+const modalInstanceStarted = ref(false);
 const deployTime = ref(0);
-const deployResult = ref('Waiting for server response...');
+const deployResult = reactive<Resp<GetLastInvokeRes>>({
+  code: 0,
+  msg: '',
+  data: {} as GetLastInvokeRes
+});
 const actionToConfirm = ref<OrEmpty<InstanceAction>>('');
+const errorInformationContent = ref('');
 
 function getActionName() {
   return {
@@ -315,24 +355,93 @@ function getActionName() {
     'reboot': '重启',
     'stop': '关闭',
     'stop_force': '强制关闭',
+    'delete': '删除',
+    'delete_force': '强制删除',
     '': '??'
   }[actionToConfirm.value];
 }
 
 async function confirmAction() {
   confirmActionLoading.value = true;
+
   switch (actionToConfirm.value) {
     case 'create': {
       let result = await get('/api/ecs/create');
-      confirmActionLoading.value = true;
+
+      confirmActionLoading.value = false;
+
       if (result.code === BackendCodes.OK) {
         modalConfirm.value = false;
         modalCreationStarted.value = true;
         // Supressing IDE warning for not using await here by adding a `finally` call
         startRefreshDeploymentResult().finally();
       } else {
+        modalError.value = true;
+        errorInformationContent.value = JSON.stringify(result);
         console.warn(result);
       }
+      break;
+    }
+
+    case 'stop':
+    case 'stop_force': {
+      let result = await get(`/api/ecs/delete?force=${actionToConfirm.value === 'stop' ? 'false' : 'true'}`);
+      modalConfirm.value = false;
+      confirmActionLoading.value = false;
+
+      if (result.code === BackendCodes.OK) {
+        modalOK.value = true;
+      } else {
+        modalError.value = true;
+        errorInformationContent.value = JSON.stringify(result);
+      }
+
+      break;
+    }
+
+    case 'reboot': {
+      let result = await get('/api/ecs/reboot');
+      modalConfirm.value = false;
+      confirmActionLoading.value = false;
+
+      if (result.code === BackendCodes.OK) {
+        modalInstanceStarted.value = true;
+      } else {
+        modalError.value = true;
+        errorInformationContent.value = JSON.stringify(result);
+      }
+
+      break;
+    }
+
+    case 'start': {
+      let result = await get('/api/ecs/start');
+      modalConfirm.value = false;
+      confirmActionLoading.value = false;
+
+      if (result.code === BackendCodes.OK) {
+        modalInstanceStarted.value = true;
+      } else {
+        modalError.value = true;
+        errorInformationContent.value = JSON.stringify(result);
+      }
+
+      break;
+    }
+
+    case 'delete':
+    case 'delete_force': {
+      let result = await del(`/api/ecs/delete?force=${actionToConfirm.value === 'delete' ? 'false' : 'true'}`);
+      modalConfirm.value = false;
+      confirmActionLoading.value = false;
+
+      if (result.code === BackendCodes.OK) {
+        modalOK.value = true;
+      } else {
+        modalError.value = true;
+        errorInformationContent.value = JSON.stringify(result);
+      }
+
       break;
     }
   }
@@ -342,18 +451,20 @@ async function startRefreshDeploymentResult() {
   while (true) {
     const result = await get<GetLastInvokeRes>(`/api/ecs/last-invoke`);
     if (result.code !== BackendCodes.OK && result.code !== BackendCodes.TargetNotExist) {
-      // TODO: Error Modal
+      // Close "possible" active modal
+      modalOK.value = false;
+      modalDeploy.value = false;
+      // Open error modal
+      modalError.value = true;
+      errorInformationContent.value = JSON.stringify(result);
       console.warn(result);
       break;
     }
 
-    if (result.code === BackendCodes.TargetNotExist) {
-      deployResult.value = '等待执行中...'
-    } else {
-      deployResult.value = result.data.content;
+    Object.assign(deployResult, result)
 
+    if (result.code !== BackendCodes.TargetNotExist) {
       if (result.data.status === 'Success') {
-        isCreatingInstance.value = false;
         break;
       }
     }
@@ -363,41 +474,39 @@ async function startRefreshDeploymentResult() {
   }
 }
 
-const describeInstanceResult = await get<DescribeInstanceRes>('/api/ecs/describe');
-if (describeInstanceResult.code === BackendCodes.OK) {
-  Object.assign(instanceInformation, describeInstanceResult.data);
-}
 
-// Test codes
-instantMessages.value = [{
-  sender: 'Subilan',
-  content: 'wtf',
-  time: '2024-05-30 22:50:39'
-}]
-instantMessageString.value = instantMessages.value.map(x => `[${x.time}] ${x.sender}: ${x.content}`).join('\n');
 
-screenfetchResult.value = `         _,met$$$$$gg.           root@iZwz9c7s2w1jnyokzyz9b7Z
-      ,g$$$$$$$$$$$$$$$P.        OS: Debian 12 bookworm
-    ,g$$P""       """Y$$.".      Kernel: x86_64 Linux 6.1.0-20-amd64
-   ,$$P'              \`$$$.      Packages: 691
-  ',$$P       ,ggs.     \`$$b:    Shell: bash 5.2.15
-  \`d$$'     ,$P"'   .    $$$     CPU: Intel Xeon Platinum 8163 @ 12x 2.5GHz
-   $$P      d$'     ,    $$P     RAM: 18651MiB / 23646MiB
-   $$:      $$.   -    ,d$$'
-   $$\\;      Y$b._   _,d$P'
-   Y$$.    \`.\`"Y$$$$P"'
-   \`$$b      "-.__
-    \`Y$$
-     \`Y$$.z
-       \`$$b.
-         \`Y$$b.
-            \`"Y$b._
-                \`""""`;
-
-deployResult.value = `         _,met$$$$$gg.           root@iZwz9c7s2w1jnyokzyz`;
-
-onMounted(() => {
+onMounted( async () => {
   username.value = getUsername().value;
+  const describeInstanceResult = await get<DescribeInstanceRes>('/api/ecs/describe');
+  if (describeInstanceResult.code === BackendCodes.OK) {
+    Object.assign(instanceInformation, describeInstanceResult.data);
+  }
+// Test codes
+//   instantMessages.value = [{
+//     sender: 'Subilan',
+//     content: 'wtf',
+//     time: '2024-05-30 22:50:39'
+//   }]
+//   instantMessageString.value = instantMessages.value.map(x => `[${x.time}] ${x.sender}: ${x.content}`).join('\n');
+//
+//   screenfetchResult.value = `         _,met$$$$$gg.           root@iZwz9c7s2w1jnyokzyz9b7Z
+//       ,g$$$$$$$$$$$$$$$P.        OS: Debian 12 bookworm
+//     ,g$$P""       """Y$$.".      Kernel: x86_64 Linux 6.1.0-20-amd64
+//    ,$$P'              \`$$$.      Packages: 691
+//   ',$$P       ,ggs.     \`$$b:    Shell: bash 5.2.15
+//   \`d$$'     ,$P"'   .    $$$     CPU: Intel Xeon Platinum 8163 @ 12x 2.5GHz
+//    $$P      d$'     ,    $$P     RAM: 18651MiB / 23646MiB
+//    $$:      $$.   -    ,d$$'
+//    $$\\;      Y$b._   _,d$P'
+//    Y$$.    \`.\`"Y$$$$P"'
+//    \`$$b      "-.__
+//     \`Y$$
+//      \`Y$$.z
+//        \`$$b.
+//          \`Y$$b.
+//             \`"Y$b._
+//                 \`""""`;
 })
 </script>
 
@@ -412,6 +521,7 @@ onMounted(() => {
   border-radius: 10px;
   max-height: 500px;
   overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-width: thin;
 }
 </style>
