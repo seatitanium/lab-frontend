@@ -115,6 +115,11 @@ function handleClick() {
     }
   }
 
+  &.with-bg--danger {
+    background-color: #ffebee;
+    color: #f44336;
+  }
+
   &.with-bg--primary {
     background-color: @primaryll;
     color: @primaryt;
