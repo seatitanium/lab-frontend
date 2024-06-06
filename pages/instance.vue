@@ -7,10 +7,17 @@
         </btn>
       </h2>
       <metabar>
-        <metabar-item class="instance-status">
+        <metabar-item class="instance-status" v-if="!firstDescribeInstanceFetchedTimeOut && !firstDescribeInstanceFetched">
           <span class="center">
-            <icon :path="mdiCheckAll"/>
-          在线
+            <circle-spinner size="12"/>
+            获取中...
+          </span>
+        </metabar-item>
+        <metabar-item v-else class="instance-status" :class="instanceInformation.retrieved.status">
+          <span class="center">
+            <icon v-if="instanceStatusIcon !== 'wait'" :path="instanceStatusIcon"/>
+            <circle-spinner size="12" v-else/>
+          {{ instanceStatusName }}
           </span>
         </metabar-item>
         <metabar-item>
@@ -103,7 +110,11 @@
           实例信息
         </card-label>
         <card-content>
-          <h2 class="value">
+          <h2 class="value" v-if="!firstDescribeInstanceFetchedTimeOut && !firstDescribeInstanceFetched">
+            <circle-spinner size="25"/>
+            获取中...
+          </h2>
+          <h2 class="value" v-else>
             {{
               isInstanceExist ? instanceInformation.local.instance_id : '暂未创建'
             }}
@@ -137,13 +148,15 @@
               </span>
             </metabar-item>
           </metabar>
-          <div class="screenfetch-result" v-if="isInstanceExist">
-            <div class="screenfetch-result-content" v-text="screenfetchResult"/>
-          </div>
-          <div class="instance-not-exist" v-else>
-            <p>
-              暂时没有活跃的实例，因此没有相关的信息可供显示。要创建并启动一个实例，请单击控制栏的「<strong>创建并启动</strong>」按钮。
-            </p>
+          <div v-if="firstDescribeInstanceFetched">
+            <div class="screenfetch-result" v-if="isInstanceExist">
+              <div class="screenfetch-result-content" v-text="screenfetchResult"/>
+            </div>
+            <div class="instance-not-exist" v-else>
+              <p>
+                暂时没有活跃的实例，因此没有相关的信息可供显示。要创建并启动一个实例，请单击控制栏的「<strong>创建并启动</strong>」按钮。
+              </p>
+            </div>
           </div>
         </card-content>
         <card-right-top>
@@ -231,7 +244,8 @@
   <modal v-model="modalInstanceStarted" class="with-bg--darken">
     <modal-title>成功</modal-title>
     <modal-content>
-      <p>{{ actionToConfirm === 'reboot' ? '重启' : '开启'}}实例的指令已经成功下达，但是服务器需要<strong> 2~5 分钟</strong>才能完全启动，请耐心等待。</p>
+      <p>{{ actionToConfirm === 'reboot' ? '重启' : '开启' }}实例的指令已经成功下达，但是服务器需要<strong> 2~5
+        分钟</strong>才能完全启动，请耐心等待。</p>
     </modal-content>
     <modal-actions>
       <btn class="with-bg--primary hover--dim" @click="modalInstanceStarted = false">关闭</btn>
@@ -256,8 +270,11 @@
       <p>单击「<strong>删除</strong>」以删除已经停机的实例。若需要删除未停机的实例，请单击「<strong>强制删除</strong>」。</p>
     </modal-content>
     <modal-actions class="right">
-      <btn class="with-bg--danger hover--dim" @click="actionToConfirm = 'delete'; modalDeleteChoice = false; modalConfirm = true">删除</btn>
-      <btn class="with-bg--danger hover--dim" @click="actionToConfirm = 'delete_force'; modalDeleteChoice = false; modalConfirm = true">强制删除
+      <btn class="with-bg--danger hover--dim"
+           @click="actionToConfirm = 'delete'; modalDeleteChoice = false; modalConfirm = true">删除
+      </btn>
+      <btn class="with-bg--danger hover--dim"
+           @click="actionToConfirm = 'delete_force'; modalDeleteChoice = false; modalConfirm = true">强制删除
       </btn>
       <btn class="with-bg--primary hover--dim" @click="modalDeleteChoice = false">取消</btn>
     </modal-actions>
@@ -274,10 +291,10 @@ import {
   mdiClipboardTextOutline,
   mdiClockOutline, mdiClockPlusOutline,
   mdiClose,
-  mdiCloseOctagonOutline,
+  mdiCloseOctagonOutline, mdiCloudClockOutline, mdiCloudQuestionOutline,
   mdiCog,
   mdiCogBox,
-  mdiCreationOutline,
+  mdiCreationOutline, mdiHelpCircleOutline,
   mdiMessageTextOutline,
   mdiNavigationVariantOutline,
   mdiRestart,
@@ -291,6 +308,7 @@ import IntelXeonLogo from '~/assets/icons/intel-xeon.svg'
 import sleep from "~/utils/sleep";
 import formatTimeString from "../utils/formatTimeString";
 import del from "~/utils/del";
+import type {UnwrapRef} from "vue";
 
 const onlinePlayers = reactive([
   'Subilan',
@@ -328,6 +346,10 @@ const instanceInformation = reactive<DescribeInstanceRes>({
     status: ''
   }
 });
+const instanceStatusIcon = computed(() =>
+    isInstanceExist.value ? getInstanceStatusNameAndIcon(instanceInformation.retrieved.status).icon : mdiCloudQuestionOutline);
+const instanceStatusName = computed(() =>
+    isInstanceExist.value ? getInstanceStatusNameAndIcon(instanceInformation.retrieved.status).name : '未创建');
 const isInstanceExist = computed(() => instanceInformation.retrieved.exist);
 const modalDebianDesc = ref(false);
 const modalJavaDesc = ref(false);
@@ -347,6 +369,8 @@ const deployResult = reactive<Resp<GetLastInvokeRes>>({
 });
 const actionToConfirm = ref<OrEmpty<InstanceAction>>('');
 const errorInformationContent = ref('');
+const enableRefreshInstanceInformation = ref(true);
+const firstDescribeInstanceFetchedTimeOut = ref(false);
 
 function getActionName() {
   return {
@@ -359,6 +383,38 @@ function getActionName() {
     'delete_force': '强制删除',
     '': '??'
   }[actionToConfirm.value];
+}
+
+function getInstanceStatusNameAndIcon(instanceStatus: UnwrapRef<OrEmpty<InstanceStatus>>): {
+  icon: string;
+  name: string
+} {
+  return {
+    'Pending': {
+      icon: mdiCloudClockOutline,
+      name: '准备中'
+    },
+    'Starting': {
+      icon: 'wait',
+      name: '启动中'
+    },
+    'Stopping': {
+      icon: 'wait',
+      name: '停止中'
+    },
+    'Stopped': {
+      icon: mdiClose,
+      name: '离线'
+    },
+    'Running': {
+      icon: mdiCheckAll,
+      name: '在线'
+    },
+    '': {
+      icon: mdiHelpCircleOutline,
+      name: '未知'
+    }
+  }[instanceStatus]
 }
 
 async function confirmAction() {
@@ -474,14 +530,43 @@ async function startRefreshDeploymentResult() {
   }
 }
 
+const firstDescribeInstanceFetched = ref(false);
 
+async function startRefreshDescribeInstanceResult() {
+  let firstDescribeInstanceTimeout = 0;
+  const maximumInstanceInformationFetchingTimeout = 10;
 
-onMounted( async () => {
-  username.value = getUsername().value;
-  const describeInstanceResult = await get<DescribeInstanceRes>('/api/ecs/describe');
-  if (describeInstanceResult.code === BackendCodes.OK) {
-    Object.assign(instanceInformation, describeInstanceResult.data);
+  const timer = setInterval(() => {
+    firstDescribeInstanceTimeout++;
+    if (firstDescribeInstanceTimeout > maximumInstanceInformationFetchingTimeout) {
+      clearInterval(timer);
+      if (!firstDescribeInstanceFetched.value) {
+        firstDescribeInstanceFetchedTimeOut.value = true;
+      }
+    }
+  }, 1000);
+
+  // noinspection InfiniteLoopJS
+  while (true) {
+    if (!enableRefreshInstanceInformation.value) continue;
+    const result = await get<DescribeInstanceRes>('/api/ecs/describe');
+    firstDescribeInstanceFetched.value = true;
+    if (result.code === BackendCodes.OK) {
+      Object.assign(instanceInformation, result.data);
+    } else {
+      if (result.code !== BackendCodes.NotFound) {
+        console.warn('Unexpected error received.', result);
+      }
+    }
+    await sleep(1000);
   }
+}
+
+
+onMounted(async () => {
+  username.value = getUsername().value;
+
+  startRefreshDescribeInstanceResult().finally();
 // Test codes
 //   instantMessages.value = [{
 //     sender: 'Subilan',
@@ -559,10 +644,35 @@ h2.value.ip {
 }
 
 .instance-status {
-  background: #e8f5e9;
-  color: #4caf50;
   border-radius: 100px;
   padding: 6px 20px;
+  background: rgb(244,244,244);
+  color: black;
+
+  &.Pending {
+    background: #fff8e1;
+    color: #ffc107;
+  }
+
+  &.Running {
+    background: #e8f5e9;
+    color: #4caf50;
+  }
+
+  &.Stopping {
+    background: #f3e5f5;
+    color: #9c27b0;
+  }
+
+  &.Starting {
+    background: #e0f2f1;
+    color: #009688;
+  }
+
+  &.Stopped {
+    background: #ffebee;
+    color: #f44336;
+  }
 }
 
 .server-actions {
