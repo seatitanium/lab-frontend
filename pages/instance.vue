@@ -441,7 +441,7 @@ async function confirmAction() {
 
     case 'stop':
     case 'stop_force': {
-      let result = await get(`/api/ecs/delete?force=${actionToConfirm.value === 'stop' ? 'false' : 'true'}`);
+      let result = await get(`/api/ecs/stop?force=${actionToConfirm.value === 'stop' ? 'false' : 'true'}`);
       modalConfirm.value = false;
       confirmActionLoading.value = false;
 
