@@ -1,8 +1,14 @@
 <template>
   <div class="page-instance container">
     <section class="section__inst_basic_information">
-      <h2 class="value ip">192.168.88.12
-        <btn class="small with-border without-bg--primary">单击复制
+      <h2 class="value ip" v-if="!firstDescribeInstanceFetchedTimeOut && !firstDescribeInstanceFetched">
+        Waiting...
+      </h2>
+      <h2 class="value ip" v-else>
+        {{
+          instanceInformation.retrieved.public_ip_address !== null ? instanceInformation.retrieved.public_ip_address[0] : '暂无 IP 地址'
+        }}
+        <btn class="small with-border without-bg--primary" v-if="instanceInformation.retrieved.public_ip_address !== null">单击复制
           <icon :path="mdiClipboardTextOutline"/>
         </btn>
       </h2>
@@ -27,7 +33,7 @@
           最近更新
           </span>
           <span class="right">
-            {{ instanceStatusLastUpdated }}
+            {{ instanceStatusLastUpdated || 'N/A' }}
           </span>
         </metabar-item>
       </metabar>
