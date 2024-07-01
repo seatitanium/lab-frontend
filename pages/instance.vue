@@ -7,7 +7,8 @@
         </btn>
       </h2>
       <metabar>
-        <metabar-item class="instance-status" v-if="!firstDescribeInstanceFetchedTimeOut && !firstDescribeInstanceFetched">
+        <metabar-item class="instance-status"
+                      v-if="!firstDescribeInstanceFetchedTimeOut && !firstDescribeInstanceFetched">
           <span class="center">
             <circle-spinner size="12"/>
             获取中...
@@ -26,7 +27,7 @@
           最近更新
           </span>
           <span class="right">
-            2024-05-31 20:54:02
+            {{ instanceStatusLastUpdated }}
           </span>
         </metabar-item>
       </metabar>
@@ -35,26 +36,27 @@
       <card class="narrow without-border">
         <card-content class="server-actions">
           <btn class="with-bg--primaryDark hover--dropShadow"
+               :disabled="instanceInformation.retrieved.status === 'Running'"
                @click="actionToConfirm = isInstanceExist ? 'start' : 'create'; modalConfirm = true;">
             <icon :path="mdiCreationOutline"/>
             {{ isInstanceExist ? '开启' : '创建并开启' }}
           </btn>
-          <btn :class="{disabled: !isInstanceExist}" class="with-bg--white hover--dim"
+          <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'" class="with-bg--white hover--dim"
                @click="actionToConfirm = 'reboot'; modalConfirm = true;">
             <icon :path="mdiRestart"/>
             重启
           </btn>
-          <btn :class="{disabled: !isInstanceExist}" class="with-bg--white hover--dim"
+          <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'" class="with-bg--white hover--dim"
                @click="actionToConfirm = 'stop'; modalConfirm = true;">
             <icon :path="mdiClose"/>
             关机
           </btn>
-          <btn :class="{disabled: !isInstanceExist}" class="with-bg--white hover--dim"
+          <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'" class="with-bg--white hover--dim"
                @click="actionToConfirm = 'stop_force'; modalConfirm = true;">
             <icon :path="mdiCloseOctagonOutline"/>
             强制停机
           </btn>
-          <btn :class="{disabled: !isInstanceExist}" class="with-bg--white hover--dim"
+          <btn :disabled="!isInstanceExist" class="with-bg--white hover--dim"
                @click="modalDeleteChoice = true">
             <icon :path="mdiTrashCanOutline"/>
             删除
@@ -172,6 +174,10 @@
             <div class="badge" @click="modalCpuDesc = true">
               <img draggable="false" src="~/assets/icons/intel-xeon.png"/>
               Platinum 6462C
+            </div>
+            <div class="badge" v-if="isInstanceBeingDeployed" @click="modalDeploy=true">
+              <circle-spinner size="15"/>
+              部署中...
             </div>
           </div>
         </card-right-top>
@@ -306,9 +312,10 @@ import DebianLogo from '~/assets/icons/debian.svg';
 import DukeWaving from '~/assets/icons/duke-waving.svg'
 import IntelXeonLogo from '~/assets/icons/intel-xeon.svg'
 import sleep from "~/utils/sleep";
-import formatTimeString from "../utils/formatTimeString";
+import formatTimeString from "../utils/formatTimeStringFromString";
 import del from "~/utils/del";
 import type {UnwrapRef} from "vue";
+import formatTimeStringFromDate from "~/utils/formatTimeStringFromDate";
 
 const onlinePlayers = reactive([
   'Subilan',
@@ -351,6 +358,7 @@ const instanceStatusIcon = computed(() =>
 const instanceStatusName = computed(() =>
     isInstanceExist.value ? getInstanceStatusNameAndIcon(instanceInformation.retrieved.status).name : '未创建');
 const isInstanceExist = computed(() => instanceInformation.retrieved.exist);
+const instanceStatusLastUpdated = ref('');
 const modalDebianDesc = ref(false);
 const modalJavaDesc = ref(false);
 const modalCpuDesc = ref(false);
@@ -367,6 +375,7 @@ const deployResult = reactive<Resp<GetLastInvokeRes>>({
   msg: '',
   data: {} as GetLastInvokeRes
 });
+const isInstanceBeingDeployed = ref(false);
 const actionToConfirm = ref<OrEmpty<InstanceAction>>('');
 const errorInformationContent = ref('');
 const enableRefreshInstanceInformation = ref(true);
@@ -552,6 +561,7 @@ async function startRefreshDescribeInstanceResult() {
     const result = await get<DescribeInstanceRes>('/api/ecs/describe');
     firstDescribeInstanceFetched.value = true;
     if (result.code === BackendCodes.OK) {
+      instanceStatusLastUpdated.value = formatTimeStringFromDate(new Date());
       Object.assign(instanceInformation, result.data);
     } else {
       if (result.code !== BackendCodes.NotFound) {
@@ -567,6 +577,24 @@ onMounted(async () => {
   username.value = getUsername().value;
 
   startRefreshDescribeInstanceResult().finally();
+
+  const deployStatus = await get<DeploymentStatus>('/api/ecs/deploy-status');
+  if (deployStatus.code !== BackendCodes.OK) {
+    console.warn('Cannot prepare deployment status.');
+    console.warn(deployStatus)
+  } else {
+    switch (deployStatus.data) {
+      case 'Pending':
+      case 'Running': {
+        isInstanceBeingDeployed.value = true;
+        startRefreshDeploymentResult().finally();
+        break;
+      }
+
+      default:
+        isInstanceBeingDeployed.value = false;
+    }
+  }
 // Test codes
 //   instantMessages.value = [{
 //     sender: 'Subilan',
@@ -646,7 +674,7 @@ h2.value.ip {
 .instance-status {
   border-radius: 100px;
   padding: 6px 20px;
-  background: rgb(244,244,244);
+  background: rgb(244, 244, 244);
   color: black;
 
   &.Pending {
