@@ -5,6 +5,7 @@ declare global {
     type OrEmpty<T extends string> = T | '';
 
     type InstanceStatus = 'Pending' | 'Running' | 'Stopping' | 'Stopped' | 'Starting'
+    type DeploymentStatus = 'Pending' | 'Invalid' | 'Aborted' | 'Running' | 'Success' | 'Failed' | 'Error' | 'Timeout' | 'Cancelled' | 'Stopping' | 'Terminated' | 'Scheduled';
 
     type Dict<T> = {[prop: string]: T}
 
@@ -44,7 +45,7 @@ declare global {
     }
 
     interface GetLastInvokeRes {
-        status: 'Pending' | 'Running' | 'Success',
+        status: DeploymentStatus,
         content: string,
         errorInfo: string,
         startTime: string,
