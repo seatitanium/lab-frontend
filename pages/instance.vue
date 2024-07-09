@@ -8,7 +8,8 @@
         {{
           instanceInformation.retrieved.public_ip_address !== null ? instanceInformation.retrieved.public_ip_address[0] : '暂无 IP 地址'
         }}
-        <btn class="small with-border without-bg--primary" v-if="instanceInformation.retrieved.public_ip_address !== null">单击复制
+        <btn class="small with-border without-bg--primary"
+             v-if="instanceInformation.retrieved.public_ip_address !== null">单击复制
           <icon :path="mdiClipboardTextOutline"/>
         </btn>
       </h2>
@@ -47,17 +48,20 @@
             <icon :path="mdiCreationOutline"/>
             {{ isInstanceExist ? '开启' : '创建并开启' }}
           </btn>
-          <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'" class="with-bg--white hover--dim"
+          <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'"
+               class="with-bg--white hover--dim"
                @click="actionToConfirm = 'reboot'; modalConfirm = true;">
             <icon :path="mdiRestart"/>
             重启
           </btn>
-          <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'" class="with-bg--white hover--dim"
+          <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'"
+               class="with-bg--white hover--dim"
                @click="actionToConfirm = 'stop'; modalConfirm = true;">
             <icon :path="mdiClose"/>
             关机
           </btn>
-          <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'" class="with-bg--white hover--dim"
+          <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'"
+               class="with-bg--white hover--dim"
                @click="actionToConfirm = 'stop_force'; modalConfirm = true;">
             <icon :path="mdiCloseOctagonOutline"/>
             强制停机
@@ -183,7 +187,7 @@
             </div>
             <div class="badge" v-if="isInstanceBeingDeployed" @click="modalDeploy=true">
               <circle-spinner size="15"/>
-              部署中...
+              {{ instanceDeployStatusName}}...
             </div>
           </div>
         </card-right-top>
@@ -363,6 +367,8 @@ const instanceStatusIcon = computed(() =>
     isInstanceExist.value ? getInstanceStatusNameAndIcon(instanceInformation.retrieved.status).icon : mdiCloudQuestionOutline);
 const instanceStatusName = computed(() =>
     isInstanceExist.value ? getInstanceStatusNameAndIcon(instanceInformation.retrieved.status).name : '未创建');
+const instanceDeployStatusName = computed(() =>
+    isInstanceBeingDeployed.value ? getInstanceDeployStatusName(deployResult.data.status) : '');
 const isInstanceExist = computed(() => instanceInformation.retrieved.exist);
 const instanceStatusLastUpdated = ref('');
 const modalDebianDesc = ref(false);
@@ -398,6 +404,19 @@ function getActionName() {
     'delete_force': '强制删除',
     '': '??'
   }[actionToConfirm.value];
+}
+
+function getInstanceDeployStatusName(instanceDeploySatatus: DeploymentStatus) {
+  switch (instanceDeploySatatus) {
+    case "Pending":
+      return "准备中";
+    case "Running":
+      return "部署中";
+    case "Failed":
+      return "失败";
+    default:
+      return "";
+  }
 }
 
 function getInstanceStatusNameAndIcon(instanceStatus: UnwrapRef<OrEmpty<InstanceStatus>>): {
