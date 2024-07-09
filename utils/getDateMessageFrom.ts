@@ -9,7 +9,7 @@ export default function (date: Date) {
     const months = days * 30;
 
     const resMonth = formatElapsedTime(delta, months);
-    const resDays = formatElapsedTime(delta, days);
+    const resDays = formatElapsedTime(delta, days, false, 30);
     const resHours = formatElapsedTime(delta, hours, false, 24);
     const resMinutes = formatElapsedTime(delta, minutes, false, 60);
     const resSeconds = formatElapsedTime(delta, seconds, false, 60);
