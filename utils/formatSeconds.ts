@@ -1,7 +1,6 @@
 import formatElapsedTime from "~/utils/formatElapsedTime";
 
-export default function (date: Date) {
-    const delta = new Date().getTime() - date.getTime();
+export default function (delta: number) {
     const seconds = 1000;
     const minutes = seconds * 60;
     const hours = minutes * 60;

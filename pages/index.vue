@@ -234,7 +234,7 @@ const descJavaModal = ref(false);
 const errorInformationContent = ref('');
 
 const termBgn = '2024-05-01';
-const termTimeDelta = ref(formatSeconds(new Date(termBgn)));
+const termTimeDelta = ref(formatSeconds(new Date().getTime() - new Date(termBgn).getTime()));
 
 async function initUser() {
   const userResult = await get<User>(`/api/user/profile/${username.value}`);
@@ -250,7 +250,7 @@ onMounted(() => {
   initUser();
 
   setInterval(() => {
-    termTimeDelta.value = formatSeconds(new Date(termBgn));
+    termTimeDelta.value = formatSeconds(new Date().getTime() - new Date(termBgn).getTime());
   }, 1000)
 })
 </script>
