@@ -168,21 +168,14 @@ import getUsername from "~/utils/getUsername";
 import {BackendCodes} from "~/consts";
 import type {Ref} from "vue";
 import {
-  mdiAbacus, mdiAnvil, mdiApple,
-  mdiBook, mdiCardsPlaying,
-  mdiCheck, mdiCheckAll, mdiClose,
-  mdiCpu64Bit,
-  mdiCubeOutline, mdiDownload, mdiHelpCircleOutline, mdiInformationOutline, mdiLanguageJava, mdiLaunch,
-  mdiMemory, mdiMicrosoft,
-  mdiMicrosoftWindows, mdiMinecraft,
-  mdiMonitor, mdiMore, mdiPlayCircle, mdiPlayCircleOutline,
+  mdiAbacus, mdiAnvil, mdiBook, mdiCardsPlaying,
+  mdiCheck, mdiCheckAll, mdiLanguageJava, mdiLaunch,
+  mdiMemory, mdiMinecraft,
   mdiServer
 } from "@mdi/js";
 import ForgeLogoFull from '~/assets/icons/forge-logo-full.svg'
-import MCJELogoFull from '~/assets/icons/mcje-full.svg'
 import DukeWaving from '~/assets/icons/duke-waving.svg'
-import JavaLogoHorizontal from '~/assets/icons/java-horizontal.svg'
-import getDateMessageFrom from "~/utils/getDateMessageFrom";
+import formatSeconds from "~/utils/formatSeconds";
 import ErrorModal from "~/components/error-modal.vue";
 
 interface SiteFunction {
@@ -241,7 +234,7 @@ const descJavaModal = ref(false);
 const errorInformationContent = ref('');
 
 const termBgn = '2024-05-01';
-const termTimeDelta = ref(getDateMessageFrom(new Date(termBgn)));
+const termTimeDelta = ref(formatSeconds(new Date(termBgn)));
 
 async function initUser() {
   const userResult = await get<User>(`/api/user/profile/${username.value}`);
@@ -257,7 +250,7 @@ onMounted(() => {
   initUser();
 
   setInterval(() => {
-    termTimeDelta.value = getDateMessageFrom(new Date(termBgn));
+    termTimeDelta.value = formatSeconds(new Date(termBgn));
   }, 1000)
 })
 </script>
