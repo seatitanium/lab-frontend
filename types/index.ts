@@ -51,4 +51,21 @@ declare global {
         startTime: string,
         finishedTime: string
     }
+
+    interface UserStatsLogin {
+        id: number,
+        actionType: boolean,
+        createdAt: string,
+        tag: string,
+        player: string
+    }
+
+    interface UserStatsPlaytime {
+        id: number,
+        total: number,
+        afk: number,
+        updatedAt: string,
+        tag: string,
+        player: string
+    }
 }
