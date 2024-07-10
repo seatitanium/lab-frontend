@@ -3,8 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import getUUIDByPlayername from "~/utils/getAshconResponse";
-import getAshconResponse from "~/utils/getAshconResponse";
+import playernameToUUID from "~/utils/playernameToUUID";
 
 const props = defineProps({
   name: {
@@ -13,5 +12,5 @@ const props = defineProps({
   }
 })
 
-const uuid = (await getAshconResponse(props.name)).uuid;
+const uuid = await playernameToUUID(props.name);
 </script>

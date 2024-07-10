@@ -20,5 +20,5 @@ interface AshconResponse {
 }
 
 export default async function(playername: string) {
-    return await getAny(`https://api.ashcon.app/mojang/v2/user/${playername}`)
+    return await getAny(`https://api.ashcon.app/mojang/v2/user/${playername}`) as Promise<AshconResponse>
 }
