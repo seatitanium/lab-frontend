@@ -4,6 +4,47 @@
       <h1>欢迎，{{ user.nickname || user.username }}</h1>
       <p>选择下列功能之一，单击以跳转到相关页面以进行操作。这些功能在不断的更新中。</p>
     </div>
+    <section class="section__player_analytics">
+      <div class="page-user-profile container">
+        <section class="player-analytics">
+          <div class="player-a">
+            <div class="text">
+              游玩时长
+            </div>
+            <div class="value">
+              {{ aPlaytime }}
+              <span class="afk">
+            AFK = {{ aPlaytimeAfk }}
+          </span>
+            </div>
+          </div>
+          <div class="player-a">
+            <div class="text">
+              登入次数
+            </div>
+            <div class="value">
+              {{ aLoginCount }}
+            </div>
+          </div>
+          <div class="player-a">
+            <div class="text">
+              参与周目
+            </div>
+            <div class="value">
+              {{ aInvolved }}
+            </div>
+          </div>
+          <div class="player-a">
+            <div class="text">
+              首次加入
+            </div>
+            <div class="value">
+              {{ aFirstJoin }}
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
     <section>
       <div class="index-functions">
         <card class="equalp" v-for="x in indexFunctions" @click="handleSiteFunctionClick(x)">
@@ -177,6 +218,8 @@ import ForgeLogoFull from '~/assets/icons/forge-logo-full.svg'
 import DukeWaving from '~/assets/icons/duke-waving.svg'
 import formatSeconds from "~/utils/formatSeconds";
 import ErrorModal from "~/components/error-modal.vue";
+import {navigateTo} from "#app";
+import playernameToSkin from "~/utils/playernameToSkin";
 
 interface SiteFunction {
   title: string,
@@ -253,10 +296,41 @@ onMounted(() => {
     termTimeDelta.value = formatSeconds(new Date().getTime() - new Date(termBgn).getTime());
   }, 1000)
 })
+
+
+const userData = reactive({} as User)
+const skin = ref('');
+
+get<User>(`/api/user/profile/${username.value}`).then(r => {
+  if (r.code === BackendCodes.TargetNotExist) {
+    navigateTo("/404");
+  }
+  Object.assign(userData, r.data);
+  playernameToSkin(userData.mcid).then(r => {
+    skin.value = r.data;
+  });
+})
+
+get<number>(`/api/user/stats/login/count?username=${username.value}`).then(r => {
+  if (r.code === BackendCodes.OK) aLoginCount.value = r.data.toString()
+})
+
+get<UserStatsPlaytime>(`/api/user/stats/playtime?username=${username.value}`).then(r => {
+  if (r.code === BackendCodes.OK) {
+    aPlaytime.value = formatSecondsDense((r.data.total - r.data.afk) * 1000);
+    aPlaytimeAfk.value = formatSecondsDense(r.data.afk * 1000);
+  }
+})
+
+const aPlaytime = ref('--');
+const aLoginCount = ref('--');
+const aInvolved = ref('--');
+const aFirstJoin = ref('--');
+const aPlaytimeAfk = ref('');
+
 </script>
 
 <style lang="less" scoped>
-
 .page-index {
   padding: 32px 0;
 }
@@ -398,6 +472,43 @@ onMounted(() => {
   > * {
     cursor: pointer;
     width: 33.33%;
+  }
+}
+</style>
+
+<style lang="less" scoped>
+
+@import "@/assets/var.less";
+
+.section__player_analytics {
+  .player-analytics {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .player-a {
+      border-radius: 10px;
+      border: 1px solid rgba(0, 0, 0, .2);
+      width: 25%;
+      padding: 16px;
+
+      .text {
+        padding-bottom: 8px;
+        font-weight: 500;
+      }
+
+      .value {
+        font-weight: bold;
+        color: @primaryd;
+        font-size: 38px;
+
+        .afk {
+          font-size: 12px;
+          font-weight: normal;
+          color: #aaa;
+        }
+      }
+    }
   }
 }
 </style>
