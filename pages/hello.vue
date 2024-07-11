@@ -361,7 +361,8 @@ watch(stateKaifangScreen, async v => {
       font-size: 60px;
 
       em {
-        font-variation-settings: 'CASL' 1, 'slnt' -15;
+        font-variation-settings: 'CASL' 1, 'slnt' -10;
+        font-style: normal;
       }
     }
 

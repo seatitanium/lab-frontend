@@ -7,7 +7,7 @@
     <section class="section__player_analytics">
       <div class="page-user-profile container">
         <section class="player-analytics">
-          <div class="player-a">
+          <div class="player-a" @click="modalPlaytimeA = true">
             <div class="text">
               游玩时长
             </div>
@@ -45,22 +45,30 @@
         </section>
       </div>
     </section>
-    <section>
-      <div class="index-functions">
-        <card class="equalp" v-for="x in indexFunctions" @click="handleSiteFunctionClick(x)">
-          <card-title>{{ x.title }}</card-title>
-          <card-content>
-            <p>{{ x.description }}</p>
-          </card-content>
-          <card-bg-icon>
-            <icon :path="x.icon"/>
-          </card-bg-icon>
-          <card-right-top>
-            v{{ x.version }}
-          </card-right-top>
-        </card>
-      </div>
-    </section>
+    <modal v-model="modalPlaytimeA" class="with-bg--darken describe">
+      <modal-content>
+        <icon color="#009688" :path="mdiClockStarFourPointsOutline"/>
+        <h2>{{ username }} 的游玩时长数据</h2>
+        <p>Seati 会自动计算你的游玩时长数据，并存储在专用的数据库中。其中包含了总在线时长和挂机时长，有效时长为两者之差。</p>
+        <p>Seati 的各种权益仅以<strong>有效时长</strong>为依据。</p>
+        <div class="playtime">
+          <div class="time">{{ formatSecondsDense(playtimeData.total * 1000) }}</div>
+          <div class="text">总在线时长</div>
+        </div>
+        <div class="playtime">
+          <div class="time">{{ formatSecondsDense(playtimeData.afk * 1000) }}</div>
+          <div class="text">挂机时长</div>
+        </div>
+        <div class="playtime">
+          <div class="time">{{ formatSecondsDense((playtimeData.total - playtimeData.afk) * 1000) }}</div>
+          <div class="text">有效时长</div>
+        </div>
+        <p>以上数据有效性截至页面刷新时间</p>
+      </modal-content>
+      <modal-actions>
+        <btn class="with-bg--primary hover--dim" @click="modalPlaytimeA = false">确定</btn>
+      </modal-actions>
+    </modal>
     <section>
       <div class="index-term-information">
         <card class="equalp">
@@ -191,7 +199,8 @@
       <btn class="without-bg--primary hover--dim" href="https://www.minecraft.net/">购买正版</btn>
     </modal-actions>
   </modal>
-  <error-modal v-model="someProblemModal" :error-information-content="errorInformationContent" :retry-func="() => $router.go(0)">
+  <error-modal v-model="someProblemModal" :error-information-content="errorInformationContent"
+               :retry-func="() => $router.go(0)">
     <p>
       在获取关键信息的时候出现了一些问题，导致页面无法正常运作。
     </p>
@@ -210,7 +219,7 @@ import {BackendCodes} from "~/consts";
 import type {Ref} from "vue";
 import {
   mdiAbacus, mdiAnvil, mdiBook, mdiCardsPlaying,
-  mdiCheck, mdiCheckAll, mdiLanguageJava, mdiLaunch,
+  mdiCheck, mdiCheckAll, mdiClock, mdiClockOutline, mdiClockStarFourPointsOutline, mdiHome, mdiLanguageJava, mdiLaunch,
   mdiMemory, mdiMinecraft,
   mdiServer
 } from "@mdi/js";
@@ -220,14 +229,13 @@ import formatSeconds from "~/utils/formatSeconds";
 import ErrorModal from "~/components/error-modal.vue";
 import {navigateTo} from "#app";
 import playernameToSkin from "~/utils/playernameToSkin";
+import formatSecondsDense from "../utils/formatSecondsDense";
 
 interface SiteFunction {
   title: string,
-  description: string,
   icon: string,
   model?: Ref<boolean>,
   href?: string,
-  version: string
 }
 
 let user = reactive<User>({
@@ -242,25 +250,24 @@ let user = reactive<User>({
 
 const indexFunctions: SiteFunction[] = [
   {
+    title: "主页",
+    icon: mdiHome,
+    href: "/"
+  },
+  {
     title: '服务器',
-    description: '查看服务器状态与玩家在线情况，管理服务器的启停。此外还可探索在线聊天等更多功能。',
     icon: mdiServer,
     href: '/instance',
-    version: '0.1.0'
   },
   {
     title: '财务',
-    description: '查看 Seati 公开的财务信息以及服务器、OSS 等阿里云服务的消费状况',
     icon: mdiAbacus,
     href: '/bill',
-    version: '0.1.0'
   },
   {
     title: '文档',
-    description: '更进一步了解 Lab 平台用法以及周围 API 注解，推荐有一定理解力与技术力的用户参考',
     icon: mdiBook,
     href: '/doc',
-    version: '0.1.0'
   }
 ]
 
@@ -319,6 +326,8 @@ get<UserStatsPlaytime>(`/api/user/stats/playtime?username=${username.value}`).th
   if (r.code === BackendCodes.OK) {
     aPlaytime.value = formatSecondsDense((r.data.total - r.data.afk) * 1000);
     aPlaytimeAfk.value = formatSecondsDense(r.data.afk * 1000);
+    playtimeData.total = r.data.total;
+    playtimeData.afk = r.data.afk;
   }
 })
 
@@ -327,6 +336,12 @@ const aLoginCount = ref('--');
 const aInvolved = ref('--');
 const aFirstJoin = ref('--');
 const aPlaytimeAfk = ref('');
+const playtimeData = reactive({
+  total: 0,
+  afk: 0
+});
+
+const modalPlaytimeA = ref(false);
 
 </script>
 
@@ -488,7 +503,7 @@ const aPlaytimeAfk = ref('');
 
     .player-a {
       border-radius: 10px;
-      border: 1px solid rgba(0, 0, 0, .2);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .3);
       width: 25%;
       padding: 16px;
 
@@ -509,6 +524,21 @@ const aPlaytimeAfk = ref('');
         }
       }
     }
+  }
+}
+
+.playtime {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 8px 0;
+  .time {
+    font-weight: bold;
+    color: @primaryd;
+    font-size: 40px;
+  }
+  .text {
+    color: #aaa;
   }
 }
 </style>

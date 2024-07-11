@@ -1,5 +1,36 @@
 <template>
   <div class="page-instance container">
+    <bottom-navigation>
+      <btn class="with-bg--primaryDark hover--dropShadow"
+           :disabled="instanceInformation.retrieved.status === 'Running'"
+           @click="actionToConfirm = isInstanceExist ? 'start' : 'create'; modalConfirm = true;">
+        <icon :path="mdiCreationOutline"/>
+        {{ isInstanceExist ? '开启' : '创建并开启' }}
+      </btn>
+      <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'"
+           class="with-bg--white hover--dim"
+           @click="actionToConfirm = 'reboot'; modalConfirm = true;">
+        <icon :path="mdiRestart"/>
+        重启
+      </btn>
+      <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'"
+           class="with-bg--white hover--dim"
+           @click="actionToConfirm = 'stop'; modalConfirm = true;">
+        <icon :path="mdiClose"/>
+        关机
+      </btn>
+      <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'"
+           class="with-bg--white hover--dim"
+           @click="actionToConfirm = 'stop_force'; modalConfirm = true;">
+        <icon :path="mdiCloseOctagonOutline"/>
+        强制停机
+      </btn>
+      <btn :disabled="!isInstanceExist" class="with-bg--white hover--dim"
+           @click="modalDeleteChoice = true">
+        <icon :path="mdiTrashCanOutline"/>
+        删除
+      </btn>
+    </bottom-navigation>
     <section class="section__inst_basic_information">
       <h2 class="value ip" v-if="!firstDescribeInstanceFetchedTimeOut && !firstDescribeInstanceFetched">
         Waiting...
@@ -38,82 +69,6 @@
           </span>
         </metabar-item>
       </metabar>
-    </section>
-    <section class="section__inst_control">
-      <card class="narrow without-border">
-        <card-content class="server-actions">
-          <btn class="with-bg--primaryDark hover--dropShadow"
-               :disabled="instanceInformation.retrieved.status === 'Running'"
-               @click="actionToConfirm = isInstanceExist ? 'start' : 'create'; modalConfirm = true;">
-            <icon :path="mdiCreationOutline"/>
-            {{ isInstanceExist ? '开启' : '创建并开启' }}
-          </btn>
-          <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'"
-               class="with-bg--white hover--dim"
-               @click="actionToConfirm = 'reboot'; modalConfirm = true;">
-            <icon :path="mdiRestart"/>
-            重启
-          </btn>
-          <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'"
-               class="with-bg--white hover--dim"
-               @click="actionToConfirm = 'stop'; modalConfirm = true;">
-            <icon :path="mdiClose"/>
-            关机
-          </btn>
-          <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'"
-               class="with-bg--white hover--dim"
-               @click="actionToConfirm = 'stop_force'; modalConfirm = true;">
-            <icon :path="mdiCloseOctagonOutline"/>
-            强制停机
-          </btn>
-          <btn :disabled="!isInstanceExist" class="with-bg--white hover--dim"
-               @click="modalDeleteChoice = true">
-            <icon :path="mdiTrashCanOutline"/>
-            删除
-          </btn>
-        </card-content>
-      </card>
-    </section>
-    <section class="section__online_players">
-      <card class="narrow">
-        <card-label>
-          <icon :path="mdiAccountGroupOutline"/>
-          在线玩家 (10)
-          <small>ST13 历史最高 · 25</small>
-        </card-label>
-        <card-content>
-          <div class="players">
-            <div class="player" v-for="x in onlinePlayers">
-              <div class="avatar">
-                <player-avatar :name="x"/>
-              </div>
-              {{ x }}
-            </div>
-          </div>
-        </card-content>
-      </card>
-    </section>
-    <section class="section__instant_message">
-      <card class="narrow">
-        <card-label>
-          <icon :path="mdiMessageTextOutline"/>
-          服内聊天
-        </card-label>
-        <card-content>
-          <div class="instant-message">
-            <div class="instant-message-content" v-text="instantMessageString"/>
-            <div class="instant-message-sender-wrapper">
-              <div class="instant-message-sender">
-                <input :placeholder="`以 ${username} 的身份发送信息...`" v-model="instantMessageToSend"/>
-                <btn class="with-bg--primary medium">
-                  <icon :path="mdiSend"/>
-                  发送
-                </btn>
-              </div>
-            </div>
-          </div>
-        </card-content>
-      </card>
     </section>
     <section class="section__instance_info">
       <card class="narrow">
@@ -165,8 +120,8 @@
               <div class="screenfetch-result-content" v-text="screenfetchResult"/>
             </div>
             <div class="instance-not-exist" v-else>
-              <p>
-                暂时没有活跃的实例，因此没有相关的信息可供显示。要创建并启动一个实例，请单击控制栏的「<strong>创建并启动</strong>」按钮。
+              <p style="margin: 0">
+                暂时没有活跃的实例，因此没有相关的信息可供显示。要创建并启动一个实例，请单击控制栏的「<strong>创建并开启</strong>」按钮。
               </p>
             </div>
           </div>
@@ -191,6 +146,47 @@
             </div>
           </div>
         </card-right-top>
+      </card>
+    </section>
+    <section class="section__online_players">
+      <card class="narrow">
+        <card-label>
+          <icon :path="mdiAccountGroupOutline"/>
+          在线玩家 (10)
+          <small>ST13 历史最高 · 25</small>
+        </card-label>
+        <card-content>
+          <div class="players">
+            <div class="player" v-for="x in onlinePlayers">
+              <div class="avatar">
+                <player-avatar :name="x"/>
+              </div>
+              {{ x }}
+            </div>
+          </div>
+        </card-content>
+      </card>
+    </section>
+    <section class="section__instant_message">
+      <card class="narrow">
+        <card-label>
+          <icon :path="mdiMessageTextOutline"/>
+          服内聊天
+        </card-label>
+        <card-content>
+          <div class="instant-message">
+            <div class="instant-message-content" v-text="instantMessageString"/>
+            <div class="instant-message-sender-wrapper">
+              <div class="instant-message-sender">
+                <input :placeholder="`以 ${username} 的身份发送信息...`" v-model="instantMessageToSend"/>
+                <btn class="with-bg--primary medium">
+                  <icon :path="mdiSend"/>
+                  发送
+                </btn>
+              </div>
+            </div>
+          </div>
+        </card-content>
       </card>
     </section>
   </div>
@@ -326,6 +322,7 @@ import formatTimeString from "../utils/formatTimeStringFromString";
 import del from "~/utils/del";
 import type {UnwrapRef} from "vue";
 import formatTimeStringFromDate from "~/utils/formatTimeStringFromDate";
+import BottomNavigation from "~/components/bottom-navigation.vue";
 
 const onlinePlayers = reactive([
   'Subilan',
@@ -726,39 +723,6 @@ h2.value.ip {
     background: #ffebee;
     color: #f44336;
   }
-}
-
-.server-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-}
-
-@keyframes section__inst_control {
-  0% {
-    transform: translate(-50%, 100%);
-  }
-
-  100% {
-    transform: translateY(-50%, 0);
-  }
-}
-
-.section__inst_control {
-  position: fixed;
-  bottom: 5px;
-  width: 50vw;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 0;
-  z-index: 300;
-  background: rgba(255, 255, 255, .8);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  border: 1px solid rgba(33, 33, 33, .05);
-  box-shadow: 0 0 5px rgba(0, 0, 0, .02);
-  animation: section__inst_control .4s ease;
 }
 
 .section__online_players .card-label small {

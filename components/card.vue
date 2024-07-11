@@ -9,7 +9,7 @@
 
 .card {
   padding: 30px 20px;
-  border: 1px solid rgba(0, 0, 0, .2);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .3);
   border-radius: 20px;
   position: relative;
   overflow: hidden;
