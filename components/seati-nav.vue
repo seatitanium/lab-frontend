@@ -96,9 +96,6 @@
               <icon :path="mdiAccountOffOutline"/>
               注销账号
             </div>
-            <div class="action">
-
-            </div>
           </div>
         </div>
       </div>
