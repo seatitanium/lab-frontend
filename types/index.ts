@@ -5,9 +5,21 @@ declare global {
     type OrEmpty<T extends string> = T | '';
 
     type InstanceStatus = 'Pending' | 'Running' | 'Stopping' | 'Stopped' | 'Starting'
-    type DeploymentStatus = 'Pending' | 'Invalid' | 'Aborted' | 'Running' | 'Success' | 'Failed' | 'Error' | 'Timeout' | 'Cancelled' | 'Stopping' | 'Terminated' | 'Scheduled';
+    type DeploymentStatus =
+        'Pending'
+        | 'Invalid'
+        | 'Aborted'
+        | 'Running'
+        | 'Success'
+        | 'Failed'
+        | 'Error'
+        | 'Timeout'
+        | 'Cancelled'
+        | 'Stopping'
+        | 'Terminated'
+        | 'Scheduled';
 
-    type Dict<T> = {[prop: string]: T}
+    type Dict<T> = { [prop: string]: T }
 
     interface Resp<T> {
         code: number,
@@ -23,6 +35,19 @@ declare global {
         mcid: string,
         createdAt: number,
         updatedAt: number
+    }
+
+    interface UserExtended extends User {
+        skinBase64: string,
+        analytics: UserAnalytics
+    }
+
+    interface UserAnalytics {
+        loginCount: number,
+        playtime: {
+            afk: number,
+            total: number
+        }
     }
 
     interface LoginRes {
