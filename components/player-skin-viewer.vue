@@ -9,7 +9,7 @@ import * as skinview3d from 'skinview3d'
 
 const skinView = ref<HTMLCanvasElement>();
 const props = defineProps({
-  image: {
+  skin: {
     type: String,
     required: true
   },
@@ -25,7 +25,7 @@ const props = defineProps({
 
 onMounted( () => {
   const image = new Image();
-  image.src = "data:image/png;base64," + props.image;
+  image.src = "data:image/png;base64," + props.skin;
   image.crossOrigin = '';
   image.addEventListener('load', e => {
     image.height = image.naturalHeight;
@@ -44,9 +44,8 @@ onMounted( () => {
 
 <style lang="less" scoped>
 .player-skin-viewer-container {
-  border: 1px solid rgba(0, 0, 0, .21);
   border-radius: 10px;
-  padding: 16px 32px;
+  padding: 16px;
   cursor: grab;
 
   &:active {
