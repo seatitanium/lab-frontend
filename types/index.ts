@@ -34,12 +34,13 @@ declare global {
         email: string
         mcid: string,
         createdAt: number,
-        updatedAt: number
+        updatedAt: number,
     }
 
     interface UserExtended extends User {
         skinBase64: string,
-        analytics: UserAnalytics
+        analytics: UserAnalytics,
+        uuid: string
     }
 
     interface UserAnalytics {

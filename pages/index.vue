@@ -69,7 +69,7 @@
       </modal-actions>
     </modal>
     <anywhere-popup v-model="playtimeDescriptionPopup" :code="false">
-      <p>Seati 会自动计算你的游玩时长数据，并存储在专用的数据库中。其中包含了<strong>总在线时长</strong>和<strong>挂机时长</strong>，有效时长为两者之差。</p>
+      <p>Seati 会自动计算你的游玩时长数据，并存储在专用的数据库中。其中包含了<strong>总在线时长</strong>和<strong>挂机时长</strong>，<strong>有效时长</strong>为两者之差。</p>
       <p>Seati 的各种权益仅以<strong>有效时长</strong>为依据。</p>
     </anywhere-popup>
     <section>

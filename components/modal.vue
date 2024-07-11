@@ -2,6 +2,9 @@
   <div class="modal-group">
     <Transition name="modal-trans">
       <div v-if="model" class="modal">
+        <btn @click="model = false" icon v-if="withCloseBtn" class="hover--dim with-bg--white close-btn">
+          <icon :path="mdiClose"/>
+        </btn>
         <slot/>
       </div>
     </Transition>
@@ -14,11 +17,17 @@
 </template>
 
 <script lang="ts" setup>
+import {mdiClose} from "@mdi/js";
+
 const model = defineModel();
 const props = defineProps({
   allowEsc: {
     type: Boolean,
     default: true
+  },
+  withCloseBtn: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -156,7 +165,7 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
   background: white;
   border-radius: 20px;
   min-width: 400px;
-  max-width: 700px;
+  max-width: 800px;
   padding: 40px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
   position: fixed;
@@ -165,5 +174,11 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
   transform: translate(-50%, -50%);
   transform-origin: 0 0;
   z-index: 400;
+}
+
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
 }
 </style>
