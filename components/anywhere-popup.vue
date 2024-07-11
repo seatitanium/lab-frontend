@@ -2,7 +2,9 @@
   <div v-if="model" class="anywhere-popup-layer" @click="model = false">
     <div class="anywhere-popup" @click="handleClickPopup">
       <code v-if="code">{{ content }}</code>
-      <p v-else>{{ content }}</p>
+      <div v-else>
+        <slot/>
+      </div>
     </div>
   </div>
 </template>
