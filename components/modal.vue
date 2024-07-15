@@ -125,7 +125,7 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
   max-width: 100%; // prevent scrollbar width from causing x-overflow 24.5.8
   height: 100vh;
   overflow: hidden;
-  z-index: 300;
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -173,7 +173,7 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
   left: 50%;
   transform: translate(-50%, -50%);
   transform-origin: 0 0;
-  z-index: 400;
+  z-index: 1500;
 }
 
 .close-btn {
