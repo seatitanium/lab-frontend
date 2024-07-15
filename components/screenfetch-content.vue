@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import {mdiConsole, mdiCpu64Bit} from "@mdi/js";
+import {mdiConsole} from "@mdi/js";
 
 const screenfetchModal = ref(false);
 </script>
