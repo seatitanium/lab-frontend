@@ -152,17 +152,21 @@
       <card class="narrow">
         <card-label>
           <icon :path="mdiAccountGroupOutline"/>
-          在线玩家 (10)
-          <small>ST13 历史最高 · 25</small>
+          在线玩家 ({{onlinePlayers.length}})
+          <small>ST13 历史最高 · {{ peakServerOnlineSnapshot.count }}</small>
         </card-label>
         <card-content>
-          <div class="players">
+          <div class="players" v-if="onlinePlayers.length > 0">
             <div class="player" v-for="x in onlinePlayers">
               <div class="avatar">
                 <player-avatar :name="x"/>
               </div>
               {{ x }}
             </div>
+          </div>
+          <div class="no-players" v-else>
+            <div class="wtf">{{ getRandomExclamation() }}</div>
+            <div class="text">{{ getRandomAbsence() }}</div>
           </div>
         </card-content>
       </card>
@@ -323,15 +327,9 @@ import del from "~/utils/del";
 import type {UnwrapRef} from "vue";
 import formatTimeStringFromDate from "~/utils/formatTimeStringFromDate";
 import BottomNavigation from "~/components/bottom-navigation.vue";
+import randomInclusive from "~/utils/randInclusive";
 
-const onlinePlayers = reactive([
-  'Subilan',
-  'Sapherise',
-  'constant137',
-  'litter_white',
-  'JesseM1024',
-  'constant137', 'constant137', 'constant137', 'constant137', 'constant137', 'constant137', 'constant137', 'constant137', 'constant137', 'constant137', 'constant137', 'constant137', 'constant137', 'constant137', 'constant137', 'constant137', 'constant137', 'constant137',
-])
+const onlinePlayers = reactive([])
 
 interface Message {
   sender: string,
@@ -594,11 +592,39 @@ async function startRefreshDescribeInstanceResult() {
   }
 }
 
+const enableRefreshServerStatus = ref(true);
+
+async function startRefreshServerStatus() {
+  // noinspection InfiniteLoopJS
+  while (true) {
+    if (!enableRefreshServerStatus.value) continue;
+    const result = await get<ServerStatus>(`/api/server/status?ip=127.0.0.1`);
+    if (result.code === BackendCodes.OK) {
+      Object.assign(onlinePlayers, result.data.players.sample.map(x => x.name_clean));
+    } else {
+      console.warn("Cannot retrieve server status", result);
+    }
+    await sleep(2000);
+  }
+}
+
+const peakServerOnlineSnapshot = reactive<SnapshotOnlinePlayers>({
+  id: -1,
+  count: 0,
+  names: '',
+  created_at: ''
+});
+
+get<SnapshotOnlinePlayers>(`/api/server/peak-online-history`).then(r => {
+  if (r.code === BackendCodes.OK) Object.assign(peakServerOnlineSnapshot, r.data);
+  else console.warn(r)
+});
 
 onMounted(async () => {
   username.value = getUsername().value;
 
   startRefreshDescribeInstanceResult().finally();
+  startRefreshServerStatus().finally();
 
   const deployStatus = await get<DeploymentStatus>('/api/ecs/deploy-status');
   if (deployStatus.code !== BackendCodes.OK) {
@@ -643,6 +669,17 @@ onMounted(async () => {
 //             \`"Y$b._
 //                 \`""""`;
 })
+
+function getRandomExclamation() {
+  const dict = ["WTF?!", "OMG...", "Ummmm", "天啦噜!", "Holy Sh!t", "But Why", "sldkghfhg"];
+  return dict[randomInclusive(0, dict.length - 1)];
+}
+
+function getRandomAbsence() {
+  const dict = ["暂时没有玩家在线", "大家都去打英雄联盟了", "大家都去玩原神了", "大家都去玩单人了"];
+  if (new Date().getHours() >= 0 && new Date().getHours() <= 6) dict.push("大家都去睡觉了");
+  return dict[randomInclusive(0, dict.length - 1)];
+}
 </script>
 
 <style lang="less" scoped>
@@ -807,5 +844,25 @@ h2.value.ip {
       }
     }
   }
+}
+</style>
+
+<style lang="less" scoped>
+.no-players {
+  text-align: center;
+  padding: 50px;
+  border: 2px dashed #ddd;
+  border-radius: 20px;
+
+  .wtf {
+    font-size: 60px;
+    font-variation-settings: 'slnt' -10, 'CASL' 1, 'wght' 800;
+  }
+
+  .text {
+    font-size: 20px;
+  }
+
+  color: #ddd;
 }
 </style>

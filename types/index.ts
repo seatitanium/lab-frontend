@@ -94,4 +94,47 @@ declare global {
         tag: string,
         player: string
     }
+
+    interface ServerStatus {
+        version: {
+            name_raw: string,
+            name_clean: string,
+            name_html: string,
+            protocol: number
+        },
+        players: {
+            max: number,
+            online: number,
+            sample: {
+                id: string,
+                name_raw: string,
+                name_clean: string,
+                name_html: string,
+            }[]
+        },
+        motd: {
+            raw: string,
+            clean: string,
+            html: string,
+        },
+        favicon: string,
+        srv_result: {
+            host: string,
+            port: number
+        }[],
+        mod_info: {
+            type: string,
+            mods: {
+                id: string,
+                version: string
+            }[]
+        }
+    }
+
+    interface SnapshotOnlinePlayers {
+        id: number,
+        count: number,
+        names: string,
+        created_at: string
+    }
 }
