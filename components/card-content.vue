@@ -7,7 +7,6 @@
 <style>
 .card-content-container {
   line-height: 1.5;
-  z-index: 15;
   position: relative;
 
   > p:last-child {

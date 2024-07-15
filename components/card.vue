@@ -13,7 +13,6 @@
   border-radius: 20px;
   position: relative;
   overflow: hidden;
-  z-index: 10;
 
   &.equalp {
     padding: 32px;
