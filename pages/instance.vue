@@ -116,14 +116,12 @@
             </metabar-item>
           </metabar>
           <div v-if="firstDescribeInstanceFetched">
-            <div class="screenfetch-result" v-if="isInstanceExist">
-              <div class="screenfetch-result-content" v-text="screenfetchResult"/>
-            </div>
-            <div class="instance-not-exist" v-else>
+            <div class="instance-not-exist" v-if="!isInstanceExist">
               <p style="margin: 0">
                 暂时没有活跃的实例，因此没有相关的信息可供显示。要创建并启动一个实例，请单击控制栏的「<strong>创建并开启</strong>」按钮。
               </p>
             </div>
+            <screenfetch-content/>
           </div>
         </card-content>
         <card-right-top>
@@ -328,6 +326,7 @@ import type {UnwrapRef} from "vue";
 import formatTimeStringFromDate from "~/utils/formatTimeStringFromDate";
 import BottomNavigation from "~/components/bottom-navigation.vue";
 import randomInclusive from "~/utils/randInclusive";
+import ScreenfetchContent from "~/components/screenfetch-content.vue";
 
 const onlinePlayers = reactive([])
 
@@ -343,7 +342,6 @@ let instantMessages = ref<Message[]>([])
 const instantMessageString = ref('');
 const instantMessageToSend = ref('');
 const username = ref('')
-const screenfetchResult = ref('')
 const confirmActionLoading = ref(false);
 const instanceInformation = reactive<DescribeInstanceRes>({
   local: {
@@ -651,23 +649,6 @@ onMounted(async () => {
 //   }]
 //   instantMessageString.value = instantMessages.value.map(x => `[${x.time}] ${x.sender}: ${x.content}`).join('\n');
 //
-//   screenfetchResult.value = `         _,met$$$$$gg.           root@iZwz9c7s2w1jnyokzyz9b7Z
-//       ,g$$$$$$$$$$$$$$$P.        OS: Debian 12 bookworm
-//     ,g$$P""       """Y$$.".      Kernel: x86_64 Linux 6.1.0-20-amd64
-//    ,$$P'              \`$$$.      Packages: 691
-//   ',$$P       ,ggs.     \`$$b:    Shell: bash 5.2.15
-//   \`d$$'     ,$P"'   .    $$$     CPU: Intel Xeon Platinum 8163 @ 12x 2.5GHz
-//    $$P      d$'     ,    $$P     RAM: 18651MiB / 23646MiB
-//    $$:      $$.   -    ,d$$'
-//    $$\\;      Y$b._   _,d$P'
-//    Y$$.    \`.\`"Y$$$$P"'
-//    \`$$b      "-.__
-//     \`Y$$
-//      \`Y$$.z
-//        \`$$b.
-//          \`Y$$b.
-//             \`"Y$b._
-//                 \`""""`;
 })
 
 function getRandomExclamation() {
@@ -717,18 +698,7 @@ h2.value.ip {
   font-size: 40px;
 }
 
-.screenfetch-result {
-  margin-top: 16px;
 
-  .screenfetch-result-content {
-    color: white;
-    background: #212121;
-    padding: 16px;
-    border-radius: 10px;
-    white-space: break-spaces;
-    font-variation-settings: 'MONO' 1;
-  }
-}
 
 .instance-status {
   border-radius: 100px;
