@@ -150,12 +150,12 @@
       <card class="narrow">
         <card-label>
           <icon :path="mdiAccountGroupOutline"/>
-          在线玩家 ({{ onlinePlayers.length }})
+          在线玩家 ({{ onlinePlayers.data.length }})
           <small>ST13 历史最高 · {{ peakServerOnlineSnapshot.count }}</small>
         </card-label>
         <card-content>
-          <div class="players" v-if="onlinePlayers.length > 0">
-            <div class="player" v-for="x in onlinePlayers">
+          <div class="players" v-if="onlinePlayers.data.length > 0">
+            <div class="player" v-for="x in onlinePlayers.data">
               <div class="avatar">
                 <player-avatar :name="x"/>
               </div>
@@ -163,8 +163,8 @@
             </div>
           </div>
           <div class="no-players" v-else>
-            <div class="wtf">{{ getRandomExclamation() }}</div>
-            <div class="text">{{ getRandomAbsence() }}</div>
+            <div class="wtf">{{ randomExclamation }}</div>
+            <div class="text">{{ randomAbsence }}</div>
           </div>
         </card-content>
       </card>
@@ -189,7 +189,8 @@
             <div class="instant-message-content" v-html="instantMessageString"/>
             <div class="instant-message-sender-wrapper" :class="{active: isSendingInstantMessage}">
               <div class="instant-message-sender">
-                <input ref="instantMessageInput" @keydown.enter="sendInstantMessage" :placeholder="`以 ${username} 的身份发送信息...`"
+                <input ref="instantMessageInput" @keydown.enter="sendInstantMessage"
+                       :placeholder="`以 ${username} 的身份发送信息...`"
                        v-model="instantMessageToSend"/>
               </div>
             </div>
@@ -334,7 +335,11 @@ import randomInclusive from "~/utils/randInclusive";
 import ScreenfetchContent from "~/components/screenfetch-content.vue";
 import {useLocalStorage} from "@vueuse/core";
 
-const onlinePlayers = reactive<string[]>([])
+let onlinePlayers = reactive<{
+  data: string[]
+}>({
+  data: []
+})
 
 type InstanceAction = 'start' | 'reboot' | 'stop' | 'stop_force' | 'create' | 'delete' | 'delete_force';
 
@@ -454,7 +459,7 @@ function getIMStatusNameAndIcon(imStatus: UnwrapRef<InstantMessageStatus>): {
       name: '已连接'
     },
     'error': {
-      icon :mdiAlertOutline,
+      icon: mdiAlertOutline,
       name: '错误'
     },
     'disconnected': {
@@ -622,7 +627,8 @@ async function startRefreshServerStatus() {
     if (!enableRefreshServerStatus.value) continue;
     const result = await get<ServerStatus>(`/api/server/status?ip=127.0.0.1`);
     if (result.code === BackendCodes.OK) {
-      Object.assign(onlinePlayers, result.data.players.sample.map(x => x.name_clean));
+      const r = result.data.players.sample.map(x => x.name_clean).filter(x => x !== 'Anonymous Player');
+      if (!r.every(x => onlinePlayers.data.includes(x)) || r.length === 0) onlinePlayers.data = r;
     } else {
       console.warn("Cannot retrieve server status", result);
     }
@@ -689,8 +695,12 @@ const instantMessageStatus = ref<InstantMessageStatus>('pending');
 const imStatusName = computed(() => getIMStatusNameAndIcon(instantMessageStatus.value).name);
 const imStatusIcon = computed(() => getIMStatusNameAndIcon(instantMessageStatus.value).icon);
 
+let randomExclamation = ref('');
+let randomAbsence = ref('');
 onMounted(async () => {
   username.value = getUsername().value;
+  randomExclamation.value = getRandomExclamation();
+  randomAbsence.value = getRandomAbsence();
 
   startRefreshDescribeInstanceResult().finally();
   startRefreshServerStatus().finally();
@@ -714,7 +724,7 @@ onMounted(async () => {
     }
   }
 
-  if (instantMessageInput.value !== null){
+  if (instantMessageInput.value !== null) {
     instantMessageInput.value.addEventListener('focus', e => {
       isSendingInstantMessage.value = true;
     })
@@ -839,6 +849,7 @@ h2.value.ip {
       transition: all .2s ease;
       font-weight: bold;
       pointer-events: none;
+
       &.active {
         transform: translateY(50%) translateX(0) skew(-8deg);
         opacity: .1;
@@ -896,6 +907,7 @@ h2.value.ip {
             cursor: text;
             width: 100%;
             border-bottom-color: rgba(255, 255, 255, .7);
+
             &::placeholder {
               color: rgba(255, 255, 255, .6);
             }

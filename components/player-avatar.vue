@@ -12,5 +12,11 @@ const props = defineProps({
   }
 })
 
-const uuid = await playernameToUUID(props.name);
+const uuid = ref('');
+
+watch(() => props.name, async v => {
+  uuid.value = await playernameToUUID(v);
+}, {
+  immediate: true
+})
 </script>
