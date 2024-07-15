@@ -1,4 +1,4 @@
-# 24.07.02
+# 24.07.15
 
-- 添加部署过程中不同状态下的标识
-- 解决部署窗口输出结果不自动向下滚动的问题
+- username, nickname, playername choice in im
+- change ability of username, nickname, playername, password, email
