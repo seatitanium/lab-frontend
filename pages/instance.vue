@@ -140,7 +140,7 @@
             </div>
             <div class="badge" v-if="isInstanceBeingDeployed" @click="modalDeploy=true">
               <circle-spinner size="15"/>
-              {{ instanceDeployStatusName}}...
+              {{ instanceDeployStatusName }}...
             </div>
           </div>
         </card-right-top>
@@ -150,7 +150,7 @@
       <card class="narrow">
         <card-label>
           <icon :path="mdiAccountGroupOutline"/>
-          在线玩家 ({{onlinePlayers.length}})
+          在线玩家 ({{ onlinePlayers.length }})
           <small>ST13 历史最高 · {{ peakServerOnlineSnapshot.count }}</small>
         </card-label>
         <card-content>
@@ -171,20 +171,26 @@
     </section>
     <section class="section__instant_message">
       <card class="narrow">
+        <card-right-top>
+          <div class="badges">
+            <div class="badge im-status" :class="instantMessageStatus">
+              <icon :path="imStatusIcon"/>
+              {{ imStatusName }}
+            </div>
+          </div>
+        </card-right-top>
         <card-label>
           <icon :path="mdiMessageTextOutline"/>
           服内聊天
         </card-label>
         <card-content>
           <div class="instant-message">
-            <div class="instant-message-content" v-text="instantMessageString"/>
-            <div class="instant-message-sender-wrapper">
+            <div class="instant-message-bg" :class="{active: isSendingInstantMessage}">发送中</div>
+            <div class="instant-message-content" v-html="instantMessageString"/>
+            <div class="instant-message-sender-wrapper" :class="{active: isSendingInstantMessage}">
               <div class="instant-message-sender">
-                <input :placeholder="`以 ${username} 的身份发送信息...`" v-model="instantMessageToSend"/>
-                <btn class="with-bg--primary medium">
-                  <icon :path="mdiSend"/>
-                  发送
-                </btn>
+                <input ref="instantMessageInput" @keydown.enter="sendInstantMessage" :placeholder="`以 ${username} 的身份发送信息...`"
+                       v-model="instantMessageToSend"/>
               </div>
             </div>
           </div>
@@ -300,8 +306,8 @@
 </template>
 <script setup lang="ts">
 import {
-  mdiAccountGroupOutline,
-  mdiCheckAll,
+  mdiAccountGroupOutline, mdiAlert, mdiAlertOutline,
+  mdiCheckAll, mdiCheckCircleOutline,
   mdiClipboardTextOutline,
   mdiClockOutline, mdiClockPlusOutline,
   mdiClose,
@@ -312,13 +318,12 @@ import {
   mdiMessageTextOutline,
   mdiNavigationVariantOutline,
   mdiRestart,
-  mdiSend, mdiTrashCan, mdiTrashCanOutline
+  mdiSend, mdiTrashCan, mdiTrashCanOutline, mdiWebOff
 } from "@mdi/js";
 import {getUsername} from "#imports";
 import {BackendCodes} from "~/consts";
 import DebianLogo from '~/assets/icons/debian.svg';
 import DukeWaving from '~/assets/icons/duke-waving.svg'
-import IntelXeonLogo from '~/assets/icons/intel-xeon.svg'
 import sleep from "~/utils/sleep";
 import formatTimeString from "../utils/formatTimeStringFromString";
 import del from "~/utils/del";
@@ -327,19 +332,14 @@ import formatTimeStringFromDate from "~/utils/formatTimeStringFromDate";
 import BottomNavigation from "~/components/bottom-navigation.vue";
 import randomInclusive from "~/utils/randInclusive";
 import ScreenfetchContent from "~/components/screenfetch-content.vue";
+import {useLocalStorage} from "@vueuse/core";
 
-const onlinePlayers = reactive([])
-
-interface Message {
-  sender: string,
-  content: string,
-  time: string
-}
+const onlinePlayers = reactive<string[]>([])
 
 type InstanceAction = 'start' | 'reboot' | 'stop' | 'stop_force' | 'create' | 'delete' | 'delete_force';
 
-let instantMessages = ref<Message[]>([])
-const instantMessageString = ref('');
+let instantMessages = reactive<{ content: string, time: string }[]>([])
+const instantMessageString = computed(() => instantMessages.map(x => `<span style="color: #aaa">[${x.time}]</span> ${x.content}`).join("\n"));
 const instantMessageToSend = ref('');
 const username = ref('')
 const confirmActionLoading = ref(false);
@@ -442,6 +442,30 @@ function getInstanceStatusNameAndIcon(instanceStatus: UnwrapRef<OrEmpty<Instance
       name: '未知'
     }
   }[instanceStatus]
+}
+
+function getIMStatusNameAndIcon(imStatus: UnwrapRef<InstantMessageStatus>): {
+  icon: string,
+  name: string
+} {
+  return {
+    'connected': {
+      icon: mdiCheckCircleOutline,
+      name: '已连接'
+    },
+    'error': {
+      icon :mdiAlertOutline,
+      name: '错误'
+    },
+    'disconnected': {
+      icon: mdiWebOff,
+      name: '未连接'
+    },
+    'pending': {
+      icon: mdiClockOutline,
+      name: '等待中'
+    }
+  }[imStatus]
 }
 
 async function confirmAction() {
@@ -618,11 +642,59 @@ get<SnapshotOnlinePlayers>(`/api/server/peak-online-history`).then(r => {
   else console.warn(r)
 });
 
+let ws: WebSocket;
+
+function initializeWebSocketConnection() {
+  const token = useLocalStorage('tisea-auth-token', '');
+  ws = new WebSocket("ws://localhost:23322?token=" + token.value);
+
+  ws.onopen = m => {
+    instantMessageStatus.value = 'connected';
+  }
+
+  ws.onclose = m => {
+    instantMessageStatus.value = 'disconnected';
+  }
+
+  ws.onmessage = m => {
+    instantMessages.push({
+      content: parseColorCodes(m.data),
+      time: formatTimeStringFromDate(new Date())
+    })
+  };
+
+  ws.onerror = m => {
+    instantMessageStatus.value = 'error';
+    console.error(m);
+    instantMessages.push({
+      content: "Caught error. Please check the console.",
+      time: formatTimeStringFromDate(new Date())
+    })
+  }
+}
+
+function sendWebSocketMessage(message: string) {
+  ws.send(message);
+}
+
+function sendInstantMessage() {
+  sendWebSocketMessage(instantMessageToSend.value);
+  instantMessageToSend.value = ''
+}
+
+const isSendingInstantMessage = ref(false);
+const instantMessageInput = ref<HTMLInputElement | null>(null);
+type InstantMessageStatus = "connected" | "error" | "disconnected" | "pending";
+const instantMessageStatus = ref<InstantMessageStatus>('pending');
+const imStatusName = computed(() => getIMStatusNameAndIcon(instantMessageStatus.value).name);
+const imStatusIcon = computed(() => getIMStatusNameAndIcon(instantMessageStatus.value).icon);
+
 onMounted(async () => {
   username.value = getUsername().value;
 
   startRefreshDescribeInstanceResult().finally();
   startRefreshServerStatus().finally();
+  initializeWebSocketConnection();
 
   const deployStatus = await get<DeploymentStatus>('/api/ecs/deploy-status');
   if (deployStatus.code !== BackendCodes.OK) {
@@ -641,14 +713,15 @@ onMounted(async () => {
         isInstanceBeingDeployed.value = false;
     }
   }
-// Test codes
-//   instantMessages.value = [{
-//     sender: 'Subilan',
-//     content: 'wtf',
-//     time: '2024-05-30 22:50:39'
-//   }]
-//   instantMessageString.value = instantMessages.value.map(x => `[${x.time}] ${x.sender}: ${x.content}`).join('\n');
-//
+
+  if (instantMessageInput.value !== null){
+    instantMessageInput.value.addEventListener('focus', e => {
+      isSendingInstantMessage.value = true;
+    })
+    instantMessageInput.value.addEventListener('focusout', e => {
+      isSendingInstantMessage.value = false;
+    })
+  }
 })
 
 function getRandomExclamation() {
@@ -699,7 +772,6 @@ h2.value.ip {
 }
 
 
-
 .instance-status {
   border-radius: 100px;
   padding: 6px 20px;
@@ -741,48 +813,93 @@ h2.value.ip {
 .section__instant_message {
   .instant-message {
     border: 1px solid rgba(0, 0, 0, .2);
-    border-radius: 10px;
+    border-radius: 20px;
     padding: 16px;
+    background: #212121;
+    color: white;
 
     .instant-message-content {
       display: block;
       width: 100%;
       white-space: break-spaces;
       font-variation-settings: 'MONO' 0.5;
+      min-height: 500px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .instant-message-bg {
+      transform: translateY(50%) translateX(-100px) skew(0);
+      opacity: 0;
+      color: white;
+      font-size: 200px;
+      position: absolute;
+      right: 20px;
+      bottom: 140px;
+      transition: all .2s ease;
+      font-weight: bold;
+      pointer-events: none;
+      &.active {
+        transform: translateY(50%) translateX(0) skew(-8deg);
+        opacity: .1;
+      }
     }
 
     .instant-message-sender-wrapper {
       display: flex;
-      justify-content: center;
 
       .instant-message-sender {
         display: flex;
         align-items: center;
         gap: 16px;
-        width: 45%;
+        width: 100%;
+        border-radius: 20px;
+        justify-content: center;
+        transition: all .2s ease;
+
+        &.active {
+          justify-content: flex-start;
+        }
 
         input {
-          width: 80%;
-          border: none;
-          border-bottom: 2px solid rgba(0, 0, 0, .1);
+          width: 20%;
+          border: 1px solid rgba(255, 255, 255, .4);
+          border-radius: 30px;
+          padding: 8px 14px;
           height: 30px;
           outline: none;
-          font-size: 16px;
           .font-family--default-V;
+          transition: all .2s ease;
+          font-size: 16px;
+          background: transparent;
+          cursor: pointer;
+          text-align: center;
+
+          &::placeholder {
+            color: white;
+            transition: all .2s ease;
+          }
 
           &:hover {
-            border-color: @primaryl;
+            border-color: rgba(255, 255, 255, .7);
           }
 
           &:focus {
-            border-color: @primary;
+            text-align: left;
+            font-size: 20px;
+            color: white;
+            border-left-color: transparent;
+            border-top-color: transparent;
+            border-right-color: transparent;
+            padding: 0 0 8px;
+            border-radius: 0;
+            cursor: text;
+            width: 100%;
+            border-bottom-color: rgba(255, 255, 255, .7);
+            &::placeholder {
+              color: rgba(255, 255, 255, .6);
+            }
           }
-
-          transition: all .2s ease;
-        }
-
-        .btn {
-          width: 20%;
         }
       }
     }
@@ -834,5 +951,29 @@ h2.value.ip {
   }
 
   color: #ddd;
+}
+
+.badge.im-status {
+  border: none;
+
+  &.pending {
+    background: #fff8e1;
+    color: #ffc107;
+  }
+
+  &.connected {
+    background: #e3f2fd;
+    color: #2196F3;
+  }
+
+  &.disconnected {
+    background: #fafafa;
+    color: #9e9e9e;
+  }
+
+  &.error {
+    background: #ffebee;
+    color: #f44336;
+  }
 }
 </style>
