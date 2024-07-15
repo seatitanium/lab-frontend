@@ -107,14 +107,10 @@
 import setLocation from "~/utils/setLocation";
 import {
   mdiAccountOffOutline,
-  mdiCheck,
-  mdiClockPlusOutline,
-  mdiCompare,
-  mdiConnection, mdiEmail, mdiEmailEdit, mdiEmailEditOutline,
+  mdiEmailEditOutline,
   mdiHome,
-  mdiKeyVariant,
   mdiLinkVariant, mdiLinkVariantPlus, mdiLockReset,
-  mdiMinecraft, mdiPencilOutline, mdiRenameOutline
+  mdiMinecraft, mdiPodium, mdiRenameOutline
 } from "@mdi/js";
 import getUsername from "~/utils/getUsername";
 import {useState} from "#app";
@@ -190,7 +186,7 @@ const navigation = [
   {
     name: "排行榜",
     route: "/board",
-    icon: mdiCompare
+    icon: mdiPodium
   }
 ]
 </script>
