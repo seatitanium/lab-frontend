@@ -54,10 +54,6 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  problem: {
-    type: String,
-    default: ""
-  },
   required: {
     type: Boolean,
     default: false
@@ -74,14 +70,13 @@ const props = defineProps({
 
 const hasValue = ref(false);
 const regexPassed = ref(false);
-const actualProblem = ref(props.problem);
+const actualProblem = ref('');
 
-watch(() => tempProblem.value, v => {
+watch(tempProblem, v => {
   actualProblem.value = v || '';
 })
 
 watch(model, v => {
-  if (actualProblem.value === tempProblem.value) tempProblem.value = '';
   hasValue.value = v !== "" && v !== undefined;
   if (props.regex !== "") {
     const regex = new RegExp(props.regex);
@@ -93,7 +88,7 @@ watch(hasValue, v => {
   if (!v && props.required) {
     actualProblem.value = '这里必填。'
   } else {
-    actualProblem.value = '';
+    actualProblem.value = tempProblem.value || '';
   }
 })
 
@@ -101,7 +96,7 @@ watch(regexPassed, v => {
   if (!v) {
     actualProblem.value = props.regexProblem;
   } else {
-    actualProblem.value = '';
+    actualProblem.value = tempProblem.value || '';
   }
 })
 
