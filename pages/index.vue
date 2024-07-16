@@ -5,7 +5,7 @@
       <p>选择下列功能之一，单击以跳转到相关页面以进行操作。这些功能在不断的更新中。</p>
     </div>
     <section class="section__player_analytics">
-      <div class="page-user-profile container">
+      <div class="user-profile" v-if="userInformation.mcid !== ''">
         <section class="player-analytics">
           <div class="player-a" @click="modalPlaytimeA = true">
             <div class="text">
@@ -44,6 +44,16 @@
           </div>
         </section>
       </div>
+      <div class="user-profile empty" v-else>
+        <div class="text textaligncenter">
+          <h2>绑定 Minecraft ID 以查看个人统计信息</h2>
+          <p>绑定后，此处会展示包括游玩时长、登入次数的个人统计信息</p>
+        </div>
+        <btn class="with-bg--primary hover--dim">
+          <icon :path="mdiLinkVariantPlus"/>
+          立即绑定
+        </btn>
+      </div>
     </section>
     <modal v-model="modalPlaytimeA" class="with-bg--darken describe">
       <modal-content>
@@ -69,7 +79,9 @@
       </modal-actions>
     </modal>
     <anywhere-popup v-model="playtimeDescriptionPopup" :code="false">
-      <p>Seati 会自动计算你的游玩时长数据，并存储在专用的数据库中。其中包含了<strong>总在线时长</strong>和<strong>挂机时长</strong>，<strong>有效时长</strong>为两者之差。</p>
+      <p>Seati
+        会自动计算你的游玩时长数据，并存储在专用的数据库中。其中包含了<strong>总在线时长</strong>和<strong>挂机时长</strong>，<strong>有效时长</strong>为两者之差。
+      </p>
       <p>Seati 的各种权益仅以<strong>有效时长</strong>为依据。</p>
     </anywhere-popup>
     <section>
@@ -194,7 +206,7 @@
     <modal-content>
       <icon color="#4caf50" :path="mdiCheckAll"/>
       <h2>正版验证开启</h2>
-      <p>服务器已经开启了正版验证，以保障玩家权利和质量。</p>
+      <p>服务器已经开启了正版验证，以保障玩家权益和质量。</p>
       <p>这代表着在进入服务器之前，你的客户端将自动连接至 MOJANG 的服务器来检查你的账号是否为正版。</p>
     </modal-content>
     <modal-actions>
@@ -209,7 +221,7 @@ import getUsername from "~/utils/getUsername";
 import type {Ref} from "vue";
 import {
   mdiAbacus, mdiAnvil, mdiBook, mdiCardsPlaying,
-  mdiCheck, mdiCheckAll, mdiClockStarFourPointsOutline, mdiHome, mdiLanguageJava, mdiLaunch,
+  mdiCheck, mdiCheckAll, mdiClockStarFourPointsOutline, mdiHome, mdiLanguageJava, mdiLaunch, mdiLinkVariantPlus,
   mdiMemory, mdiMinecraft,
   mdiServer
 } from "@mdi/js";
@@ -472,13 +484,33 @@ const playtimeDescriptionPopup = ref(false);
   align-items: baseline;
   gap: 8px;
   margin: 8px 0;
+
   .time {
     font-weight: bold;
     color: @primaryd;
     font-size: 40px;
   }
+
   .text {
     color: #aaa;
+  }
+}
+
+.user-profile.empty {
+  border-radius: 20px;
+  border: 2px dashed #ddd;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+
+  .text {
+    h2 {
+      color: @primaryd;
+      font-size: 30px;
+      font-weight: bold;
+    }
   }
 }
 </style>

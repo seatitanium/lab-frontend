@@ -161,30 +161,6 @@ defineExpose({
   pointer-events: none;
 }
 
-@keyframes RotateInPlace {
-  0% {
-    transform: rotate(0deg) translateX(2px) rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg) translateX(2px) rotate(-360deg);
-  }
-}
-
-@keyframes PopAppear {
-  0% {
-    transform: scale(1) translateX(2px);
-  }
-
-  50% {
-    transform: scale(1.1) translateX(2px);
-  }
-
-  100% {
-    transform: scale(1) translateX(2px);
-  }
-}
-
 .hover-notice-wrap {
   position: absolute;
   top: 8px;
@@ -192,7 +168,7 @@ defineExpose({
   display: flex;
   align-items: stretch;
   filter: drop-shadow(0 4px 3px rgba(0, 0, 0, .3));
-  animation: RotateInPlace 2.2s linear .4s infinite, PopAppear .3s ease;
+  .animation--RotateInPlace;
   transform-origin: center;
   transform: translateX(2px);
 

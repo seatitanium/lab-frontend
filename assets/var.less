@@ -71,3 +71,31 @@
     opacity: 1;
   }
 }
+
+@keyframes RotateInPlace {
+  0% {
+    transform: rotate(0deg) translateX(2px) rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg) translateX(2px) rotate(-360deg);
+  }
+}
+
+@keyframes PopAppear {
+  0% {
+    transform: scale(1) translateX(2px);
+  }
+
+  50% {
+    transform: scale(1.1) translateX(2px);
+  }
+
+  100% {
+    transform: scale(1) translateX(2px);
+  }
+}
+
+.animation--RotateInPlace {
+  animation: RotateInPlace 2.2s linear .4s infinite, PopAppear .3s ease;
+}

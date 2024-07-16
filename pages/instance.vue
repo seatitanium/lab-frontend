@@ -189,9 +189,16 @@
             <div class="instant-message-content" v-html="instantMessageString"/>
             <div class="instant-message-sender-wrapper" :class="{active: isSendingInstantMessage}">
               <div class="instant-message-sender">
-                <input ref="instantMessageInput" @keydown.enter="sendInstantMessage"
-                       :placeholder="`以 ${username} 的身份发送信息...`"
-                       v-model="instantMessageToSend"/>
+                <input
+                    :disabled="instantMessageStatus !== 'connected' || userInformation.mcid === ''"
+                    ref="instantMessageInput"
+                    @keydown.enter="sendInstantMessage"
+                    :placeholder="
+                    instantMessageStatus === 'connected'
+                    ? (userInformation.mcid !== '' ? `以 ${userInformation.mcid} 的身份发送信息` : '请绑定游戏名后使用送信功能')
+                    : '暂未连接到服务器'"
+                    v-model="instantMessageToSend"
+                />
               </div>
             </div>
           </div>
@@ -334,6 +341,7 @@ import BottomNavigation from "~/components/bottom-navigation.vue";
 import randomInclusive from "~/utils/randInclusive";
 import ScreenfetchContent from "~/components/screenfetch-content.vue";
 import {useLocalStorage} from "@vueuse/core";
+import {useState} from "#app";
 
 let onlinePlayers = reactive<{
   data: string[]
@@ -346,7 +354,8 @@ type InstanceAction = 'start' | 'reboot' | 'stop' | 'stop_force' | 'create' | 'd
 let instantMessages = reactive<{ content: string, time: string }[]>([])
 const instantMessageString = computed(() => instantMessages.map(x => `<span style="color: #aaa">[${x.time}]</span> ${x.content}`).join("\n"));
 const instantMessageToSend = ref('');
-const username = ref('')
+const username = ref('');
+const userInformation = useState<UserExtended>('user-data');
 const confirmActionLoading = ref(false);
 const instanceInformation = reactive<DescribeInstanceRes>({
   local: {
@@ -883,33 +892,41 @@ h2.value.ip {
           transition: all .2s ease;
           font-size: 16px;
           background: transparent;
-          cursor: pointer;
+
           text-align: center;
 
-          &::placeholder {
-            color: white;
-            transition: all .2s ease;
+          [disabled] {
+            cursor: not-allowed;
           }
 
-          &:hover {
-            border-color: rgba(255, 255, 255, .7);
-          }
-
-          &:focus {
-            text-align: left;
-            font-size: 20px;
-            color: white;
-            border-left-color: transparent;
-            border-top-color: transparent;
-            border-right-color: transparent;
-            padding: 0 0 8px;
-            border-radius: 0;
-            cursor: text;
-            width: 100%;
-            border-bottom-color: rgba(255, 255, 255, .7);
+          &:not([disabled]) {
+            cursor: pointer;
 
             &::placeholder {
-              color: rgba(255, 255, 255, .6);
+              color: white;
+              transition: all .2s ease;
+            }
+
+            &:hover {
+              border-color: rgba(255, 255, 255, .7);
+            }
+
+            &:focus {
+              text-align: left;
+              font-size: 20px;
+              color: white;
+              border-left-color: transparent;
+              border-top-color: transparent;
+              border-right-color: transparent;
+              padding: 0 0 8px;
+              border-radius: 0;
+              cursor: text;
+              width: 100%;
+              border-bottom-color: rgba(255, 255, 255, .7);
+
+              &::placeholder {
+                color: rgba(255, 255, 255, .6);
+              }
             }
           }
         }

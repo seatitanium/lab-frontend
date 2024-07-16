@@ -17,9 +17,10 @@
         </div>
         <div class="spacer"></div>
         <div class="user-avatar" v-if="userInformation.id > 0">
-          <avatar-spinner v-if="userInformation.uuid === ''"/>
-          <img @click="userActionsModal = true" draggable="false" v-else
+          <avatar-spinner v-if="userInformation.uuid === '' && userInformation.mcid !== ''"/>
+          <img @click="userActionsModal = true" draggable="false" v-else-if="userInformation.uuid !== '' && userInformation.mcid !== ''"
                :src="`https://crafatar.com/avatars/${userInformation.uuid}`"/>
+          <div class="avatar-placeholder" @click="userActionsModal = true">{{ username.charAt(0).toUpperCase() }}</div>
         </div>
       </div>
     </nav>
@@ -39,13 +40,13 @@
   <modal v-model="userActionsModal" class="with-bg--darken" with-close-btn>
     <modal-content>
       <div class="user-actions-container">
-        <div class="left">
-          <player-skin-viewer v-if="userInformation.skinBase64 !== ''" :skin="userInformation.skinBase64" :width="200"
+        <div class="left" v-if="userInformation.skinBase64 !== ''">
+          <player-skin-viewer :skin="userInformation.skinBase64" :width="200"
                               :height="400"/>
         </div>
         <div class="right">
           <div class="top">
-            <h2>{{ userInformation.mcid }}</h2>
+            <h2>{{ userInformation.mcid || userInformation.username }}</h2>
             <div class="namesub">普通玩家</div>
           </div>
           <metabar>
@@ -69,32 +70,40 @@
           <div class="actions">
             <div class="action">
               <icon :path="userInformation.mcid !== '' ? mdiLinkVariant : mdiLinkVariantPlus"/>
-              {{ userInformation.mcid !== '' ? '更新' : '绑定' }} Minecraft ID
-              <span class="current">
+              <span class="text">{{ userInformation.mcid !== '' ? '更新' : '绑定' }} Minecraft ID</span>
+              <span class="current" v-if="userInformation.mcid">
                 {{ userInformation.mcid }}
+              </span>
+              <span class="current note" v-else>
+                <icon :path="mdiCreationOutline"/>
+                解锁完整功能
               </span>
             </div>
             <div class="action">
               <icon :path="mdiLockReset"/>
-              修改密码
+              <span class="text">修改密码</span>
             </div>
             <div class="action">
               <icon :path="mdiEmailEditOutline"/>
-              修改邮箱
+              <span class="text">修改邮箱</span>
               <span class="current">
                 {{ userInformation.email }}
               </span>
             </div>
             <div class="action">
               <icon :path="mdiRenameOutline"/>
-              {{ userInformation.nickname ? '修改' : '添加'}}昵称
-              <span class="current">
+              <span class="text">{{ userInformation.nickname ? '修改' : '添加'}}昵称</span>
+              <span class="current" v-if="userInformation.nickname">
                 {{ userInformation.nickname }}
+              </span>
+              <span class="current note" v-else>
+                <icon :path="mdiAccountHeartOutline"/>
+                沟通交流更方便
               </span>
             </div>
             <div class="action red">
               <icon :path="mdiAccountOffOutline"/>
-              注销账号
+              <span class="text">注销账号</span>
             </div>
           </div>
         </div>
@@ -106,7 +115,8 @@
 <script lang="ts" setup>
 import setLocation from "~/utils/setLocation";
 import {
-  mdiAccountOffOutline,
+  mdiAccountHeartOutline,
+  mdiAccountOffOutline, mdiCreationOutline,
   mdiEmailEditOutline,
   mdiHome,
   mdiLinkVariant, mdiLinkVariantPlus, mdiLockReset,
@@ -155,17 +165,20 @@ async function initUser() {
     errorInformationContent.value = JSON.stringify(userResult);
   } else {
     Object.assign(userInformation.value, userResult.data)
-    const skinRes = await playernameToSkin(userInformation.value.mcid);
-    userInformation.value.skinBase64 = skinRes.data;
-    userInformation.value.uuid = await playernameToUUID(userInformation.value.mcid);
 
-    const loginCountRes = await get<number>(`/api/user/stats/login/count?username=${username.value}`);
-    if (loginCountRes.code === BackendCodes.OK) userInformation.value.analytics.loginCount = loginCountRes.data;
+    if (userInformation.value.mcid.length > 0) {
+      const skinRes = await playernameToSkin(userInformation.value.mcid);
+      userInformation.value.skinBase64 = skinRes.data;
+      userInformation.value.uuid = await playernameToUUID(userInformation.value.mcid);
 
-    const playtimeRes = await get<UserStatsPlaytime>(`/api/user/stats/playtime?username=${username.value}`);
-    if (playtimeRes.code === BackendCodes.OK) {
-      userInformation.value.analytics.playtime.total = playtimeRes.data.total;
-      userInformation.value.analytics.playtime.afk = playtimeRes.data.afk;
+      const loginCountRes = await get<number>(`/api/user/stats/login/count?playername=${userInformation.value.mcid}`);
+      if (loginCountRes.code === BackendCodes.OK) userInformation.value.analytics.loginCount = loginCountRes.data;
+
+      const playtimeRes = await get<UserStatsPlaytime>(`/api/user/stats/playtime?playername=${userInformation.value.mcid}`);
+      if (playtimeRes.code === BackendCodes.OK) {
+        userInformation.value.analytics.playtime.total = playtimeRes.data.total;
+        userInformation.value.analytics.playtime.afk = playtimeRes.data.afk;
+      }
     }
   }
 }
@@ -243,6 +256,18 @@ const navigation = [
     height: 40px;
     cursor: pointer;
   }
+
+  .avatar-placeholder {
+    font-size: 20px;
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 100%;
+    border: 1px solid rgba(0, 0, 0, .2);
+    cursor: pointer;
+  }
 }
 
 .user-actions-container {
@@ -257,10 +282,15 @@ const navigation = [
       gap: 8px;
 
       h2 {
-        font-family: 'Minecraft', monospace;
-        font-weight: normal;
+        &.mcid {
+          font-family: 'Minecraft', monospace;
+          font-weight: normal;
+          font-size: 48px;
+        }
+
+        font-variation-settings: 'wght' 800;
         margin: 0;
-        font-size: 48px;
+        font-size: 38px;
       }
 
       .namesub {
@@ -291,6 +321,21 @@ const navigation = [
         color: #aaa;
         opacity: 1;
         transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+
+        &.note {
+          color: @primaryd;
+          background: @primaryl;
+          border-radius: 30px;
+          padding: 0 14px;
+          .animation--RotateInPlace;
+        }
+
+        svg {
+          width: 20px;
+        }
       }
 
       &:hover {
@@ -301,19 +346,25 @@ const navigation = [
 
         border-radius: 20px;
         padding: 16px 0;
-        svg {
+
+        > svg {
           transform: rotate(6deg) scale(2) translateX(-4px);
         }
+
         &.red {
           background: #ffebee;
           color: #f44336;
         }
+
         &:not(.red) {
           background: @primaryl;
           color: @primaryd;
         }
-        font-weight: bold;
-        font-variation-settings: 'wght' 800;
+
+        > .text {
+          font-weight: bold;
+          font-variation-settings: 'wght' 800;
+        }
       }
 
       svg {
