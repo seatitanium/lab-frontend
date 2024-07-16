@@ -94,7 +94,7 @@
                 {{ userInformation.email }}
               </span>
             </div>
-            <div class="action">
+            <div class="action" @click="userActionsModal = false; modalUserAction_nickname = true">
               <icon :path="mdiRenameOutline"/>
               <span class="text">{{ userInformation.nickname ? '修改' : '添加'}}昵称</span>
               <span class="current" v-if="userInformation.nickname">
@@ -168,6 +168,7 @@ const errorInformationContent = useState('error-modal-content', () => '');
 const userActionsModal = ref(false);
 
 const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
+const modalUserAction_nickname = useState('modal-user-action-nickname', () => false);
 
 async function initUser() {
   if (username.value === '') return;
