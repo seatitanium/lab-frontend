@@ -16,7 +16,10 @@ interface AshconResponse {
     },
     username: string,
     username_history: {username: string}[],
-    uuid: string
+    uuid: string,
+    code?: number,
+    error?: string,
+
 }
 
 export default async function(playername: string) {

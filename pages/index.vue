@@ -5,7 +5,13 @@
       <p>选择下列功能之一，单击以跳转到相关页面以进行操作。这些功能在不断的更新中。</p>
     </div>
     <section class="section__player_analytics">
-      <div class="user-profile" v-if="userInformation.mcid !== ''">
+      <div class="user-profile loading" v-if="userInformation.loading">
+        <div class="text textaligncenter">
+          <circle-spinner size="25"/>
+          <p>加载用户信息中</p>
+        </div>
+      </div>
+      <div class="user-profile" v-else-if="userInformation.hasBoundValidMCID">
         <section class="player-analytics">
           <div class="player-a" @click="modalPlaytimeA = true">
             <div class="text">
@@ -49,7 +55,7 @@
           <h2>绑定 Minecraft ID 以查看个人统计信息</h2>
           <p>绑定后，此处会展示包括游玩时长、登入次数的个人统计信息</p>
         </div>
-        <btn class="with-bg--primary hover--dim">
+        <btn class="with-bg--primary hover--dim" @click="modalUserAction_mcid = true">
           <icon :path="mdiLinkVariantPlus"/>
           立即绑定
         </btn>
@@ -58,7 +64,7 @@
     <modal v-model="modalPlaytimeA" class="with-bg--darken describe">
       <modal-content>
         <icon color="#009688" :path="mdiClockStarFourPointsOutline"/>
-        <h2>{{ username }} 的游玩时长数据</h2>
+        <h2>{{ userInformation.mcid }} 的游玩时长数据</h2>
         <div class="playtime">
           <div class="time">{{ formatSecondsDense(userPlaytimeTotal) }}</div>
           <div class="text">总在线时长</div>
@@ -294,6 +300,8 @@ onMounted(() => {
 
 const modalPlaytimeA = ref(false);
 const playtimeDescriptionPopup = ref(false);
+
+const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
 </script>
 
 <style lang="less" scoped>
@@ -496,20 +504,24 @@ const playtimeDescriptionPopup = ref(false);
   }
 }
 
-.user-profile.empty {
-  border-radius: 20px;
-  border: 2px dashed #ddd;
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
+.user-profile {
+  &.empty, &.loading {
+    border-radius: 20px;
+    border: 2px dashed #ddd;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
 
-  .text {
-    h2 {
-      color: @primaryd;
-      font-size: 30px;
-      font-weight: bold;
+  &.empty {
+    .text {
+      h2 {
+        color: @primaryd;
+        font-size: 30px;
+        font-weight: bold;
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 <template>
-  <modal v-model="modalUserAction_mcid" :class="{describe: userInformation.mcid === ''}" class="with-bg--darken">
-    <modal-content v-if="userInformation.mcid === ''">
+  <modal v-model="modalUserAction_mcid" :class="{describe: !userInformation.hasBoundValidMCID}" class="with-bg--darken">
+    <modal-content v-if="!userInformation.hasBoundValidMCID">
       <icon :path="mdiMinecraft"/>
       <h2>立即绑定 Minecraft ID</h2>
       <p>Minecraft ID 是指你在 MOJANG 处注册的游戏名称，显示在游戏内的聊天中。</p>
@@ -10,9 +10,9 @@
                    v-model:tempProblem="mcidTempProblem" required/>
       </form>
     </modal-content>
-    <modal-title v-if="userInformation.mcid !== ''">更新 Minecraft ID</modal-title>
-    <modal-content v-if="userInformation.mcid !== ''">
-      <p>如果你最近修改过游戏名称，可以在此键入你的新游戏名以完成更新。</p>
+    <modal-title v-if="userInformation.hasBoundValidMCID">更新 Minecraft ID</modal-title>
+    <modal-content v-if="userInformation.hasBoundValidMCID">
+      <p>如果你希望绑定另一个不同的游戏名，可以在此处修改。</p>
       <form class="mcid-form">
         <textfield class="mcid-textfield" placeholder="游戏名" bg-text v-model:input="mcidToBind"
                    v-model:tempProblem="mcidTempProblem" required/>
@@ -20,7 +20,7 @@
     </modal-content>
     <modal-actions>
       <btn :disabled="!mcidValid" class="with-bg--primary hover--dim" :loading="mcidBindLoading" @click="bindMCID">
-        立即{{ userInformation.mcid === '' ? '绑定' : '修改'}}
+        立即{{ !userInformation.hasBoundValidMCID ? '绑定' : '修改'}}
       </btn>
       <btn @click="modalUserAction_mcid = false" class="with-bg--white hover--dim">
         取消
@@ -38,6 +38,7 @@ import {useState} from "#app";
 import {mdiMinecraft} from "@mdi/js";
 import patch from "~/utils/patch";
 import {BackendCodes} from "~/consts";
+import getAshconResponse from "~/utils/getAshconResponse";
 
 const userInformation = useState<UserExtended>('user-data');
 const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
@@ -63,6 +64,12 @@ watch(mcidToBind, v => {
 
 async function bindMCID() {
   mcidBindLoading.value = true;
+  const ashconResult = await getAshconResponse(mcidToBind.value);
+  if (ashconResult.code === 404) {
+    mcidBindLoading.value = false;
+    mcidTempProblem.value = "此游戏名不存在";
+    return;
+  }
   const result = await patch(`/api/user/profile?username=${userInformation.value.username}`, {
     'mc_id': mcidToBind.value
   });
@@ -70,7 +77,7 @@ async function bindMCID() {
   modalUserAction_mcid.value = false;
 
   if (result.code === BackendCodes.OK) {
-    // TODO: snackbar
+    useRouter().go(0);
   } else {
     modalError.value = true;
     errorModalContent.value = JSON.stringify(result);

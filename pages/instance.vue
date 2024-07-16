@@ -190,12 +190,12 @@
             <div class="instant-message-sender-wrapper" :class="{active: isSendingInstantMessage}">
               <div class="instant-message-sender">
                 <input
-                    :disabled="instantMessageStatus !== 'connected' || userInformation.mcid === ''"
+                    :disabled="instantMessageStatus !== 'connected' || !userInformation.hasBoundValidMCID"
                     ref="instantMessageInput"
                     @keydown.enter="sendInstantMessage"
                     :placeholder="
                     instantMessageStatus === 'connected'
-                    ? (userInformation.mcid !== '' ? `以 ${userInformation.mcid} 的身份发送信息` : '请绑定游戏名后使用送信功能')
+                    ? (userInformation.hasBoundValidMCID ? `以 ${userInformation.mcid} 的身份发送信息` : '请绑定游戏名后使用送信功能')
                     : '暂未连接到服务器'"
                     v-model="instantMessageToSend"
                 />
