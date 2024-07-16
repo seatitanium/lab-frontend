@@ -20,7 +20,7 @@
           <avatar-spinner v-if="userInformation.uuid === '' && userInformation.mcid !== ''"/>
           <img @click="userActionsModal = true" draggable="false" v-else-if="userInformation.uuid !== '' && userInformation.mcid !== ''"
                :src="`https://crafatar.com/avatars/${userInformation.uuid}`"/>
-          <div class="avatar-placeholder" @click="userActionsModal = true">{{ username.charAt(0).toUpperCase() }}</div>
+          <div class="avatar-placeholder" @click="userActionsModal = true" v-else>{{ username.charAt(0).toUpperCase() }}</div>
         </div>
       </div>
     </nav>
@@ -68,7 +68,7 @@
             </metabar-item>
           </metabar>
           <div class="actions">
-            <div class="action">
+            <div class="action" @click="userActionsModal = false; modalUserAction_mcid = true">
               <icon :path="userInformation.mcid !== '' ? mdiLinkVariant : mdiLinkVariantPlus"/>
               <span class="text">{{ userInformation.mcid !== '' ? '更新' : '绑定' }} Minecraft ID</span>
               <span class="current" v-if="userInformation.mcid">
@@ -110,6 +110,7 @@
       </div>
     </modal-content>
   </modal>
+  <mg-user-actions/>
 </template>
 
 <script lang="ts" setup>
@@ -129,6 +130,7 @@ import playernameToSkin from "~/utils/playernameToSkin";
 import {playernameToUUID} from "#imports";
 import AvatarSpinner from "~/components/avatar-spinner.vue";
 import formatTimeStringFromDate from "../utils/formatTimeStringFromDate";
+import MgUserActions from "~/components/modal-groups/mg-user-actions.vue";
 
 const username = getUsername();
 
@@ -156,6 +158,8 @@ const userInformation = useState<UserExtended>('user-data', () => {
 const someProblemModal = useState('error-modal-state', () => false);
 const errorInformationContent = useState('error-modal-content', () => '');
 const userActionsModal = ref(false);
+
+const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
 
 async function initUser() {
   if (username.value === '') return;

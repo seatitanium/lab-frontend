@@ -94,19 +94,19 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
     flex-direction: column;
     align-items: center;
 
-    svg, img {
+    > svg, img {
       height: 150px;
       width: auto;
       margin: 16px 0;
       max-width: 70%;
     }
 
-    h2 {
+    > h2 {
       font-size: 28px;
       text-align: center;
     }
 
-    p {
+    > p {
       text-align: center;
       margin: 8px 0;
     }

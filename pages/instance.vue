@@ -636,8 +636,10 @@ async function startRefreshServerStatus() {
     if (!enableRefreshServerStatus.value) continue;
     const result = await get<ServerStatus>(`/api/server/status?ip=127.0.0.1`);
     if (result.code === BackendCodes.OK) {
-      const r = result.data.players.sample.map(x => x.name_clean).filter(x => x !== 'Anonymous Player');
-      if (!r.every(x => onlinePlayers.data.includes(x)) || r.length === 0) onlinePlayers.data = r;
+      if (result.data !== null) {
+        const r = result.data.players.sample.map(x => x.name_clean).filter(x => x !== 'Anonymous Player');
+        if (!r.every(x => onlinePlayers.data.includes(x)) || r.length === 0) onlinePlayers.data = r;
+      }
     } else {
       console.warn("Cannot retrieve server status", result);
     }
@@ -680,11 +682,11 @@ function initializeWebSocketConnection() {
 
   ws.onerror = m => {
     instantMessageStatus.value = 'error';
-    console.error(m);
+    console.warn(m);
     instantMessages.push({
       content: "Caught error. Please check the console.",
       time: formatTimeStringFromDate(new Date())
-    })
+    });
   }
 }
 
