@@ -70,7 +70,7 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 5000;
 
   .anywhere-popup {
     border: 5px solid black;
