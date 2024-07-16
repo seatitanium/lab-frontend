@@ -159,7 +159,7 @@ const userActionsModal = ref(false);
 
 async function initUser() {
   if (username.value === '') return;
-  const userResult = await get<User>(`/api/user/profile/${username.value}`);
+  const userResult = await get<User>(`/api/user/profile?username=${username.value}`);
   if (userResult.code !== BackendCodes.OK) {
     someProblemModal.value = true;
     errorInformationContent.value = JSON.stringify(userResult);
