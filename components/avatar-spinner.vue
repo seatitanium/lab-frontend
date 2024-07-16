@@ -25,6 +25,7 @@ export default {
   background: #009688;
   border-radius: 50%;
   overflow: hidden;
+  cursor: wait;
 }
 
 .spinner:before, .spinner:after {
