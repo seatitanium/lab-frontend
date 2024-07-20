@@ -9,7 +9,7 @@
   display: flex;
   align-items: center;
   gap: 15px;
-  padding-top: 32px;
+  padding-top: 16px;
   z-index: 100;
 
   &.right {
