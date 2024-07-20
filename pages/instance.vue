@@ -743,6 +743,10 @@ onMounted(async () => {
       isSendingInstantMessage.value = false;
     })
   }
+});
+
+onBeforeRouteLeave(() => {
+  ws.close();
 })
 
 function getRandomExclamation() {
