@@ -67,7 +67,7 @@
 
 <script lang="ts" setup>
 import {useState} from "#app";
-import {mdiAlertOutline, mdiMinecraft, mdiPencilOutline, mdiRenameOutline} from "@mdi/js";
+import {mdiAlertOutline, mdiMinecraft, mdiRenameOutline} from "@mdi/js";
 import patch from "~/utils/patch";
 import {BackendCodes} from "~/consts";
 import getAshconResponse from "~/utils/getAshconResponse";
