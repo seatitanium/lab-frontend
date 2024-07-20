@@ -62,7 +62,7 @@
         <metabar-item>
           <span class="left">
             <icon :path="mdiClockOutline"/>
-          最近更新
+          最近刷新
           </span>
           <span class="right">
             {{ instanceStatusLastUpdated || 'N/A' }}
