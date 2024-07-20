@@ -40,7 +40,7 @@
   <modal v-model="userActionsModal" class="with-bg--darken" with-close-btn>
     <modal-content>
       <div class="user-actions-container">
-        <div class="left" v-if="userInformation.skinBase64 !== ''">
+        <div class="left" v-if="userInformation.hasBoundValidMCID">
           <player-skin-viewer :skin="userInformation.skinBase64" :width="200"
                               :height="400"/>
         </div>
@@ -77,6 +77,10 @@
               <span class="mcid-not-exist-warning current" v-else-if="userInformation.mcid && !userInformation.mcidExist">
                 <icon :path="mdiAlertOutline"/>
                 请及时更换无效 ID
+              </span>
+              <span class="mcid-not-verified current" v-else-if="userInformation.mcid && !userInformation.mcidVerified">
+                <icon :path="mdiAlertOutline"/>
+                请及时验证 ID
               </span>
               <span class="current note" v-else>
                 <icon :path="mdiCreationOutline"/>
@@ -162,7 +166,8 @@ const userInformation = useState<UserExtended>('user-data', () => {
     uuid: "",
     mcidExist: false,
     hasBoundValidMCID: false,
-    loading: true
+    loading: true,
+    mcidVerified: false
   };
 });
 
@@ -206,7 +211,7 @@ async function initUser() {
     if (userInformation.value.mcid.length > 0) {
       const ashconResponse = await getAshconResponse(userInformation.value.mcid);
       userInformation.value.mcidExist = ashconResponse.code !== 404;
-      userInformation.value.hasBoundValidMCID = userInformation.value.mcidExist;
+      userInformation.value.hasBoundValidMCID = userInformation.value.mcidExist && userInformation.value.mcidVerified;
       const skinRes = await playernameToSkin(userInformation.value.mcid);
       if (skinRes) userInformation.value.skinBase64 = skinRes.data;
       userInformation.value.uuid = await playernameToUUID(userInformation.value.mcid);
@@ -388,6 +393,13 @@ watch(userInitState, () => {
         &.mcid-not-exist-warning {
           color: #f44336;
           background: #ffebee;
+          border-radius: 30px;
+          padding: 0 14px;
+        }
+
+        &.mcid-not-verified {
+          color: #ff9800;
+          background: #fff8e1;
           border-radius: 30px;
           padding: 0 14px;
         }

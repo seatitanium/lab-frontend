@@ -2,7 +2,11 @@
   <modal v-model="modalUserAction_mcid" :class="{describe: !userInformation.hasBoundValidMCID}" class="with-bg--darken">
     <modal-content v-if="!userInformation.hasBoundValidMCID">
       <icon :path="mdiMinecraft"/>
-      <h2>立即绑定 Minecraft ID</h2>
+      <h2>{{ mcidExistButNotVerified ? '重新' : '立即' }}绑定 Minecraft ID</h2>
+      <block class="with-bg--orange" v-if="mcidExistButNotVerified">
+        <icon :path="mdiAlertOutline"/>
+        你已经绑定了一个游戏名（{{ userInformation.mcid}}），但没有验证
+      </block>
       <p>Minecraft ID 是指你在 MOJANG 处注册的游戏名称，显示在游戏内的聊天中。</p>
       <p>绑定后，你可以在 TiLab 中与游戏进行信息交互，并可享受后续推出的更多相关功能。</p>
       <form>
@@ -20,7 +24,7 @@
     </modal-content>
     <modal-actions>
       <btn :disabled="!mcidValid" class="with-bg--primary hover--dim" :loading="loading" @click="bindMCID">
-        立即{{ !userInformation.hasBoundValidMCID ? '绑定' : '修改' }}
+        {{ mcidExistButNotVerified ? '重新' : '立即'}}{{ !userInformation.hasBoundValidMCID ? '绑定' : '修改' }}
       </btn>
       <btn @click="modalUserAction_mcid = false" class="with-bg--white hover--dim">
         取消
@@ -63,7 +67,7 @@
 
 <script lang="ts" setup>
 import {useState} from "#app";
-import {mdiMinecraft, mdiPencilOutline, mdiRenameOutline} from "@mdi/js";
+import {mdiAlertOutline, mdiMinecraft, mdiPencilOutline, mdiRenameOutline} from "@mdi/js";
 import patch from "~/utils/patch";
 import {BackendCodes} from "~/consts";
 import getAshconResponse from "~/utils/getAshconResponse";
@@ -77,7 +81,8 @@ const userInformation = useState<UserExtended>('user-data');
 const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
 const mcidToBind = ref('');
 const mcidTempProblem = ref('');
-const mcidValid = computed(() => regexMCID.test(mcidToBind.value))
+const mcidValid = computed(() => regexMCID.test(mcidToBind.value) && mcidToBind.value !== userInformation.value.mcid)
+const mcidExistButNotVerified = computed(() => userInformation.value.mcidExist && !userInformation.value.mcidVerified);
 
 const modalUserAction_nickname = useState('modal-user-action-nickname', () => false);
 const nicknameToChange = ref('');
@@ -105,6 +110,10 @@ watch(nicknameToChange, v => {
 })
 
 watch(mcidToBind, v => {
+  if (v === userInformation.value.mcid) {
+    mcidTempProblem.value = "请填写不同于当前的游戏名"
+    return;
+  }
   if (!regexMCID.test(v)) {
     if (!/^[a-zA-Z0-9_]+$/.test(v)) {
       mcidTempProblem.value = "只能包含英文、下划线或者数字"

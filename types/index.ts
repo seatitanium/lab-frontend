@@ -35,6 +35,7 @@ declare global {
         mcid: string,
         createdAt: number,
         updatedAt: number,
+        mcidVerified: boolean,
     }
 
     interface UserExtended extends User {

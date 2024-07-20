@@ -22,5 +22,10 @@
     background: @primaryl;
     color: @primaryd;
   }
+
+  &.with-bg--orange {
+    background: #fff3e0;
+    color: #ff9800;
+  }
 }
 </style>

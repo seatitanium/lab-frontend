@@ -52,10 +52,11 @@
       </div>
       <div class="user-profile empty" v-else>
         <div class="text textaligncenter">
-          <h2>绑定 Minecraft ID 以查看个人统计信息</h2>
-          <p>绑定后，此处会展示包括游玩时长、登入次数的个人统计信息</p>
+          <h2>{{ userInformation.mcidVerified ? '绑定有效' : '验证' }} Minecraft ID 以查看个人统计信息</h2>
+          <p v-if="userInformation.mcidVerified">绑定后，此处会展示包括游玩时长、登入次数的个人统计信息</p>
+          <p v-else>请登入 Seati 服务器，按照提示进行操作以验证 Minecraft ID</p>
         </div>
-        <btn class="with-bg--primary hover--dim" @click="modalUserAction_mcid = true">
+        <btn class="with-bg--primary hover--dim" @click="modalUserAction_mcid = true" v-if="userInformation.mcidVerified">
           <icon :path="mdiLinkVariantPlus"/>
           立即绑定
         </btn>
@@ -220,7 +221,6 @@
       <btn class="without-bg--primary hover--dim" href="https://www.minecraft.net/">购买正版</btn>
     </modal-actions>
   </modal>
-  <login-modal/>
 </template>
 
 <script lang="ts" setup>
