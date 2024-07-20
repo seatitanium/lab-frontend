@@ -314,7 +314,7 @@
 </template>
 <script setup lang="ts">
 import {
-  mdiAccountGroupOutline, mdiAlert, mdiAlertOutline,
+  mdiAccountGroupOutline, mdiAlertOutline,
   mdiCheckAll, mdiCheckCircleOutline,
   mdiClipboardTextOutline,
   mdiClockOutline, mdiClockPlusOutline,
@@ -326,7 +326,7 @@ import {
   mdiMessageTextOutline,
   mdiNavigationVariantOutline,
   mdiRestart,
-  mdiSend, mdiTrashCan, mdiTrashCanOutline, mdiWebOff
+  mdiTrashCanOutline, mdiWebOff
 } from "@mdi/js";
 import {getUsername} from "#imports";
 import {BackendCodes} from "~/consts";
@@ -665,11 +665,11 @@ function initializeWebSocketConnection() {
   const token = useLocalStorage('tisea-auth-token', '');
   ws = new WebSocket("ws://localhost:23322?token=" + token.value);
 
-  ws.onopen = m => {
+  ws.onopen = () => {
     instantMessageStatus.value = 'connected';
   }
 
-  ws.onclose = m => {
+  ws.onclose = () => {
     instantMessageStatus.value = 'disconnected';
   }
 
@@ -736,10 +736,10 @@ onMounted(async () => {
   }
 
   if (instantMessageInput.value !== null) {
-    instantMessageInput.value.addEventListener('focus', e => {
+    instantMessageInput.value.addEventListener('focus', () => {
       isSendingInstantMessage.value = true;
     })
-    instantMessageInput.value.addEventListener('focusout', e => {
+    instantMessageInput.value.addEventListener('focusout', () => {
       isSendingInstantMessage.value = false;
     })
   }

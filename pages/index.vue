@@ -225,12 +225,10 @@
 
 <script lang="ts" setup>
 import getUsername from "~/utils/getUsername";
-import type {Ref} from "vue";
 import {
-  mdiAbacus, mdiAnvil, mdiBook, mdiCardsPlaying,
-  mdiCheck, mdiCheckAll, mdiClockStarFourPointsOutline, mdiHome, mdiLanguageJava, mdiLaunch, mdiLinkVariantPlus,
-  mdiMemory, mdiMinecraft,
-  mdiServer
+  mdiAnvil, mdiCardsPlaying,
+  mdiCheck, mdiCheckAll, mdiClockStarFourPointsOutline, mdiLanguageJava, mdiLaunch, mdiLinkVariantPlus,
+  mdiMemory, mdiMinecraft
 } from "@mdi/js";
 import ForgeLogoFull from '~/assets/icons/forge-logo-full.svg'
 import DukeWaving from '~/assets/icons/duke-waving.svg'
