@@ -40,7 +40,10 @@ declare global {
     interface UserExtended extends User {
         skinBase64: string,
         analytics: UserAnalytics,
-        uuid: string
+        uuid: string,
+        mcidExist: boolean,
+        hasBoundValidMCID: boolean,
+        loading: boolean
     }
 
     interface UserAnalytics {

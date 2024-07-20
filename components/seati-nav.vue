@@ -17,8 +17,8 @@
         </div>
         <div class="spacer"></div>
         <div class="user-avatar" v-if="userInformation.id > 0">
-          <avatar-spinner v-if="userInformation.uuid === '' && userInformation.mcid !== ''"/>
-          <img @click="userActionsModal = true" draggable="false" v-else-if="userInformation.uuid !== '' && userInformation.mcid !== ''"
+          <avatar-spinner v-if="userInformation.loading"/>
+          <img @click="userActionsModal = true" draggable="false" v-else-if="userInformation.hasBoundValidMCID"
                :src="`https://crafatar.com/avatars/${userInformation.uuid}`"/>
           <div class="avatar-placeholder" @click="userActionsModal = true" v-else>{{ username.charAt(0).toUpperCase() }}</div>
         </div>
@@ -46,7 +46,7 @@
         </div>
         <div class="right">
           <div class="top">
-            <h2>{{ userInformation.mcid || userInformation.username }}</h2>
+            <h2 :class="{mcid: userInformation.hasBoundValidMCID}">{{ userInformation.hasBoundValidMCID ? userInformation.mcid : userInformation.username}}</h2>
             <div class="namesub">普通玩家</div>
           </div>
           <metabar>
@@ -69,10 +69,14 @@
           </metabar>
           <div class="actions">
             <div class="action" @click="userActionsModal = false; modalUserAction_mcid = true">
-              <icon :path="userInformation.mcid !== '' ? mdiLinkVariant : mdiLinkVariantPlus"/>
-              <span class="text">{{ userInformation.mcid !== '' ? '更新' : '绑定' }} Minecraft ID</span>
-              <span class="current" v-if="userInformation.mcid">
+              <icon :path="userInformation.hasBoundValidMCID ? mdiLinkVariant : mdiLinkVariantPlus"/>
+              <span class="text">{{ userInformation.hasBoundValidMCID ? '更新' : '绑定' }} Minecraft ID</span>
+              <span class="current" v-if="userInformation.hasBoundValidMCID">
                 {{ userInformation.mcid }}
+              </span>
+              <span class="mcid-not-exist-warning current" v-else-if="userInformation.mcid && !userInformation.mcidExist">
+                <icon :path="mdiAlertOutline"/>
+                请及时更换无效 ID
               </span>
               <span class="current note" v-else>
                 <icon :path="mdiCreationOutline"/>
@@ -90,7 +94,7 @@
                 {{ userInformation.email }}
               </span>
             </div>
-            <div class="action">
+            <div class="action" @click="userActionsModal = false; modalUserAction_nickname = true">
               <icon :path="mdiRenameOutline"/>
               <span class="text">{{ userInformation.nickname ? '修改' : '添加'}}昵称</span>
               <span class="current" v-if="userInformation.nickname">
@@ -118,7 +122,7 @@
 import setLocation from "~/utils/setLocation";
 import {
   mdiAccountHeartOutline,
-  mdiAccountOffOutline, mdiCreationOutline,
+  mdiAccountOffOutline, mdiAlertOutline, mdiCreationOutline,
   mdiEmailEditOutline,
   mdiHome,
   mdiLinkVariant, mdiLinkVariantPlus, mdiLockReset,
@@ -133,6 +137,7 @@ import AvatarSpinner from "~/components/avatar-spinner.vue";
 import formatTimeStringFromDate from "../utils/formatTimeStringFromDate";
 import MgUserActions from "~/components/modal-groups/mg-user-actions.vue";
 import getToken from "~/utils/getToken";
+import getAshconResponse from "~/utils/getAshconResponse";
 
 const username = getUsername();
 const token = getToken();
@@ -154,7 +159,10 @@ const userInformation = useState<UserExtended>('user-data', () => {
         total: 0
       }
     },
-    uuid: ""
+    uuid: "",
+    mcidExist: false,
+    hasBoundValidMCID: false,
+    loading: true
   };
 });
 
@@ -164,6 +172,7 @@ const errorInformationContent = useState('error-modal-content', () => '');
 const userActionsModal = ref(false);
 
 const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
+const modalUserAction_nickname = useState('modal-user-action-nickname', () => false);
 const userLoginState = useState('user-login-state', () => false);
 const userInitState = ref(false);
 
@@ -195,8 +204,11 @@ async function initUser() {
     Object.assign(userInformation.value, userResult.data);
 
     if (userInformation.value.mcid.length > 0) {
+      const ashconResponse = await getAshconResponse(userInformation.value.mcid);
+      userInformation.value.mcidExist = ashconResponse.code !== 404;
+      userInformation.value.hasBoundValidMCID = userInformation.value.mcidExist;
       const skinRes = await playernameToSkin(userInformation.value.mcid);
-      userInformation.value.skinBase64 = skinRes.data;
+      if (skinRes) userInformation.value.skinBase64 = skinRes.data;
       userInformation.value.uuid = await playernameToUUID(userInformation.value.mcid);
 
       const loginCountRes = await get<number>(`/api/user/stats/login/count?playername=${userInformation.value.mcid}`);
@@ -209,6 +221,8 @@ async function initUser() {
       }
     }
   }
+
+  userInformation.value.loading = false;
 }
 
 onMounted(() => {
@@ -369,6 +383,13 @@ watch(userInitState, () => {
           border-radius: 30px;
           padding: 0 14px;
           .animation--RotateInPlace;
+        }
+
+        &.mcid-not-exist-warning {
+          color: #f44336;
+          background: #ffebee;
+          border-radius: 30px;
+          padding: 0 14px;
         }
 
         svg {
