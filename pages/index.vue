@@ -214,6 +214,7 @@
       <btn class="without-bg--primary hover--dim" href="https://www.minecraft.net/">购买正版</btn>
     </modal-actions>
   </modal>
+  <login-modal/>
 </template>
 
 <script lang="ts" setup>
@@ -231,51 +232,6 @@ import formatSeconds from "~/utils/formatSeconds";
 import formatSecondsDense from "../utils/formatSecondsDense";
 import {useState} from "#app";
 
-interface SiteFunction {
-  title: string,
-  icon: string,
-  model?: Ref<boolean>,
-  href?: string,
-}
-
-let user = reactive<User>({
-  id: 0,
-  username: '',
-  nickname: '',
-  email: '',
-  mcid: '',
-  createdAt: 0,
-  updatedAt: 0
-});
-
-const indexFunctions: SiteFunction[] = [
-  {
-    title: "主页",
-    icon: mdiHome,
-    href: "/"
-  },
-  {
-    title: '服务器',
-    icon: mdiServer,
-    href: '/instance',
-  },
-  {
-    title: '财务',
-    icon: mdiAbacus,
-    href: '/bill',
-  },
-  {
-    title: '文档',
-    icon: mdiBook,
-    href: '/doc',
-  }
-]
-
-function handleSiteFunctionClick(func: SiteFunction) {
-  if (func.href) location.href = func.href;
-  else if (func.model) func.model.value = !func.model.value
-}
-
 const username = getUsername();
 const userInformation = useState<UserExtended>('user-data');
 const userPlaytimeTotal = computed(() => userInformation.value.analytics.playtime.total * 1000);
@@ -289,11 +245,15 @@ const termTimeDelta = ref(formatSeconds(new Date().getTime() - new Date(termBgn)
 onMounted(() => {
   setInterval(() => {
     termTimeDelta.value = formatSeconds(new Date().getTime() - new Date(termBgn).getTime());
-  }, 1000)
+  }, 1000);
 })
 
 const modalPlaytimeA = ref(false);
 const playtimeDescriptionPopup = ref(false);
+
+definePageMeta({
+  requireLogin: true
+})
 </script>
 
 <style lang="less" scoped>

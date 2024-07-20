@@ -111,6 +111,7 @@
     </modal-content>
   </modal>
   <mg-user-actions/>
+  <login-modal/>
 </template>
 
 <script lang="ts" setup>
@@ -124,15 +125,17 @@ import {
   mdiMinecraft, mdiPodium, mdiRenameOutline
 } from "@mdi/js";
 import getUsername from "~/utils/getUsername";
-import {useState} from "#app";
+import {useRoute, useState} from "#app";
 import {BackendCodes} from "~/consts";
 import playernameToSkin from "~/utils/playernameToSkin";
 import {playernameToUUID} from "#imports";
 import AvatarSpinner from "~/components/avatar-spinner.vue";
 import formatTimeStringFromDate from "../utils/formatTimeStringFromDate";
 import MgUserActions from "~/components/modal-groups/mg-user-actions.vue";
+import getToken from "~/utils/getToken";
 
 const username = getUsername();
+const token = getToken();
 
 const userInformation = useState<UserExtended>('user-data', () => {
   return {
@@ -156,19 +159,40 @@ const userInformation = useState<UserExtended>('user-data', () => {
 });
 
 const someProblemModal = useState('error-modal-state', () => false);
+const loginModalState = useState('login-modal');
 const errorInformationContent = useState('error-modal-content', () => '');
 const userActionsModal = ref(false);
 
 const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
+const userLoginState = useState('user-login-state', () => false);
+const userInitState = ref(false);
+
+async function checkUser() {
+  if (username.value === '' || token.value === '') {
+    userLoginState.value = false;
+    userInitState.value = true;
+    return;
+  }
+
+  const result = await get(`/api/auth/check?token=${token.value}`);
+
+  userLoginState.value = result.code === BackendCodes.OK;
+
+  if (userLoginState.value) {
+    await initUser();
+  }
+
+  userInitState.value = true;
+}
 
 async function initUser() {
-  if (username.value === '') return;
   const userResult = await get<User>(`/api/user/profile?username=${username.value}`);
+
   if (userResult.code !== BackendCodes.OK) {
     someProblemModal.value = true;
     errorInformationContent.value = JSON.stringify(userResult);
   } else {
-    Object.assign(userInformation.value, userResult.data)
+    Object.assign(userInformation.value, userResult.data);
 
     if (userInformation.value.mcid.length > 0) {
       const skinRes = await playernameToSkin(userInformation.value.mcid);
@@ -187,7 +211,9 @@ async function initUser() {
   }
 }
 
-initUser();
+onMounted(() => {
+  checkUser();
+})
 
 const navigation = [
   {
@@ -206,6 +232,14 @@ const navigation = [
     icon: mdiPodium
   }
 ]
+
+watch(userInitState, () => {
+  if (useRoute().meta.requireLogin === true) {
+    if (!userLoginState.value) {
+      loginModalState.value = true;
+    }
+  }
+})
 </script>
 
 <style lang="less" scoped>

@@ -1,5 +1,5 @@
 <template>
-  <modal v-model="model" class="with-bg--darken w400 animation--Scale">
+  <modal v-model="loginModalState" class="with-bg--darken with-bg--blur w400 animation--Scale" :allow-esc="false">
     <modal-title>登录</modal-title>
     <modal-content>
       <p>Lab 的功能需要与你的服务器账号关联，登录后即可畅享所有功能。</p>
@@ -14,7 +14,7 @@
       </div>
     </modal-content>
     <modal-actions class="right">
-      <btn class="without-bg--primary hover--dim" @click="model = false">关闭</btn>
+      <btn class="without-bg--primary hover--dim" @click="loginModalState = false" v-if="allowClose">关闭</btn>
       <btn class="with-bg--primary hover--dim" :loading="loginLoading" @click="login" :disabled="!formValid">登录</btn>
     </modal-actions>
   </modal>
@@ -26,7 +26,14 @@ import {useLocalStorage} from "@vueuse/core";
 import post from "~/utils/post";
 import {BackendCodes} from "~/consts";
 
-const model = defineModel();
+const props = defineProps({
+  allowClose: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const loginModalState = useState('login-modal', () => false);
 const loginLoading = ref(false);
 
 const username = ref('');
@@ -55,6 +62,7 @@ async function login() {
     const username = useLocalStorage('tisea-auth-username', '');
     token.value = result.data.token;
     username.value = result.data.username;
+    useRouter().go(0);
   } else {
     console.log(result)
     if (result.code === BackendCodes.TargetNotExist) {
@@ -75,6 +83,7 @@ async function login() {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  margin-top: 16px;
 }
 
 .register__now {

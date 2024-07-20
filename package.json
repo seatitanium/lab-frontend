@@ -18,6 +18,7 @@
     "less": "^4.2.0",
     "less-loader": "^12.2.0",
     "nuxt": "^3.11.2",
+    "nuxt-route-meta": "^5.0.3",
     "skinview3d": "^3.0.1",
     "three": "^0.166.1",
     "typewriter-vue": "^0.5.19",

@@ -69,7 +69,7 @@
       </section>
     </div>
   </div>
-  <login-modal v-model="stateLoginModal"/>
+  <login-modal allow-close/>
   <screen id="kaifang-screen" class="with-bg--darken" v-model="stateKaifangScreen">
     <screen-content flex-vertical flex-center>
       <div class="home-screen-text">
@@ -132,7 +132,7 @@ import OpenBg from '~/assets/images/hello/open.svg?component';
 import typewriter from "typewriter-vue/src/components/Typewriter.vue";
 import {useElementVisibility} from "@vueuse/core";
 
-const stateLoginModal = ref(false);
+const stateLoginModal = useState('login-modal');
 const stateKaifangScreen = ref(false);
 const stateMianfeiScreen = ref(false);
 const stateBianjieScreen = ref(false);

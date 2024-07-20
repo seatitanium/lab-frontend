@@ -755,6 +755,10 @@ function getRandomAbsence() {
   if (new Date().getHours() >= 0 && new Date().getHours() <= 6) dict.push("大家都去睡觉了");
   return dict[randomInclusive(0, dict.length - 1)];
 }
+
+definePageMeta({
+  requireLogin: true
+})
 </script>
 
 <style lang="less" scoped>
