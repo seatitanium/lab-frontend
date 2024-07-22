@@ -14,3 +14,5 @@ export const BackendCodes = {
     AliyunError: 1303,
     OperationNotApplied: 1304
 }
+
+export const SupportEmail = "i@seati.cc";

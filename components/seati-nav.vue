@@ -87,11 +87,11 @@
                 解锁完整功能
               </span>
             </div>
-            <div class="action">
+            <div class="action" @click="userActionsModal = false; modalUserAction_password = true">
               <icon :path="mdiLockReset"/>
               <span class="text">修改密码</span>
             </div>
-            <div class="action">
+            <div class="action" @click="userActionsModal = false; modalUserAction_email = true">
               <icon :path="mdiEmailEditOutline"/>
               <span class="text">修改邮箱</span>
               <span class="current">
@@ -109,7 +109,7 @@
                 沟通交流更方便
               </span>
             </div>
-            <div class="action red">
+            <div class="action red" @click="userActionsModal = false; modalUserAction_delete = true">
               <icon :path="mdiAccountOffOutline"/>
               <span class="text">注销账号</span>
             </div>
@@ -178,6 +178,10 @@ const userActionsModal = ref(false);
 
 const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
 const modalUserAction_nickname = useState('modal-user-action-nickname', () => false);
+const modalUserAction_email = useState('modal-user-action-email', () => false);
+const modalUserAction_password = useState('modal-user-action-password', () => false);
+const modalUserAction_delete = useState('modal-user-action-delete', () => false);
+
 const userLoginState = useState('user-login-state', () => false);
 const userInitState = ref(false);
 

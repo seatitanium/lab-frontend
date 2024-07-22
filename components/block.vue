@@ -6,6 +6,7 @@
 
 <style lang="less">
 @import "@/assets/var.less";
+
 .block {
   border-radius: 10px;
   padding: 16px;
@@ -25,7 +26,14 @@
 
   &.with-bg--orange {
     background: #fff3e0;
-    color: #ff9800;
+
+    &, a {
+      color: #ff9800;
+    }
+
+    a {
+      font-weight: bold;
+    }
   }
 }
 </style>

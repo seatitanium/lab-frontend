@@ -59,6 +59,60 @@
       </btn>
     </modal-actions>
   </modal>
+  <modal v-model="modalUserAction_email" class="with-bg--darken">
+    <modal-title>修改邮箱</modal-title>
+    <modal-content>
+      <p>如果你更换了邮箱，请在此修改。</p>
+      <block class="with-bg--orange">
+        <icon :path="mdiAlertOutline"/>
+        <p>我们暂时无法提供对邮箱的验证服务。请自行检查邮箱正确性，避免将来出现问题。</p>
+      </block>
+      <form>
+        <textfield class="email-textfield" placeholder="邮箱" bg-text v-model:input="emailToChange" v-model:temp-problem="emailTempProblem"/>
+      </form>
+    </modal-content>
+    <modal-actions>
+      <btn :disabled="!emailValid" class="with-bg--primary hover--dim" :loading="loading" @click="bindEmail">
+        立即修改
+      </btn>
+      <btn @click="modalUserAction_email = false" class="with-bg--white hover--dim">
+        取消
+      </btn>
+    </modal-actions>
+  </modal>
+  <modal v-model="modalUserAction_password" class="with-bg--darken">
+    <modal-title>修改密码</modal-title>
+    <modal-content>
+      <p>如果知道当前的密码，且希望更换它，请在此修改。</p>
+      <block class="with-bg--orange">
+        <icon :path="mdiAlertOutline"/>
+        <p>如果你忘记了密码，请联系讨论群管理员或发送邮件到 <a-support-email/> 寻求帮助。<br/>在此处修改密码需要以先前的密码作为凭据。</p>
+      </block>
+      <form>
+        <textfield class="password-textfield" type="password" placeholder="原密码" bg-text required v-model:input="oldPassword" v-model:temp-problem="oldPasswordTempProblem"/>
+        <textfield class="password-textfield" placeholder="新密码" bg-text required v-model:input="passwordToChange" v-model:temp-problem="passwordTempProblem"/>
+      </form>
+    </modal-content>
+    <modal-actions>
+      <btn :disabled="!passwordValid || oldPassword.length === 0" class="with-bg--primary hover--dim" :loading="loading" @click="bindPassword">
+        立即更新
+      </btn>
+      <btn @click="modalUserAction_password = false" class="with-bg--white hover--dim">
+        取消
+      </btn>
+    </modal-actions>
+  </modal>
+  <modal v-model="modalUserAction_delete" class="describe with-bg--darken">
+    <modal-content>
+      <icon :path="mdiAccountOffOutline" color="#f44336"/>
+      <h2>注销账号</h2>
+      <p>注销账号将完全删除服务器上与你有关的<strong>一切数据</strong>，并且<strong>不可恢复</strong>。我们<strong>不会</strong>对任何注销的用户信息进行额外的备份。</p>
+      <p>如果确认需要注销账号，请联系讨论群内的任意管理员，或者发送邮件到 <a-support-email/> 进行申请。</p>
+    </modal-content>
+    <modal-actions>
+      <btn class="with-bg--white" @click="modalUserAction_delete = false">关闭</btn>
+    </modal-actions>
+  </modal>
   <error-modal allow-close no-retry :error-information-content="errorModalContent" v-model="modalError">
     <p>在执行操作过程中出现了一些问题。</p>
     <p>单击「<strong>错误信息</strong>」按钮查看内部错误信息，然后单击弹出的信息复制，将其传达给维护者以得到支持。</p>
@@ -67,15 +121,18 @@
 
 <script lang="ts" setup>
 import {useState} from "#app";
-import {mdiAlertOutline, mdiMinecraft, mdiRenameOutline} from "@mdi/js";
+import {mdiAccountOffOutline, mdiAlert, mdiAlertOutline, mdiMinecraft, mdiRenameOutline} from "@mdi/js";
 import patch from "~/utils/patch";
-import {BackendCodes} from "~/consts";
+import {BackendCodes, SupportEmail} from "~/consts";
 import getAshconResponse from "~/utils/getAshconResponse";
+import ASupportEmail from "~/components/a-support-email.vue";
 
 const loading = ref(false);
 
 const regexMCID = /^[a-zA-Z0-9_]{2,16}$/;
 const regexNickname = /^[\u4E00-\u9FFFA-Za-z0-9_]{3,15}$/;
+const regexEmail = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/;
+const regexPassword = /^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9]).{6,20})\S$/;
 
 const userInformation = useState<UserExtended>('user-data');
 const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
@@ -87,10 +144,50 @@ const mcidExistButNotVerified = computed(() => userInformation.value.mcidExist &
 const modalUserAction_nickname = useState('modal-user-action-nickname', () => false);
 const nicknameToChange = ref('');
 const nicknameTempProblem = ref('');
-const nicknameValid = computed(() => regexNickname.test(nicknameToChange.value) || nicknameToChange.value.length === 0)
+const nicknameValid = computed(() => regexNickname.test(nicknameToChange.value) || nicknameToChange.value.length === 0);
+
+const modalUserAction_email = useState('modal-user-action-email', () => false);
+const emailToChange = ref('');
+const emailTempProblem = ref('');
+const emailValid = computed(() => regexEmail.test(emailToChange.value));
+
+const modalUserAction_password = useState('modal-user-action-password', () => false);
+const oldPassword = ref('');
+const passwordToChange = ref('');
+const passwordTempProblem = ref('');
+const oldPasswordTempProblem = ref('');
+const passwordValid = computed(() => regexPassword.test(passwordToChange.value));
+
+const modalUserAction_delete = useState('modal-user-action-delete', () => false);
 
 const errorModalContent = ref('');
 const modalError = ref(false);
+
+watch(passwordToChange, v => {
+  if (!regexPassword.test(v)) {
+    if (!/(?=\S*?[A-Z])/.test(v)) {
+      passwordTempProblem.value = "密码应至少包含一个大写字母";
+    } else if (!/(?=\S*?[a-z])/.test(v)) {
+      passwordTempProblem.value = "密码应至少包含一个小写字母";
+    } else if (!/(?=\S*?[0-9])/.test(v)) {
+      passwordTempProblem.value = "密码应至少包含一个数字";
+    } else if (v.length < 6) {
+      passwordTempProblem.value = "密码应至少有 6 位"
+    } else if (v.length > 20) {
+      passwordTempProblem.value = "密码最长支持 20 位"
+    }
+  } else {
+    passwordTempProblem.value = "";
+  }
+})
+
+watch(emailToChange, v => {
+  if (!regexEmail.test(v)) {
+    emailTempProblem.value = "不符合电子邮件格式";
+  } else {
+    emailTempProblem.value = '';
+  }
+})
 
 watch(nicknameToChange, v => {
   if (v.length === 0) {
@@ -114,6 +211,7 @@ watch(mcidToBind, v => {
     mcidTempProblem.value = "请填写不同于当前的游戏名"
     return;
   }
+
   if (!regexMCID.test(v)) {
     if (!/^[a-zA-Z0-9_]+$/.test(v)) {
       mcidTempProblem.value = "只能包含英文、下划线或者数字"
@@ -125,14 +223,12 @@ watch(mcidToBind, v => {
   }
 })
 
-async function bindNickname() {
+async function updateProfile(object: {[prop: string]: any}, callback: Function) {
   loading.value = true;
 
-  const result = await patch(`/api/user/profile?username=${userInformation.value.username}`, {
-    'nickname': nicknameToChange.value
-  });
+  const result = await patch(`/api/user/profile?username=${userInformation.value.username}`, object);
   loading.value = false;
-  modalUserAction_nickname.value = false;
+  callback();
 
   if (result.code === BackendCodes.OK) {
     useRouter().go(0);
@@ -140,6 +236,43 @@ async function bindNickname() {
     modalError.value = true;
     errorModalContent.value = JSON.stringify(result);
   }
+}
+
+async function bindPassword() {
+  loading.value = true;
+
+  const loginResult = await post("/api/auth/login", {
+    username: userInformation.value.username,
+    password: oldPassword.value
+  });
+
+  if (loginResult.code !== BackendCodes.OK) {
+    oldPasswordTempProblem.value = "原密码不正确";
+    loading.value = false;
+    return;
+  }
+
+  await updateProfile({
+    'password': passwordToChange.value
+  }, () => {
+    modalUserAction_password.value = false;
+  })
+}
+
+function bindEmail() {
+  updateProfile({
+    'email': emailToChange.value
+  }, () => {
+    modalUserAction_email.value = false;
+  })
+}
+
+function bindNickname() {
+  updateProfile({
+    'nickname': nicknameToChange.value
+  }, () => {
+    modalUserAction_nickname.value = false;
+  })
 }
 
 async function bindMCID() {
@@ -150,18 +283,12 @@ async function bindMCID() {
     mcidTempProblem.value = "此游戏名不存在";
     return;
   }
-  const result = await patch(`/api/user/profile?username=${userInformation.value.username}`, {
-    'mc_id': mcidToBind.value
-  });
-  loading.value = false;
-  modalUserAction_mcid.value = false;
 
-  if (result.code === BackendCodes.OK) {
-    useRouter().go(0);
-  } else {
-    modalError.value = true;
-    errorModalContent.value = JSON.stringify(result);
-  }
+  await updateProfile({
+    'mc_id': mcidToBind.value
+  }, () => {
+    modalUserAction_mcid.value = false;
+  })
 }
 </script>
 

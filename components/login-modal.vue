@@ -79,13 +79,6 @@ async function login() {
 <style lang="less" scoped>
 @import "@/assets/var.less";
 
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-top: 16px;
-}
-
 .register__now {
   margin: 16px 0;
   padding: 16px;
