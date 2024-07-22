@@ -773,6 +773,8 @@ watch(() => userInformation.value.loading, v => {
     const token = useLocalStorage('tisea-auth-token', '');
     initializeWebSocketConnection(userInformation.value.hasBoundValidMCID ? `${ServerWebSocketURL}?token=${token.value}&displayname=${userInformation.value.mcid}` : ServerWebSocketURL);
   }
+}, {
+  immediate: true
 })
 </script>
 
