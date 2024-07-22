@@ -19,12 +19,12 @@ export default function parseColorCodes(str: string) {
         'e': 'FFFF55',
         'f': 'FFFFFF'
     } as Dict<string>;
-    if (str.split("§").length === 1 && !str.startsWith("§")) return str;
+    if (str.split("§").length === 1 && !str.startsWith("§")) return escapeLtGt(str);
     return str.split("§").map(x => {
         if (Object.keys(dictionary).includes(x.charAt(0))) {
             return `<span style="color: #${dictionary[x.charAt(0)]}">${escapeLtGt(x.substring(1, x.length))}</span>`
         } else {
-            return x;
+            return escapeLtGt(x);
         }
     }).join("");
 }
