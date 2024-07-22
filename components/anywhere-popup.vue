@@ -1,6 +1,6 @@
 <template>
-  <div v-if="model" class="anywhere-popup-layer" @click="model = false">
-    <div class="anywhere-popup" @click="handleClickPopup">
+  <div v-if="model" class="anywhere-popup-layer" @click="delayClose">
+    <div class="anywhere-popup" :class="{closing}" @click="handleClickPopup">
       <code v-if="code">{{ content }}</code>
       <div v-else>
         <slot/>
@@ -20,6 +20,16 @@ const props = defineProps({
     default: true
   }
 })
+
+const closing = ref(false);
+
+function delayClose() {
+  closing.value = true;
+  setTimeout(() => {
+    model.value = false;
+    closing.value = false;
+  }, 300);
+}
 
 function keypressListener(e: KeyboardEvent) {
   if (e.key == "Escape") {
@@ -61,6 +71,16 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
   }
 }
 
+@keyframes FadeOut {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
 .anywhere-popup-layer {
   width: 100vw;
   height: 100vh;
@@ -81,6 +101,10 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
     cursor: pointer;
     animation: RotateInPlace 2.2s linear .4s infinite, PopAppear .3s ease;
     transform: translateX(2px);
+
+    &.closing {
+      animation: RotateInPlace 2.2s linear .4s infinite, FadeOut .3s ease;
+    }
   }
 }
 </style>
