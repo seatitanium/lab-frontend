@@ -16,3 +16,5 @@ export const BackendCodes = {
 }
 
 export const SupportEmail = "i@seati.cc";
+
+export const ServerWebSocketURL = "ws://localhost:23322";

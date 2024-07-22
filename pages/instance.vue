@@ -329,7 +329,7 @@ import {
   mdiTrashCanOutline, mdiWebOff
 } from "@mdi/js";
 import {getUsername} from "#imports";
-import {BackendCodes} from "~/consts";
+import {BackendCodes, ServerWebSocketURL} from "~/consts";
 import DebianLogo from '~/assets/icons/debian.svg';
 import DukeWaving from '~/assets/icons/duke-waving.svg'
 import sleep from "~/utils/sleep";
@@ -661,9 +661,8 @@ get<SnapshotOnlinePlayers>(`/api/server/peak-online-history`).then(r => {
 
 let ws: WebSocket;
 
-function initializeWebSocketConnection() {
-  const token = useLocalStorage('tisea-auth-token', '');
-  ws = new WebSocket("ws://localhost:23322?token=" + token.value);
+function initializeWebSocketConnection(url: string) {
+  ws = new WebSocket(url);
 
   ws.onopen = () => {
     instantMessageStatus.value = 'connected';
@@ -708,6 +707,7 @@ const imStatusIcon = computed(() => getIMStatusNameAndIcon(instantMessageStatus.
 
 let randomExclamation = ref('');
 let randomAbsence = ref('');
+
 onMounted(async () => {
   username.value = getUsername().value;
   randomExclamation.value = getRandomExclamation();
@@ -715,7 +715,11 @@ onMounted(async () => {
 
   startRefreshDescribeInstanceResult().finally();
   startRefreshServerStatus().finally();
-  initializeWebSocketConnection();
+
+  instantMessages.push({
+    content: "Connecting to server...",
+    time: formatTimeStringFromDate(new Date())
+  });
 
   const deployStatus = await get<DeploymentStatus>('/api/ecs/deploy-status');
   if (deployStatus.code !== BackendCodes.OK) {
@@ -762,6 +766,13 @@ function getRandomAbsence() {
 
 definePageMeta({
   requireLogin: true
+})
+
+watch(() => userInformation.value.loading, v => {
+  if (v === false) {
+    const token = useLocalStorage('tisea-auth-token', '');
+    initializeWebSocketConnection(userInformation.value.hasBoundValidMCID ? `${ServerWebSocketURL}?token=${token.value}&displayname=${userInformation.value.mcid}` : ServerWebSocketURL);
+  }
 })
 </script>
 
