@@ -54,11 +54,11 @@
         <div class="text textaligncenter">
           <h2>{{ userInformation.mcidVerified ? '绑定有效' : '验证' }} Minecraft ID 以查看个人统计信息</h2>
           <p v-if="userInformation.mcidVerified">绑定后，此处会展示包括游玩时长、登入次数的个人统计信息</p>
-          <p v-else>请登入 Seati 服务器，按照提示进行操作以验证 Minecraft ID</p>
+          <p v-else>请用 {{ userInformation.mcid }} 登入 Seati 服务器，按照提示进行操作以验证 Minecraft ID</p>
         </div>
-        <btn class="with-bg--primary hover--dim" @click="modalUserAction_mcid = true" v-if="userInformation.mcidVerified">
-          <icon :path="mdiLinkVariantPlus"/>
-          立即绑定
+        <btn class="with-bg--primary hover--dim" @click="modalUserAction_mcid = true">
+          <icon :path="userInformation.mcidVerified ? mdiLinkVariantPlus : mdiRefresh"/>
+          {{ userInformation.mcidVerified ? '立即绑定': '重新绑定' }}
         </btn>
       </div>
     </section>
@@ -228,7 +228,7 @@ import getUsername from "~/utils/getUsername";
 import {
   mdiAnvil, mdiCardsPlaying,
   mdiCheck, mdiCheckAll, mdiClockStarFourPointsOutline, mdiLanguageJava, mdiLaunch, mdiLinkVariantPlus,
-  mdiMemory, mdiMinecraft
+  mdiMemory, mdiMinecraft, mdiRefresh, mdiRenameOutline
 } from "@mdi/js";
 import ForgeLogoFull from '~/assets/icons/forge-logo-full.svg'
 import DukeWaving from '~/assets/icons/duke-waving.svg'
