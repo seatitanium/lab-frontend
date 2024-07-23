@@ -1,5 +1,6 @@
 <template>
-  <img :src="`https://crafatar.com/avatars/${uuid}`"/>
+  <img v-if="uuid.length > 0" :src="`https://crafatar.com/avatars/${uuid}`"/>
+  <circle-spinner v-else :size="loadingSize"/>
 </template>
 
 <script lang="ts" setup>
@@ -9,6 +10,10 @@ const props = defineProps({
   name: {
     type: String,
     required: true
+  },
+  loadingSize: {
+    type: String,
+    default: "20"
   }
 })
 

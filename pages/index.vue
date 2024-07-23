@@ -1,6 +1,6 @@
 <template>
   <div class="page-index container">
-    <div class="index-title">
+    <div class="page-title">
       <h1>欢迎，{{ userInformation.nickname || userInformation.username }}</h1>
       <p>选择下列功能之一，单击以跳转到相关页面以进行操作。这些功能在不断的更新中。</p>
     </div>
@@ -383,19 +383,6 @@ const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
 </style>
 
 <style lang="less" scoped>
-.index-title {
-  padding-bottom: 32px;
-
-  h1 {
-    font-size: 40px;
-  }
-
-  p {
-    font-size: 20px;
-    margin: 8px 0;
-  }
-}
-
 .index-functions {
   display: flex;
   align-items: stretch;

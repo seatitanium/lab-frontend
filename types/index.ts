@@ -141,4 +141,17 @@ declare global {
         names: string,
         created_at: string
     }
+
+    interface LoginRecordBoard extends Dict<any> {
+        player: string,
+        count: number,
+        lastCreatedAt: string
+    }
+
+    interface PlaytimeBoard extends Dict<any> {
+        player: string,
+        timeTotal: number,
+        timeAfk: number,
+        timeValid?: number
+    }
 }

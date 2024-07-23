@@ -19,20 +19,30 @@
     padding: 8px 16px;
   }
 
+  &.no-margin-bottom {
+    margin-bottom: 0;
+  }
+
   &.with-bg--primary {
     background: @primaryl;
     color: @primaryd;
   }
 
-  &.with-bg--orange {
-    background: #fff3e0;
-
-    &, a {
-      color: #ff9800;
-    }
+  &.with-bg--indigo {
+    background: @indigol;
+    color: @indigo;
 
     a {
-      font-weight: bold;
+      color: @indigod;
+    }
+  }
+
+  &.with-bg--orange {
+    background: @orangel;
+    color: @orange;
+
+    a {
+      color: @oranged;
     }
   }
 }
