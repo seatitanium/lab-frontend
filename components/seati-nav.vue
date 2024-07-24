@@ -182,13 +182,21 @@ const userInformation = useState<UserExtended>('user-data', () => {
       playtime: {
         afk: 0,
         total: 0
-      }
+      },
+      firstLoginRecord: {
+        id: -1,
+        actionType: false,
+        createdAt: "",
+        player: "",
+        tag: ""
+      },
+      termsInvolved: []
     },
     uuid: "",
     mcidExist: false,
     hasBoundValidMCID: false,
     loading: true,
-    mcidVerified: false
+    mcidVerified: false,
   };
 });
 
@@ -245,10 +253,20 @@ async function initUser() {
       const loginCountRes = await get<number>(`/api/user/stats/login/count?playername=${userInformation.value.mcid}`);
       if (loginCountRes.code === BackendCodes.OK) userInformation.value.analytics.loginCount = loginCountRes.data;
 
-      const playtimeRes = await get<UserStatsPlaytime>(`/api/user/stats/playtime?playername=${userInformation.value.mcid}`);
+      const playtimeRes = await get<PlaytimeRecord>(`/api/user/stats/playtime?playername=${userInformation.value.mcid}`);
       if (playtimeRes.code === BackendCodes.OK) {
         userInformation.value.analytics.playtime.total = playtimeRes.data.total;
         userInformation.value.analytics.playtime.afk = playtimeRes.data.afk;
+      }
+
+      const firstLoginRecordRes = await get<LoginRecord>(`/api/user/first-login?playername=${userInformation.value.mcid}`);
+      if (firstLoginRecordRes.code === BackendCodes.OK) {
+        Object.assign(userInformation.value.analytics.firstLoginRecord, firstLoginRecordRes.data);
+      }
+
+      const termsInvolvedRes = await get<Term[]>(`/api/user/terms-involved?playername=${userInformation.value.mcid}`);
+      if (termsInvolvedRes.code === BackendCodes.OK) {
+        Object.assign(userInformation.value.analytics.termsInvolved, termsInvolvedRes.data);
       }
     }
   }

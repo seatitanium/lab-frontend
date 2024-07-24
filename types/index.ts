@@ -52,7 +52,9 @@ declare global {
         playtime: {
             afk: number,
             total: number
-        }
+        },
+        firstLoginRecord: LoginRecord,
+        termsInvolved: Term[]
     }
 
     interface LoginRes {
@@ -82,7 +84,7 @@ declare global {
         finishedTime: string
     }
 
-    interface UserStatsLogin {
+    interface LoginRecord {
         id: number,
         actionType: boolean,
         createdAt: string,
@@ -90,7 +92,7 @@ declare global {
         player: string
     }
 
-    interface UserStatsPlaytime {
+    interface PlaytimeRecord {
         id: number,
         total: number,
         afk: number,
@@ -153,5 +155,12 @@ declare global {
         timeTotal: number,
         timeAfk: number,
         timeValid?: number
+    }
+
+    interface Term {
+        tag: string,
+        startAt: string,
+        endAt: string,
+        active: boolean
     }
 }

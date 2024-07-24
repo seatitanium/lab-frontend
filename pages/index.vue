@@ -13,7 +13,7 @@
       </div>
       <div class="user-profile" v-else-if="userInformation.hasBoundValidMCID">
         <section class="player-analytics">
-          <div class="player-a" @click="modalPlaytimeA = true">
+          <div class="player-a" @click="modalPlaytime = true">
             <div class="text">
               游玩时长
             </div>
@@ -37,7 +37,7 @@
               参与周目
             </div>
             <div class="value">
-              --
+              {{ userInformation.analytics.termsInvolved.length }}
             </div>
           </div>
           <div class="player-a">
@@ -45,7 +45,7 @@
               首次加入
             </div>
             <div class="value">
-              --
+              {{ formatTimeStringFromStringPartialYM(userInformation.analytics.firstLoginRecord.createdAt) }}
             </div>
           </div>
         </section>
@@ -62,7 +62,7 @@
         </btn>
       </div>
     </section>
-    <modal v-model="modalPlaytimeA" class="with-bg--darken describe">
+    <modal v-model="modalPlaytime" class="with-bg--darken describe">
       <modal-content>
         <icon color="#009688" :path="mdiClockStarFourPointsOutline"/>
         <h2>{{ userInformation.mcid }} 的游玩时长数据</h2>
@@ -81,11 +81,11 @@
         <p>以上数据有效性截至页面刷新时间</p>
       </modal-content>
       <modal-actions>
-        <btn class="with-bg--primary hover--dim" @click="modalPlaytimeA = false">确定</btn>
-        <btn class="with-bg--white hover--dim" @click="playtimeDescriptionPopup = true">了解更多</btn>
+        <btn class="with-bg--primary hover--dim" @click="modalPlaytime = false">确定</btn>
+        <btn class="with-bg--white hover--dim" @click="anypopPlaytimeDescription = true">了解更多</btn>
       </modal-actions>
     </modal>
-    <anywhere-popup v-model="playtimeDescriptionPopup" :code="false">
+    <anywhere-popup v-model="anypopPlaytimeDescription" :code="false">
       <p>Seati
         会自动计算你的游玩时长数据，并存储在专用的数据库中。其中包含了<strong>总在线时长</strong>和<strong>挂机时长</strong>，<strong>有效时长</strong>为两者之差。
       </p>
@@ -224,7 +224,6 @@
 </template>
 
 <script lang="ts" setup>
-import getUsername from "~/utils/getUsername";
 import {
   mdiAnvil, mdiCardsPlaying,
   mdiCheck, mdiCheckAll, mdiClockStarFourPointsOutline, mdiLanguageJava, mdiLaunch, mdiLinkVariantPlus,
@@ -235,8 +234,8 @@ import DukeWaving from '~/assets/icons/duke-waving.svg'
 import formatSeconds from "~/utils/formatSeconds";
 import formatSecondsDense from "../utils/formatSecondsDense";
 import {useState} from "#app";
+import formatTimeStringFromStringPartialYM from "../utils/formatTimeStringFromStringPartialYM";
 
-const username = getUsername();
 const userInformation = useState<UserExtended>('user-data');
 const userPlaytimeTotal = computed(() => userInformation.value.analytics.playtime.total * 1000);
 const userPlaytimeAfk = computed(() => userInformation.value.analytics.playtime.afk * 1000);
@@ -246,20 +245,20 @@ const descJavaModal = ref(false);
 const termBgn = '2024-05-01';
 const termTimeDelta = ref(formatSeconds(new Date().getTime() - new Date(termBgn).getTime()));
 
-onMounted(() => {
-  setInterval(() => {
-    termTimeDelta.value = formatSeconds(new Date().getTime() - new Date(termBgn).getTime());
-  }, 1000);
-})
-
-const modalPlaytimeA = ref(false);
-const playtimeDescriptionPopup = ref(false);
+const modalPlaytime = ref(false);
+const anypopPlaytimeDescription = ref(false);
 
 definePageMeta({
   requireLogin: true
 })
 
 const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
+
+onMounted(() => {
+  setInterval(() => {
+    termTimeDelta.value = formatSeconds(new Date().getTime() - new Date(termBgn).getTime());
+  }, 1000);
+})
 </script>
 
 <style lang="less" scoped>
