@@ -18,9 +18,9 @@
               游玩时长
             </div>
             <div class="value">
-              {{ formatSecondsDense(userPlaytimeTotal - userPlaytimeAfk) }}
+              {{ formatSecondsDense(userInformation.playtimeTotalMillis - userInformation.playtimeAfkMillis) }}
               <span class="afk">
-            AFK = {{ formatSecondsDense(userPlaytimeAfk) }}
+            AFK = {{ formatSecondsDense(userInformation.playtimeAfkMillis) }}
           </span>
             </div>
           </div>
@@ -62,44 +62,15 @@
         </btn>
       </div>
     </section>
-    <modal v-model="modalPlaytime" class="with-bg--darken describe">
-      <modal-content>
-        <icon color="#009688" :path="mdiClockStarFourPointsOutline"/>
-        <h2>{{ userInformation.mcid }} 的游玩时长数据</h2>
-        <div class="playtime">
-          <div class="time">{{ formatSecondsDense(userPlaytimeTotal) }}</div>
-          <div class="text">总在线时长</div>
-        </div>
-        <div class="playtime">
-          <div class="time">{{ formatSecondsDense(userPlaytimeAfk) }}</div>
-          <div class="text">挂机时长</div>
-        </div>
-        <div class="playtime">
-          <div class="time">{{ formatSecondsDense(userPlaytimeTotal - userPlaytimeAfk) }}</div>
-          <div class="text">有效时长</div>
-        </div>
-        <p>以上数据有效性截至页面刷新时间</p>
-      </modal-content>
-      <modal-actions>
-        <btn class="with-bg--primary hover--dim" @click="modalPlaytime = false">确定</btn>
-        <btn class="with-bg--white hover--dim" @click="anypopPlaytimeDescription = true">了解更多</btn>
-      </modal-actions>
-    </modal>
-    <anywhere-popup v-model="anypopPlaytimeDescription" :code="false">
-      <p>Seati
-        会自动计算你的游玩时长数据，并存储在专用的数据库中。其中包含了<strong>总在线时长</strong>和<strong>挂机时长</strong>，<strong>有效时长</strong>为两者之差。
-      </p>
-      <p>Seati 的各种权益仅以<strong>有效时长</strong>为依据。</p>
-    </anywhere-popup>
     <section>
       <div class="index-term-information">
         <card class="equalp">
           <card-right-top>
             <div class="badges">
-              <div class="badge preset--online" @click="descOnlineModal = true">正版验证
+              <div class="badge preset--online" @click="modalOnlineModeDesc = true">正版验证
                 <icon :path="mdiCheck"/>
               </div>
-              <div class="badge preset--mcje" @click="descJavaModal = true">
+              <div class="badge preset--mcje" @click="modalJavaDesc = true">
                 <DukeWaving/>
                 Java 版
               </div>
@@ -151,7 +122,7 @@
         <card class="equalp">
           <card-right-top>
             <div class="badges">
-              <div class="badge preset--forge" @click="descForgeModal = true">Forge</div>
+              <div class="badge preset--forge" @click="modalForgeDesc = true">Forge</div>
             </div>
           </card-right-top>
           <card-content>
@@ -187,72 +158,40 @@
       </div>
     </section>
   </div>
-  <modal v-model="descForgeModal" class="with-bg--darken describe">
-    <modal-content>
-      <ForgeLogoFull/>
-      <h2>此整合包使用 Forge 作为加载器</h2>
-      <p>Minecraft 模组具有多种加载器，如 Forge、Fabric 和
-        Quilt，不同的加载器之间的模组一般不互通，除非作者专门制作相应版本。</p>
-      <p>此整合包使用的是 Forge 加载器。</p>
-    </modal-content>
-    <modal-actions>
-      <btn class="with-bg--primary hover--dim" @click="descForgeModal = false">确定</btn>
-    </modal-actions>
-  </modal>
-  <modal v-model="descJavaModal" class="with-bg--darken describe">
-    <modal-content>
-      <DukeWaving/>
-      <h2>支持 Minecraft Java 版</h2>
-      <p>Java 版是众多 Minecraft 版本之一，也是较为流行的版本，有别于基岩版、网易版等。本周目服务器支持 Java 版进入。</p>
-    </modal-content>
-    <modal-actions>
-      <btn class="with-bg--primary hover--dim" @click="descJavaModal = false">确定</btn>
-    </modal-actions>
-  </modal>
-  <modal v-model="descOnlineModal" class="with-bg--darken describe">
-    <modal-content>
-      <icon color="#4caf50" :path="mdiCheckAll"/>
-      <h2>正版验证开启</h2>
-      <p>服务器已经开启了正版验证，以保障玩家权益和质量。</p>
-      <p>这代表着在进入服务器之前，你的客户端将自动连接至 MOJANG 的服务器来检查你的账号是否为正版。</p>
-    </modal-content>
-    <modal-actions>
-      <btn class="with-bg--primary hover--dim" @click="descOnlineModal = false">确定</btn>
-      <btn class="without-bg--primary hover--dim" href="https://www.minecraft.net/">购买正版</btn>
-    </modal-actions>
-  </modal>
+  <mg-index-badges/>
+  <mg-user-analytics/>
 </template>
 
 <script lang="ts" setup>
 import {
   mdiAnvil, mdiCardsPlaying,
-  mdiCheck, mdiCheckAll, mdiClockStarFourPointsOutline, mdiLanguageJava, mdiLaunch, mdiLinkVariantPlus,
-  mdiMemory, mdiMinecraft, mdiRefresh, mdiRenameOutline
+  mdiCheck, mdiLanguageJava, mdiLaunch, mdiLinkVariantPlus,
+  mdiMemory, mdiMinecraft, mdiRefresh
 } from "@mdi/js";
-import ForgeLogoFull from '~/assets/icons/forge-logo-full.svg'
 import DukeWaving from '~/assets/icons/duke-waving.svg'
 import formatSeconds from "~/utils/formatSeconds";
 import formatSecondsDense from "../utils/formatSecondsDense";
 import {useState} from "#app";
 import formatTimeStringFromStringPartialYM from "../utils/formatTimeStringFromStringPartialYM";
-
-const userInformation = useState<UserExtended>('user-data');
-const userPlaytimeTotal = computed(() => userInformation.value.analytics.playtime.total * 1000);
-const userPlaytimeAfk = computed(() => userInformation.value.analytics.playtime.afk * 1000);
-const descForgeModal = ref(false);
-const descOnlineModal = ref(false);
-const descJavaModal = ref(false);
-const termBgn = '2024-05-01';
-const termTimeDelta = ref(formatSeconds(new Date().getTime() - new Date(termBgn).getTime()));
-
-const modalPlaytime = ref(false);
-const anypopPlaytimeDescription = ref(false);
+import MgUserAnalytics from "~/components/modal-groups/mg-user-analytics.vue";
+import MgIndexBadges from "~/components/modal-groups/mg-index-badges.vue";
 
 definePageMeta({
   requireLogin: true
 })
 
+const modalForgeDesc = useState('modal-forge-description', () => false);
+const modalJavaDesc = useState('modal-java-description', () => false);
+const modalOnlineModeDesc = useState('modal-online-mode-description', () => false);
+
+const termBgn = '2024-05-01';
+const termTimeDelta = ref(formatSeconds(new Date().getTime() - new Date(termBgn).getTime()));
+
+const modalPlaytime = useState('modal-playtime', () => false);
+
 const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
+
+const userInformation = useState<UserExtended>('user-data');
 
 onMounted(() => {
   setInterval(() => {
@@ -428,23 +367,6 @@ onMounted(() => {
         }
       }
     }
-  }
-}
-
-.playtime {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin: 8px 0;
-
-  .time {
-    font-weight: bold;
-    color: @primaryd;
-    font-size: 40px;
-  }
-
-  .text {
-    color: #aaa;
   }
 }
 
