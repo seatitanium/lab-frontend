@@ -44,11 +44,14 @@ declare global {
         uuid: string,
         mcidExist: boolean,
         hasBoundValidMCID: boolean,
-        loading: boolean
+        loading: boolean,
+        playtimeTotalMillis: number,
+        playtimeAfkMillis: number
     }
 
     interface UserAnalytics {
         loginCount: number,
+        loginRecords: LoginRecord[],
         playtime: {
             afk: number,
             total: number

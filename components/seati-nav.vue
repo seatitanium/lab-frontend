@@ -179,6 +179,7 @@ const userInformation = useState<UserExtended>('user-data', () => {
     skinBase64: '',
     analytics: {
       loginCount: 0,
+      loginRecords: [],
       playtime: {
         afk: 0,
         total: 0
@@ -197,6 +198,8 @@ const userInformation = useState<UserExtended>('user-data', () => {
     hasBoundValidMCID: false,
     loading: true,
     mcidVerified: false,
+    playtimeAfkMillis: 0,
+    playtimeTotalMillis: 0
   };
 });
 
@@ -243,30 +246,40 @@ async function initUser() {
     Object.assign(userInformation.value, userResult.data);
 
     if (userInformation.value.mcid.length > 0) {
-      const ashconResponse = await getAshconResponse(userInformation.value.mcid);
-      userInformation.value.mcidExist = ashconResponse.code !== 404;
+      const ashconResp = await getAshconResponse(userInformation.value.mcid);
+      userInformation.value.mcidExist = ashconResp.code !== 404;
       userInformation.value.hasBoundValidMCID = userInformation.value.mcidExist && userInformation.value.mcidVerified;
-      const skinRes = await playernameToSkin(userInformation.value.mcid);
-      if (skinRes) userInformation.value.skinBase64 = skinRes.data;
+
+      const skinResp = await playernameToSkin(userInformation.value.mcid);
+      if (skinResp) userInformation.value.skinBase64 = skinResp.data;
       userInformation.value.uuid = await playernameToUUID(userInformation.value.mcid);
 
-      const loginCountRes = await get<number>(`/api/user/stats/login/count?playername=${userInformation.value.mcid}`);
-      if (loginCountRes.code === BackendCodes.OK) userInformation.value.analytics.loginCount = loginCountRes.data;
-
-      const playtimeRes = await get<PlaytimeRecord>(`/api/user/stats/playtime?playername=${userInformation.value.mcid}`);
-      if (playtimeRes.code === BackendCodes.OK) {
-        userInformation.value.analytics.playtime.total = playtimeRes.data.total;
-        userInformation.value.analytics.playtime.afk = playtimeRes.data.afk;
+      const loginTotalCountResp = await get<number>(`/api/user/stats/login/total?playername=${userInformation.value.mcid}`);
+      if (loginTotalCountResp.code === BackendCodes.OK) {
+        userInformation.value.analytics.loginCount = loginTotalCountResp.data;
       }
 
-      const firstLoginRecordRes = await get<LoginRecord>(`/api/user/first-login?playername=${userInformation.value.mcid}`);
-      if (firstLoginRecordRes.code === BackendCodes.OK) {
-        Object.assign(userInformation.value.analytics.firstLoginRecord, firstLoginRecordRes.data);
+      const loginRecordsResp = await get<LoginRecord[]>(`/api/user/stats/login?playername=${userInformation.value.mcid}`);
+      if (loginRecordsResp.code === BackendCodes.OK) {
+        Object.assign(userInformation.value.analytics.loginRecords, loginRecordsResp.data);
       }
 
-      const termsInvolvedRes = await get<Term[]>(`/api/user/terms-involved?playername=${userInformation.value.mcid}`);
-      if (termsInvolvedRes.code === BackendCodes.OK) {
-        Object.assign(userInformation.value.analytics.termsInvolved, termsInvolvedRes.data);
+      const playtimeRecordResp = await get<PlaytimeRecord>(`/api/user/stats/playtime?playername=${userInformation.value.mcid}`);
+      if (playtimeRecordResp.code === BackendCodes.OK) {
+        userInformation.value.analytics.playtime.total = playtimeRecordResp.data.total;
+        userInformation.value.playtimeTotalMillis = playtimeRecordResp.data.total * 1000;
+        userInformation.value.analytics.playtime.afk = playtimeRecordResp.data.afk;
+        userInformation.value.playtimeAfkMillis = playtimeRecordResp.data.afk * 1000;
+      }
+
+      const firstLoginRecordResp = await get<LoginRecord>(`/api/user/first-login?playername=${userInformation.value.mcid}`);
+      if (firstLoginRecordResp.code === BackendCodes.OK) {
+        Object.assign(userInformation.value.analytics.firstLoginRecord, firstLoginRecordResp.data);
+      }
+
+      const termsInvolvedResp = await get<Term[]>(`/api/user/terms-involved?playername=${userInformation.value.mcid}`);
+      if (termsInvolvedResp.code === BackendCodes.OK) {
+        Object.assign(userInformation.value.analytics.termsInvolved, termsInvolvedResp.data);
       }
     }
   }

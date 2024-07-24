@@ -24,7 +24,7 @@
           </span>
             </div>
           </div>
-          <div class="player-a">
+          <div class="player-a" @click="modalLoginRecord = true">
             <div class="text">
               登入次数
             </div>
@@ -32,7 +32,7 @@
               {{ userInformation.analytics.loginCount }}
             </div>
           </div>
-          <div class="player-a">
+          <div class="player-a" @click="modalTermsInvolved = true">
             <div class="text">
               参与周目
             </div>
@@ -40,7 +40,7 @@
               {{ userInformation.analytics.termsInvolved.length }}
             </div>
           </div>
-          <div class="player-a">
+          <div class="player-a" @click="modalFirstLogin = true">
             <div class="text">
               首次加入
             </div>
@@ -82,7 +82,7 @@
             </div>
             <div class="right">
               <div class="term-title">
-                <div class="main">当前周目<img src="~/assets/images/terms/st13.png"/></div>
+                <div class="main">当前周目 <term-icon num="13"/></div>
                 <div class="sub">
                   <icon :path="mdiCardsPlaying"/>
                   进行中 · {{ termTimeDelta }}
@@ -188,6 +188,9 @@ const termBgn = '2024-05-01';
 const termTimeDelta = ref(formatSeconds(new Date().getTime() - new Date(termBgn).getTime()));
 
 const modalPlaytime = useState('modal-playtime', () => false);
+const modalLoginRecord = useState('modal-login-record', () => false);
+const modalTermsInvolved = useState('modal-terms-involved', () => false);
+const modalFirstLogin = useState('modal-first-login', () => false);
 
 const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
 

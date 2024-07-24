@@ -12,7 +12,10 @@
         <div class="text">挂机时长</div>
       </div>
       <div class="playtime">
-        <div class="time">{{ formatSecondsDense(userInformation.playtimeTotalMillis - userInformation.playtimeAfkMillis) }}</div>
+        <div class="time">{{
+            formatSecondsDense(userInformation.playtimeTotalMillis - userInformation.playtimeAfkMillis)
+          }}
+        </div>
         <div class="text">有效时长</div>
       </div>
       <p>以上数据有效性截至页面刷新时间</p>
@@ -28,16 +31,75 @@
     </p>
     <p>Seati 的各种权益仅以<strong>有效时长</strong>为依据。</p>
   </anywhere-popup>
+  <modal v-model="modalLoginRecord" class="with-bg--darken">
+    <modal-title>游戏登入/登出记录</modal-title>
+    <modal-content>
+      <p>这里显示了最近 {{ userInformation.analytics.loginRecords.length }} 次 {{ userInformation.mcid }} 玩家的登入或者登出记录，如果你发现有任何异常，请及时联系管理员。</p>
+      <block class="with-bg--primary">
+        <icon :path="mdiInformationOutline"/>
+        <p><strong>提示</strong>：有时会出现登入和登出不相邻的状况，这是服务器异常关闭所致，此情形可忽略。</p>
+      </block>
+      <table>
+        <thead>
+        <tr>
+          <th>操作</th>
+          <th>时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="x in userInformation.analytics.loginRecords">
+          <td>{{ x.actionType ? "登入" : "登出" }}</td>
+          <td>{{ formatTimeStringFromString(x.createdAt) }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </modal-content>
+    <modal-actions class="right">
+      <btn class="with-bg--primary hover--dim" @click="modalLoginRecord = false">关闭</btn>
+    </modal-actions>
+  </modal>
+  <modal v-model="modalTermsInvolved" class="with-bg--darken describe">
+    <modal-content>
+      <icon color="#009688" :path="mdiGamepadVariantOutline"/>
+      <h2>{{ userInformation.mcid }} 参与过的周目</h2>
+      <div class="term-group">
+        <term-icon v-for="x in userInformation.analytics.termsInvolved" :num="x.tag.slice(2)"/>
+      </div>
+      <p>共参与了 {{ userInformation.analytics.termsInvolved.length }} 个周目</p>
+    </modal-content>
+    <modal-actions class="right">
+      <btn class="with-bg--primary hover--dim" @click="modalTermsInvolved = false">关闭</btn>
+    </modal-actions>
+  </modal>
+  <modal v-model="modalFirstLogin" class="with-bg--darken describe">
+    <modal-content>
+      <SeatiPrimary/>
+      <h2>首次登入</h2>
+      <p>首次登入日期可作为参与 Seati 的起始点参考。</p>
+      <p><strong>{{ userInformation.mcid }} 于 {{ formatTimeStringFromStringPartialYM(userInformation.analytics.firstLoginRecord.createdAt) }} 首次登入 Seati 服务器，开始了 TA 的模组服务器旅程。</strong></p>
+    </modal-content>
+    <modal-actions class="right">
+      <btn class="with-bg--primary hover--dim" @click="modalFirstLogin = false">关闭</btn>
+    </modal-actions>
+  </modal>
 </template>
 <script setup lang="ts">
-import {mdiClockStarFourPointsOutline} from "@mdi/js";
+import {mdiClockStarFourPointsOutline, mdiGamepadVariantOutline, mdiInformationOutline, mdiLogin} from "@mdi/js";
 import formatSecondsDense from "~/utils/formatSecondsDense";
 import {useState} from "#app";
+import SeatiPrimary from 'assets/icons/seati/seati-primary.svg'
+import formatTimeStringFromStringPartialYM from "~/utils/formatTimeStringFromStringPartialYM";
+
+const userInformation = useState<UserExtended>('user-data');
 
 const modalPlaytime = useState('modal-playtime', () => false);
-const userInformation = useState<UserExtended>('user-data');
 const anypopPlaytimeDescription = ref(false);
 
+const modalLoginRecord = useState('modal-login-record', () => false);
+
+const modalTermsInvolved = useState('modal-terms-involved', () => false);
+
+const modalFirstLogin = useState('modal-first-login', () => false);
 </script>
 
 <style lang="less" scoped>
@@ -58,5 +120,14 @@ const anypopPlaytimeDescription = ref(false);
   .text {
     color: #aaa;
   }
+}
+
+.term-group {
+  font-size: 36px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
 }
 </style>
