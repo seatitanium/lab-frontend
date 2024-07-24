@@ -22,11 +22,17 @@
           <table>
             <thead>
             <tr>
+              <th>名次 RANK</th>
               <th v-for="x in Object.values(loginBoardTableHeads)">{{ x }}</th>
             </tr>
             </thead>
             <tbody>
-            <tr v-for="x in loginRecordBoard">
+            <tr v-for="(x, i) in loginRecordBoard">
+              <td>
+                <div class="cell">
+                  {{ i + 1 }}
+                </div>
+              </td>
               <td v-for="y in Object.keys(loginBoardTableHeads)">
                 <div class="cell">
                   <player-avatar v-if="y === 'player'" :name="x[y]"/>
@@ -49,11 +55,17 @@
           <table>
             <thead>
             <tr>
+              <th>名次 RANK</th>
               <th v-for="x in Object.values(playtimeBoardTableHeads)">{{ x }}</th>
             </tr>
             </thead>
             <tbody>
-            <tr v-for="x in playtimeBoard">
+            <tr v-for="(x, i) in playtimeBoard">
+              <td>
+                <div class="cell">
+                  {{ i + 1 }}
+                </div>
+              </td>
               <td v-for="y in Object.keys(playtimeBoardTableHeads)">
                 <div class="cell">
                   <player-avatar v-if="y === 'player'" :name="x[y]"/>
@@ -162,6 +174,10 @@ table {
   // bottom
   tbody tr:last-of-type td {
     border-bottom: 1px solid #ddd;
+  }
+
+  thead th:first-child, tbody tr td:first-child {
+    width: 100px;
   }
 
   // left-right
