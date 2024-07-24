@@ -110,7 +110,7 @@
       <p>如果确认需要注销账号，请联系讨论群内的任意管理员，或者发送邮件到 <a-support-email/> 进行申请。</p>
     </modal-content>
     <modal-actions>
-      <btn class="with-bg--white" @click="modalUserAction_delete = false">关闭</btn>
+      <btn class="with-bg--white hover--dim" @click="modalUserAction_delete = false">关闭</btn>
     </modal-actions>
   </modal>
   <error-modal allow-close no-retry :error-information-content="errorModalContent" v-model="modalError">

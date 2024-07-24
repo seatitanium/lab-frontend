@@ -19,8 +19,11 @@
         <div class="user-avatar" v-if="userInformation.id > 0">
           <avatar-spinner v-if="userInformation.loading"/>
           <img @click="userActionsModal = true" draggable="false" v-else-if="userInformation.hasBoundValidMCID"
-               :src="`https://crafatar.com/avatars/${userInformation.uuid}`"/>
-          <div class="avatar-placeholder" @click="userActionsModal = true" v-else>{{ username.charAt(0).toUpperCase() }}</div>
+               :src="`https://crafatar.com/avatars/${userInformation.uuid}`"
+               @contextmenu="handleUserAvatarContextMenu"/>
+          <div class="avatar-placeholder" @click="userActionsModal = true" v-else>
+            {{ userInformation.username.charAt(0).toUpperCase() }}
+          </div>
         </div>
       </div>
     </nav>
@@ -46,7 +49,8 @@
         </div>
         <div class="right">
           <div class="top">
-            <h2 :class="{mcid: userInformation.hasBoundValidMCID}">{{ userInformation.hasBoundValidMCID ? userInformation.mcid : userInformation.username}}</h2>
+            <h2 :class="{mcid: userInformation.hasBoundValidMCID}">
+              {{ userInformation.hasBoundValidMCID ? userInformation.mcid : userInformation.username }}</h2>
             <div class="namesub">普通玩家</div>
           </div>
           <metabar>
@@ -74,7 +78,8 @@
               <span class="current" v-if="userInformation.hasBoundValidMCID">
                 {{ userInformation.mcid }}
               </span>
-              <span class="mcid-not-exist-warning current" v-else-if="userInformation.mcid && !userInformation.mcidExist">
+              <span class="mcid-not-exist-warning current"
+                    v-else-if="userInformation.mcid && !userInformation.mcidExist">
                 <icon :path="mdiAlertOutline"/>
                 请及时更换无效 ID
               </span>
@@ -100,7 +105,7 @@
             </div>
             <div class="action" @click="userActionsModal = false; modalUserAction_nickname = true">
               <icon :path="mdiRenameOutline"/>
-              <span class="text">{{ userInformation.nickname ? '修改' : '添加'}}昵称</span>
+              <span class="text">{{ userInformation.nickname ? '修改' : '添加' }}昵称</span>
               <span class="current" v-if="userInformation.nickname">
                 {{ userInformation.nickname }}
               </span>
@@ -120,21 +125,32 @@
   </modal>
   <mg-user-actions/>
   <login-modal/>
+  <context-menu v-model="contextMenuEnabled" :x="contextMenuX" :y="contextMenuY">
+    <context-menu-item @click="logout">
+      <icon :path="mdiLogout"/>
+      退出登录
+    </context-menu-item>
+    <context-menu-item @click="loginModalState = true">
+      <icon :path="mdiAccountConvertOutline "/>
+      切换账户
+    </context-menu-item>
+  </context-menu>
 </template>
 
 <script lang="ts" setup>
 import setLocation from "~/utils/setLocation";
 import {
+  mdiAccountConvertOutline,
   mdiAccountHeartOutline,
   mdiAccountOffOutline, mdiAlertOutline, mdiCreationOutline,
   mdiEmailEditOutline,
   mdiHome,
-  mdiLinkVariant, mdiLinkVariantPlus, mdiLockReset,
+  mdiLinkVariant, mdiLinkVariantPlus, mdiLockReset, mdiLogout,
   mdiMinecraft, mdiPodium, mdiRenameOutline
 } from "@mdi/js";
 import getUsername from "~/utils/getUsername";
 import {useRoute, useState} from "#app";
-import {BackendCodes} from "~/consts";
+import {BackendCodes, LocalStorageAuthTokenKey, LocalStorageAuthUsernameKey} from "~/consts";
 import playernameToSkin from "~/utils/playernameToSkin";
 import {playernameToUUID} from "#imports";
 import AvatarSpinner from "~/components/avatar-spinner.vue";
@@ -142,9 +158,14 @@ import formatTimeStringFromDate from "../utils/formatTimeStringFromDate";
 import MgUserActions from "~/components/modal-groups/mg-user-actions.vue";
 import getToken from "~/utils/getToken";
 import getAshconResponse from "~/utils/getAshconResponse";
+import ContextMenu from "~/components/context-menu.vue";
 
 const username = getUsername();
 const token = getToken();
+
+const contextMenuEnabled = ref(false);
+const contextMenuX = ref(0);
+const contextMenuY = ref(0);
 
 const userInformation = useState<UserExtended>('user-data', () => {
   return {
@@ -183,12 +204,13 @@ const modalUserAction_password = useState('modal-user-action-password', () => fa
 const modalUserAction_delete = useState('modal-user-action-delete', () => false);
 
 const userLoginState = useState('user-login-state', () => false);
-const userInitState = ref(false);
+const userLoading = ref(true);
 
 async function checkUser() {
   if (username.value === '' || token.value === '') {
     userLoginState.value = false;
-    userInitState.value = true;
+    userLoading.value = false;
+    userInformation.value.loading = false;
     return;
   }
 
@@ -200,7 +222,7 @@ async function checkUser() {
     await initUser();
   }
 
-  userInitState.value = true;
+  userLoading.value = false;
 }
 
 async function initUser() {
@@ -236,6 +258,13 @@ async function initUser() {
 
 onMounted(() => {
   checkUser();
+});
+
+watch(() => useRoute().fullPath, async () => {
+  await checkUser();
+  if (!userLoginState.value) {
+    loginModalState.value = true;
+  }
 })
 
 const navigation = [
@@ -256,13 +285,31 @@ const navigation = [
   }
 ]
 
-watch(userInitState, () => {
-  if (useRoute().meta.requireLogin === true) {
-    if (!userLoginState.value) {
-      loginModalState.value = true;
+watch(userLoading, v => {
+  if (!v) {
+    if (useRoute().meta.requireLogin === true) {
+      if (!userLoginState.value) {
+        loginModalState.value = true;
+      }
     }
   }
+}, {
+  immediate: true
 })
+
+function handleUserAvatarContextMenu(e: MouseEvent) {
+  e.preventDefault();
+
+  contextMenuX.value = e.x;
+  contextMenuY.value = e.y;
+  contextMenuEnabled.value = true;
+}
+
+function logout() {
+  localStorage.removeItem(LocalStorageAuthUsernameKey);
+  localStorage.removeItem(LocalStorageAuthTokenKey);
+  useRouter().go(0);
+}
 </script>
 
 <style lang="less" scoped>
