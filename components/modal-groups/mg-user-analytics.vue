@@ -2,7 +2,7 @@
   <modal v-model="modalPlaytime" class="with-bg--darken describe">
     <modal-content>
       <icon color="#009688" :path="mdiClockStarFourPointsOutline"/>
-      <h2>{{ userInformation.mcid }} 的游玩时长数据</h2>
+      <h2>{{ userInformation.mcid }} 在 {{ PeriodTag.toUpperCase() }} 的游玩时长数据</h2>
       <div class="playtime">
         <div class="time">{{ formatSecondsDense(userInformation.playtimeTotalMillis) }}</div>
         <div class="text">总在线时长</div>
@@ -65,7 +65,7 @@
       <div class="term-group">
         <term-icon v-for="x in userInformation.analytics.termsInvolved" :num="x.tag.slice(2)"/>
       </div>
-      <p>共参与了 {{ userInformation.analytics.termsInvolved.length }} 个周目</p>
+      <p>共参与了 {{ userInformation.analytics.termsInvolved.length }}/{{ getTermCount() }} 个周目</p>
     </modal-content>
     <modal-actions class="right">
       <btn class="with-bg--primary hover--dim" @click="modalTermsInvolved = false">关闭</btn>
@@ -73,10 +73,13 @@
   </modal>
   <modal v-model="modalFirstLogin" class="with-bg--darken describe">
     <modal-content>
-      <SeatiPrimary/>
-      <h2>首次登入</h2>
-      <p>首次登入日期可作为参与 Seati 的起始点参考。</p>
-      <p><strong>{{ userInformation.mcid }} 于 {{ formatTimeStringFromStringPartialYM(userInformation.analytics.firstLoginRecord.createdAt) }} 首次登入 Seati 服务器，开始了 TA 的模组服务器旅程。</strong></p>
+      <Seati/>
+      <h2>{{ userInformation.mcid }} 的首次登入时间</h2>
+      <block class="with-bg--primary">
+        <icon :path="mdiInformationOutline"/>
+        <p>统计数据自 <term-icon class="text" num="7"/> 开始，不包含先前数据。<strong>2023-06</strong> 为最早首次登入时间。</p>
+      </block>
+      <p>{{ userInformation.mcid }} 于 {{ formatTimeStringFromStringPartialYM(userInformation.analytics.firstLoginRecord.createdAt) }} 首次登入 Seati 服务器</p>
     </modal-content>
     <modal-actions class="right">
       <btn class="with-bg--primary hover--dim" @click="modalFirstLogin = false">关闭</btn>
@@ -87,8 +90,10 @@
 import {mdiClockStarFourPointsOutline, mdiGamepadVariantOutline, mdiInformationOutline, mdiLogin} from "@mdi/js";
 import formatSecondsDense from "~/utils/formatSecondsDense";
 import {useState} from "#app";
-import SeatiPrimary from 'assets/icons/seati/seati-primary.svg'
+import Seati from 'assets/icons/seati/seati.svg'
 import formatTimeStringFromStringPartialYM from "~/utils/formatTimeStringFromStringPartialYM";
+import {PeriodTag} from "~/consts";
+import getTermCount from "../../utils/getTermCount";
 
 const userInformation = useState<UserExtended>('user-data');
 

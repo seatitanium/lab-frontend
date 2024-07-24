@@ -24,7 +24,11 @@
           </span>
             </div>
           </div>
-          <div class="player-a" @click="modalLoginRecord = true">
+          <div class="player-a" @click="() => {
+            if (userInformation.analytics.loginCount > 0) {
+              modalLoginRecord = true
+            }
+          }">
             <div class="text">
               登入次数
             </div>
@@ -32,20 +36,28 @@
               {{ userInformation.analytics.loginCount }}
             </div>
           </div>
-          <div class="player-a" @click="modalTermsInvolved = true">
+          <div class="player-a" @click="() => {
+            if (userInformation.analytics.termsInvolved.length > 0) {
+              modalTermsInvolved = true
+            }
+          }">
             <div class="text">
               参与周目
             </div>
             <div class="value">
-              {{ userInformation.analytics.termsInvolved.length }}
+              {{ userInformation.analytics.termsInvolved.length }}<small>/{{ getTermCount() }}</small>
             </div>
           </div>
-          <div class="player-a" @click="modalFirstLogin = true">
+          <div class="player-a" @click="() => {
+            if (userInformation.analytics.firstLoginRecord.createdAt) {
+              modalFirstLogin = true
+            }
+          }">
             <div class="text">
               首次加入
             </div>
             <div class="value">
-              {{ formatTimeStringFromStringPartialYM(userInformation.analytics.firstLoginRecord.createdAt) }}
+              {{ userInformation.analytics.firstLoginRecord.createdAt ? formatTimeStringFromStringPartialYM(userInformation.analytics.firstLoginRecord.createdAt) : '未曾加入'}}
             </div>
           </div>
         </section>

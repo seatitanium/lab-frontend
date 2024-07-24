@@ -25,6 +25,14 @@ export const LocalStorageAuthTokenKey = 'tisea-auth-token';
 
 export const LocalStorageAuthUsernameKey = 'tisea-auth-username';
 
-export const TermColors: Dict<string> = {
+export const TermBGColors: Dict<string> = {
+    '7': 'rgb(242,150,0)',
+    '8': 'rgb(187,10,196)',
+    '9': 'rgb(64,33,15)',
+    '10': 'rgb(255,133,133)',
+    '11': 'rgb(158,158,158)',
+    '12': 'rgb(0,198,151)',
     '13': 'rgb(243, 209, 61)'
 }
+
+export const TermFGWhite = ['7', '8', '9', '10', '11', '12']
