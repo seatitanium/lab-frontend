@@ -2,7 +2,7 @@
   <div class="page-index container">
     <div class="page-title">
       <h1>欢迎，{{ userInformation.nickname || userInformation.username }}</h1>
-      <p>选择下列功能之一，单击以跳转到相关页面以进行操作。这些功能在不断的更新中。</p>
+      <p>要开始，请选择下列功能之一，单击以进行相关操作，或选择上方导航栏中的选项跳转至相关页面。</p>
     </div>
     <section class="section__player_analytics">
       <div class="user-profile loading" v-if="userInformation.loading">
