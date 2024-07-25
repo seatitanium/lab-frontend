@@ -27,7 +27,7 @@ import {mdiArrowRight} from "@mdi/js";
 import {useLocalStorage} from "@vueuse/core";
 import post from "~/utils/post";
 import {BackendCodes} from "~/consts";
-import doLogin from "~/utils/doLogin";
+import doLogin from "~/utils/requests/doLogin";
 
 const props = defineProps({
   allowClose: {

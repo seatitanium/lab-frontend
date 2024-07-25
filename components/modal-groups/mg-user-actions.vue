@@ -113,10 +113,6 @@
       <btn class="with-bg--white hover--dim" @click="modalUserAction_delete = false">关闭</btn>
     </modal-actions>
   </modal>
-  <error-modal allow-close no-retry :error-information-content="errorModalContent" v-model="modalError">
-    <p>在执行操作过程中出现了一些问题。</p>
-    <p>单击「<strong>错误信息</strong>」按钮查看内部错误信息，然后单击弹出的信息复制，将其传达给维护者以得到支持。</p>
-  </error-modal>
 </template>
 
 <script lang="ts" setup>
@@ -127,6 +123,7 @@ import {BackendCodes, GlobalRegex, SupportEmail} from "~/consts";
 import getAshconResponse from "~/utils/getAshconResponse";
 import ASupportEmail from "~/components/a-support-email.vue";
 import {checkEmail, checkMCID, checkNickname, checkPassword} from "~/field-checks";
+import doUpdateProfile from "~/utils/requests/doUpdateProfile";
 
 const loading = ref(false);
 
@@ -156,9 +153,6 @@ const passwordValid = computed(() => passwordTempProblem.value === '');
 
 const modalUserAction_delete = useState('modal-user-action-delete', () => false);
 
-const errorModalContent = ref('');
-const modalError = ref(false);
-
 watch(passwordToChange, v => {
   checkPassword(v, passwordTempProblem);
 })
@@ -180,19 +174,20 @@ watch(mcidToBind, v => {
   checkMCID(v, mcidTempProblem)
 })
 
-async function updateProfile(object: {[prop: string]: any}, callback: Function) {
+async function updateProfile(object: {[prop: string]: any}, onSuccess: () => void, onException?: (r: Resp<unknown>) => void) {
   loading.value = true;
 
-  const result = await patch(`/api/user/profile?username=${userInformation.value.username}`, object);
-  loading.value = false;
-  callback();
-
-  if (result.code === BackendCodes.OK) {
+  await doUpdateProfile(userInformation.value.username, object, () => {
+    onSuccess();
     useRouter().go(0);
-  } else {
-    modalError.value = true;
-    errorModalContent.value = JSON.stringify(result);
-  }
+  }, r => {
+    if (onException) {
+      onException(r);
+    }
+    console.warn(r);
+  })
+
+  loading.value = false;
 }
 
 async function bindPassword() {
@@ -245,6 +240,10 @@ async function bindMCID() {
     'mc_id': mcidToBind.value
   }, () => {
     modalUserAction_mcid.value = false;
+  }, r => {
+    if (r.code === BackendCodes.DuplicatedMCIDBinding) {
+      mcidTempProblem.value = '此 ID 已经被绑定';
+    }
   })
 }
 </script>
