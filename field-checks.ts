@@ -55,3 +55,15 @@ export function checkMCID(newValue: string, problem: Ref<string>) {
         problem.value = ''
     }
 }
+
+export function checkUsername(newValue: string, problem: Ref<string>) {
+    if (!GlobalRegex.username.test(newValue)) {
+        if (!/^[a-zA-Z0-9_]+$/.test(newValue)) {
+            problem.value = "只能包含英文、下划线或者数字"
+        } else {
+            problem.value = "长度为 3~20 位";
+        }
+    } else {
+        problem.value = ''
+    }
+}
