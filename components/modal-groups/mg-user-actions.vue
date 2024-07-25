@@ -123,40 +123,36 @@
 import {useState} from "#app";
 import {mdiAccountOffOutline, mdiAlert, mdiAlertOutline, mdiMinecraft, mdiRenameOutline} from "@mdi/js";
 import patch from "~/utils/patch";
-import {BackendCodes, SupportEmail} from "~/consts";
+import {BackendCodes, GlobalRegex, SupportEmail} from "~/consts";
 import getAshconResponse from "~/utils/getAshconResponse";
 import ASupportEmail from "~/components/a-support-email.vue";
+import {checkEmail, checkMCID, checkNickname, checkPassword} from "~/field-checks";
 
 const loading = ref(false);
-
-const regexMCID = /^[a-zA-Z0-9_]{2,16}$/;
-const regexNickname = /^[\u4E00-\u9FFFA-Za-z0-9_]{3,15}$/;
-const regexEmail = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/;
-const regexPassword = /^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9]).{6,20})\S$/;
 
 const userInformation = useState<UserExtended>('user-data');
 const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
 const mcidToBind = ref('');
 const mcidTempProblem = ref('');
-const mcidValid = computed(() => regexMCID.test(mcidToBind.value) && mcidToBind.value !== userInformation.value.mcid)
+const mcidValid = computed(() => GlobalRegex.mcid.test(mcidToBind.value) && mcidToBind.value !== userInformation.value.mcid)
 const mcidExistButNotVerified = computed(() => userInformation.value.mcidExist && !userInformation.value.mcidVerified);
 
 const modalUserAction_nickname = useState('modal-user-action-nickname', () => false);
 const nicknameToChange = ref('');
 const nicknameTempProblem = ref('');
-const nicknameValid = computed(() => regexNickname.test(nicknameToChange.value) || nicknameToChange.value.length === 0);
+const nicknameValid = computed(() => GlobalRegex.nickname.test(nicknameToChange.value) || nicknameToChange.value.length === 0);
 
 const modalUserAction_email = useState('modal-user-action-email', () => false);
 const emailToChange = ref('');
 const emailTempProblem = ref('');
-const emailValid = computed(() => regexEmail.test(emailToChange.value));
+const emailValid = computed(() => GlobalRegex.email.test(emailToChange.value));
 
 const modalUserAction_password = useState('modal-user-action-password', () => false);
 const oldPassword = ref('');
 const passwordToChange = ref('');
 const passwordTempProblem = ref('');
 const oldPasswordTempProblem = ref('');
-const passwordValid = computed(() => regexPassword.test(passwordToChange.value));
+const passwordValid = computed(() => GlobalRegex.password.test(passwordToChange.value));
 
 const modalUserAction_delete = useState('modal-user-action-delete', () => false);
 
@@ -164,46 +160,15 @@ const errorModalContent = ref('');
 const modalError = ref(false);
 
 watch(passwordToChange, v => {
-  if (!regexPassword.test(v)) {
-    if (!/(?=\S*?[A-Z])/.test(v)) {
-      passwordTempProblem.value = "密码应至少包含一个大写字母";
-    } else if (!/(?=\S*?[a-z])/.test(v)) {
-      passwordTempProblem.value = "密码应至少包含一个小写字母";
-    } else if (!/(?=\S*?[0-9])/.test(v)) {
-      passwordTempProblem.value = "密码应至少包含一个数字";
-    } else if (v.length < 6) {
-      passwordTempProblem.value = "密码应至少有 6 位"
-    } else if (v.length > 20) {
-      passwordTempProblem.value = "密码最长支持 20 位"
-    }
-  } else {
-    passwordTempProblem.value = "";
-  }
+  checkPassword(v, passwordTempProblem);
 })
 
 watch(emailToChange, v => {
-  if (!regexEmail.test(v)) {
-    emailTempProblem.value = "不符合电子邮件格式";
-  } else {
-    emailTempProblem.value = '';
-  }
+  checkEmail(v, emailTempProblem)
 })
 
 watch(nicknameToChange, v => {
-  if (v.length === 0) {
-    nicknameTempProblem.value = '';
-    return;
-  }
-
-  if (!regexNickname.test(v)) {
-    if (!/^[\u4E00-\u9FFFA-Za-z0-9_]+$/.test(v)) {
-      nicknameTempProblem.value = "只能包含汉字、英文、下划线或数字";
-    } else {
-      nicknameTempProblem.value = "长度为 3~15 位"
-    }
-  } else {
-    nicknameTempProblem.value = '';
-  }
+ checkNickname(v, nicknameTempProblem)
 })
 
 watch(mcidToBind, v => {
@@ -212,15 +177,7 @@ watch(mcidToBind, v => {
     return;
   }
 
-  if (!regexMCID.test(v)) {
-    if (!/^[a-zA-Z0-9_]+$/.test(v)) {
-      mcidTempProblem.value = "只能包含英文、下划线或者数字"
-    } else {
-      mcidTempProblem.value = "长度为 2~16 位";
-    }
-  } else {
-    mcidTempProblem.value = ''
-  }
+  checkMCID(v, mcidTempProblem)
 })
 
 async function updateProfile(object: {[prop: string]: any}, callback: Function) {

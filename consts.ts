@@ -36,3 +36,10 @@ export const TermBGColors: Dict<string> = {
 }
 
 export const TermFGWhite = ['7', '8', '9', '10', '11', '12']
+
+export const GlobalRegex = {
+    mcid: /^[a-zA-Z0-9_]{2,16}$/,
+    nickname: /^[\u4E00-\u9FFFA-Za-z0-9_]{3,15}$/,
+    email: /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/,
+    password: /^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9]).{6,20})\S$/
+}
