@@ -19,6 +19,13 @@ strong {
   color: @primaryd;
 }
 
+p > code {
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid rgba(@primaryd, .2);
+  padding: 3px 6px;
+}
+
 code {
   font-size: 16px;
   .font-family--default-V;
@@ -215,4 +222,42 @@ slim {
 
 p {
   margin: 8px 0;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+
+    .number {
+      &::after {
+        content: ".";
+      }
+      font-variation-settings: 'wght' 600;
+      color: @primaryd;
+    }
+
+    .content {
+      p {
+        margin: 0;
+      }
+
+      img {
+        margin: 8px 0;
+        width: 100%;
+        box-shadow: 0 2px 4px transparent;
+        transition: all .2s ease;
+
+        &:hover {
+          transform: scale(1.8);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+        }
+      }
+    }
+  }
 }
