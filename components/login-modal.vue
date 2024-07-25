@@ -4,10 +4,12 @@
     <modal-content>
       <p>Lab 的功能需要与你的服务器账号关联，登录后即可畅享所有功能。</p>
       <form class="login-form">
-        <textfield v-model:tempProblem="usernameTempProblem" v-model:input="username" required bg-text placeholder="用户名"/>
-        <textfield v-model:tempProblem="passwordTempProblem" v-model:input="password" required bg-text type="password" placeholder="密码"/>
+        <textfield v-model:tempProblem="usernameTempProblem" v-model:input="username" required bg-text
+                   placeholder="用户名"/>
+        <textfield v-model:tempProblem="passwordTempProblem" v-model:input="password" required bg-text type="password"
+                   placeholder="密码"/>
       </form>
-      <div tabindex="0" class="register__now">
+      <div tabindex="0" class="register__now" @click="loginModalState = false; registerModalState = true">
         还没有账号？<br/>
         <h2>现在就注册一个</h2>
         <icon :path="mdiArrowRight"/>
@@ -25,6 +27,7 @@ import {mdiArrowRight} from "@mdi/js";
 import {useLocalStorage} from "@vueuse/core";
 import post from "~/utils/post";
 import {BackendCodes} from "~/consts";
+import doLogin from "~/utils/doLogin";
 
 const props = defineProps({
   allowClose: {
@@ -34,6 +37,7 @@ const props = defineProps({
 })
 
 const loginModalState = useState('login-modal', () => false);
+const registerModalState = useState('register-modal');
 const loginLoading = ref(false);
 
 const username = ref('');
@@ -50,29 +54,25 @@ async function login() {
 
   loginLoading.value = true;
 
-  const result = await post<LoginRes>('/api/auth/login', {
-    username: username.value,
-    password: password.value
-  });
+  await doLogin(
+      {
+        username: username.value,
+        password: password.value
+      },
+      () => useRouter().go(0),
+      result => {
+        if (result.code === BackendCodes.TargetNotExist) {
+          usernameTempProblem.value = '这个用户名不存在。';
+        }
+
+        if (result.code === BackendCodes.AuthenticationFailed) {
+          passwordTempProblem.value = '请检查密码是否正确。';
+        }
+      }
+  );
 
   loginLoading.value = false;
 
-  if (result.code === BackendCodes.OK) {
-    const token = useLocalStorage('tisea-auth-token', '');
-    const username = useLocalStorage('tisea-auth-username', '');
-    token.value = result.data.token;
-    username.value = result.data.username;
-    useRouter().go(0);
-  } else {
-    console.log(result)
-    if (result.code === BackendCodes.TargetNotExist) {
-      usernameTempProblem.value = '这个用户名不存在。';
-    }
-
-    if (result.code === BackendCodes.AuthenticationFailed) {
-      passwordTempProblem.value = '请检查密码是否正确。';
-    }
-  }
 }
 </script>
 
