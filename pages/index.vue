@@ -1,7 +1,8 @@
 <template>
   <div class="page-index container">
     <div class="page-title">
-      <h1>欢迎，{{ userInformation.nickname || userInformation.username }}</h1>
+      <h1 v-if="userLoginState">欢迎，{{ userInformation.nickname || userInformation.username }}</h1>
+      <h1 v-else>未登录</h1>
       <p>要开始，请选择下列功能之一，单击以进行相关操作，或选择上方导航栏中的选项跳转至相关页面。</p>
     </div>
     <section class="section__player_analytics">
@@ -61,6 +62,12 @@
             </div>
           </div>
         </section>
+      </div>
+      <div class="user-profile empty" v-else-if="!userLoginState">
+        <div class="text textaligncenter">
+          <h2>请登录后查看个人统计信息</h2>
+          <p>个人统计信息仅在绑定 Minecraft ID 且登录状态下可用</p>
+        </div>
       </div>
       <div class="user-profile empty" v-else>
         <div class="text textaligncenter">
