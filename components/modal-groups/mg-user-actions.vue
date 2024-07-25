@@ -140,19 +140,19 @@ const mcidExistButNotVerified = computed(() => userInformation.value.mcidExist &
 const modalUserAction_nickname = useState('modal-user-action-nickname', () => false);
 const nicknameToChange = ref('');
 const nicknameTempProblem = ref('');
-const nicknameValid = computed(() => GlobalRegex.nickname.test(nicknameToChange.value) || nicknameToChange.value.length === 0);
+const nicknameValid = computed(() => nicknameTempProblem.value === '');
 
 const modalUserAction_email = useState('modal-user-action-email', () => false);
 const emailToChange = ref('');
 const emailTempProblem = ref('');
-const emailValid = computed(() => GlobalRegex.email.test(emailToChange.value));
+const emailValid = computed(() => emailTempProblem.value === '');
 
 const modalUserAction_password = useState('modal-user-action-password', () => false);
 const oldPassword = ref('');
 const passwordToChange = ref('');
 const passwordTempProblem = ref('');
 const oldPasswordTempProblem = ref('');
-const passwordValid = computed(() => GlobalRegex.password.test(passwordToChange.value));
+const passwordValid = computed(() => passwordTempProblem.value === '');
 
 const modalUserAction_delete = useState('modal-user-action-delete', () => false);
 
