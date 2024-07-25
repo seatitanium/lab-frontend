@@ -123,8 +123,6 @@
       </div>
     </modal-content>
   </modal>
-  <mg-user-actions/>
-  <login-modal/>
   <context-menu v-model="contextMenuEnabled" :x="contextMenuX" :y="contextMenuY">
     <context-menu-item @click="logout">
       <icon :path="mdiLogout"/>
@@ -135,6 +133,12 @@
       切换账户
     </context-menu-item>
   </context-menu>
+  <bind-mcid-suggestion-modal v-model="bindSuggestionModal"/>
+  <register-complete-modal v-model="registerCompleteNoticeModal"/>
+  <mg-user-actions/>
+  <login-modal/>
+  <register-modal/>
+  <tips-bind-mcid/>
 </template>
 
 <script lang="ts" setup>
@@ -159,6 +163,8 @@ import MgUserActions from "~/components/modal-groups/mg-user-actions.vue";
 import getToken from "~/utils/getToken";
 import getAshconResponse from "~/utils/getAshconResponse";
 import ContextMenu from "~/components/context-menu.vue";
+import BindMcidSuggestionModal from "~/components/bind-mcid-suggestion-modal.vue";
+import TipsBindMcid from "~/components/tips-modal/tips-bind-mcid.vue";
 
 const username = getUsername();
 const token = getToken();
@@ -166,6 +172,8 @@ const token = getToken();
 const contextMenuEnabled = ref(false);
 const contextMenuX = ref(0);
 const contextMenuY = ref(0);
+
+const termInformation = useState<Term[]>('term-information', () => [])
 
 const userInformation = useState<UserExtended>('user-data', () => {
   return {
@@ -207,6 +215,8 @@ const someProblemModal = useState('error-modal-state', () => false);
 const loginModalState = useState('login-modal');
 const errorInformationContent = useState('error-modal-content', () => '');
 const userActionsModal = ref(false);
+const bindSuggestionModal = ref(false);
+const registerCompleteNoticeModal = ref(false);
 
 const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
 const modalUserAction_nickname = useState('modal-user-action-nickname', () => false);
@@ -238,6 +248,12 @@ async function checkUser() {
 
 async function initUser() {
   const userResult = await get<User>(`/api/user/profile?username=${username.value}`);
+
+  const termResult = await get<Term[]>(`/api/server/terms`);
+
+  if (termResult.code === BackendCodes.OK) {
+    Object.assign(termInformation.value, termResult.data)
+  }
 
   if (userResult.code !== BackendCodes.OK) {
     someProblemModal.value = true;
@@ -287,8 +303,19 @@ async function initUser() {
   userInformation.value.loading = false;
 }
 
+const afterRegisterNoticeConfig = getAfterRegisterNoticeConfig();
+
 onMounted(() => {
   checkUser();
+  if (afterRegisterNoticeConfig.value.ready) {
+    if (afterRegisterNoticeConfig.value.mcid === true) {
+      registerCompleteNoticeModal.value = true;
+    } else {
+      bindSuggestionModal.value = true;
+    }
+
+    afterRegisterNoticeConfig.value.ready = false;
+  }
 });
 
 watch(() => useRoute().fullPath, async () => {
