@@ -12,6 +12,7 @@
   "dependencies": {
     "@jamescoyle/vue-icon": "^0.1.2",
     "@mdi/js": "^7.4.47",
+    "@nuxt/image": "^1.7.0",
     "@types/animejs": "^3.1.12",
     "@vueuse/core": "^10.9.0",
     "animejs": "^3.2.2",

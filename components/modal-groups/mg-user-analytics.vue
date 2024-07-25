@@ -63,7 +63,7 @@
       <icon color="#009688" :path="mdiGamepadVariantOutline"/>
       <h2>{{ userInformation.mcid }} 参与过的周目</h2>
       <div class="term-group">
-        <term-icon v-for="x in userInformation.analytics.termsInvolved" :num="x.tag.slice(2)"/>
+        <term-icon v-for="x in userInformation.analytics.termsInvolved" :num="x.tag.slice(2)" @click="modalTermsInvolved = false"/>
       </div>
       <p>共参与了 {{ userInformation.analytics.termsInvolved.length }}/{{ getTermCount() }} 个周目</p>
     </modal-content>
@@ -77,7 +77,7 @@
       <h2>{{ userInformation.mcid }} 的首次登入时间</h2>
       <block class="with-bg--primary">
         <icon :path="mdiInformationOutline"/>
-        <p>统计数据自 <term-icon class="text" num="7"/> 开始，不包含先前数据。<strong>2023-06</strong> 为最早首次登入时间。</p>
+        <p>统计数据自 <term-icon no-click class="text" num="7"/> 开始，不包含先前数据。<strong>2023-06</strong> 为最早首次登入时间。</p>
       </block>
       <p>{{ userInformation.mcid }} 于 {{ formatTimeStringFromStringPartialYM(userInformation.analytics.firstLoginRecord.createdAt) }} 首次登入 Seati 服务器</p>
     </modal-content>

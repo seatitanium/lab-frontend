@@ -1,7 +1,7 @@
 <template>
   <div class="modal-group">
     <Transition name="modal-trans">
-      <div v-if="model" class="modal">
+      <div v-if="model" class="modal" :style="{background, color}">
         <btn @click="model = false" icon v-if="withCloseBtn" class="hover--dim with-bg--white close-btn">
           <icon :path="mdiClose"/>
         </btn>
@@ -28,6 +28,12 @@ const props = defineProps({
   withCloseBtn: {
     type: Boolean,
     default: false
+  },
+  background: {
+    type: String
+  },
+  color: {
+    type: String
   }
 })
 

@@ -31,5 +31,5 @@ export default defineNuxtConfig({
         }
     },
 
-    modules: ["nuxt-route-meta"]
+    modules: ["nuxt-route-meta", "@nuxt/image"]
 });

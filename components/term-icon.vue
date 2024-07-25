@@ -1,18 +1,36 @@
 <template>
-  <div class="term-icon" :class="`st${num}`" :style="{background: TermBGColors[num], color: TermFGWhite.includes(num) ? 'white' : 'black'}">
+  <div class="term-icon" @click="() => {
+    if (!noClick) {
+      termModalNum = num; model = true
+    }
+  }" :class="[`st${num}`, noClick ? 'noclick' : '', text ? 'text' : ''].join(' ')" :style="{background: TermBGColors[num], color: TermFGWhite.includes(num) ? 'white' : 'black'}">
     {{ num }}
   </div>
+
 </template>
 
 <script lang="ts" setup>
-import {TermBGColors, TermFGWhite} from "~/consts";
+import {BackendCodes, TermBGColors, TermFGWhite} from "~/consts";
+import {useState} from "#app";
+import {mdiLaunch} from "@mdi/js";
 
 const props = defineProps({
   num: {
     type: String,
     required: true
+  },
+  noClick: {
+    type: Boolean,
+    default: false
+  },
+  text: {
+    type: Boolean,
+    default: false,
   }
 })
+
+const termModalNum = useState('term-modal-num', () => '7');
+const model = useState('term-modal');
 
 </script>
 
@@ -20,6 +38,7 @@ const props = defineProps({
 @import "assets/var";
 
 .term-icon {
+  cursor: pointer;
   font-family: 'Highway Gothic', sans-serif;
   width: 50px;
   height: 50px;
@@ -30,9 +49,14 @@ const props = defineProps({
   font-size: 85%;
   font-weight: normal;
 
+  &.noclick {
+    pointer-events: none;
+  }
+
   &.text {
-    width: 20px;
-    height: 20px;
+    width: 25px;
+    height: 25px;
+    font-size: 100%;
     vertical-align: middle;
     border-radius: 5px;
   }

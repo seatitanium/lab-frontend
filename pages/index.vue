@@ -58,7 +58,7 @@
               首次加入
             </div>
             <div class="value">
-              {{ userInformation.analytics.firstLoginRecord.createdAt ? formatTimeStringFromStringPartialYM(userInformation.analytics.firstLoginRecord.createdAt) : '未曾加入'}}
+              {{ userInformation.analytics.firstLoginRecord.createdAt ? formatTimeStringFromStringPartialYM(userInformation.analytics.firstLoginRecord.createdAt) : '未曾加入' }}
             </div>
           </div>
         </section>
@@ -77,7 +77,7 @@
         </div>
         <btn class="with-bg--primary hover--dim" @click="modalUserAction_mcid = true">
           <icon :path="userInformation.mcidVerified ? mdiLinkVariantPlus : mdiRefresh"/>
-          {{ userInformation.mcidVerified ? '立即绑定': '重新绑定' }}
+          {{ userInformation.mcidVerified ? '立即绑定' : '重新绑定' }}
         </btn>
       </div>
     </section>
@@ -101,7 +101,9 @@
             </div>
             <div class="right">
               <div class="term-title">
-                <div class="main">当前周目 <term-icon num="13"/></div>
+                <div class="main">当前周目
+                  <term-icon num="13"/>
+                </div>
                 <div class="sub">
                   <icon :path="mdiCardsPlaying"/>
                   进行中 · {{ termTimeDelta }}
@@ -214,6 +216,7 @@ const modalFirstLogin = useState('modal-first-login', () => false);
 const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
 
 const userInformation = useState<UserExtended>('user-data');
+const userLoginState = useState('user-login-state');
 
 onMounted(() => {
   setInterval(() => {

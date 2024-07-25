@@ -2,7 +2,8 @@ export {};
 
 declare global {
     type Nullable<T> = T | null;
-    type OrEmpty<T extends string> = T | '';
+    type OrEmpty<T extends string> = Either<T, ''>;
+    type Either<K, T> = K | T;
 
     type InstanceStatus = 'Pending' | 'Running' | 'Stopping' | 'Stopped' | 'Starting'
     type DeploymentStatus =
@@ -161,9 +162,22 @@ declare global {
     }
 
     interface Term {
-        tag: string,
-        startAt: string,
-        endAt: string,
-        active: boolean
+        tag: string;
+        version: string;
+        theme: string;
+        themeAlt?: string;
+        packVersion?: string;
+        type: string;
+        author: string;
+        link?: string;
+        startAt: string;
+        endAt?: string;
+        created: string;
+        image?: string;
+    }
+
+    interface ServerPlayer {
+        uuid: string,
+        name: string
     }
 }

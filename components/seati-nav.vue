@@ -21,7 +21,7 @@
           <img @click="userActionsModal = true" draggable="false" v-else-if="userInformation.hasBoundValidMCID"
                :src="`https://crafatar.com/avatars/${userInformation.uuid}`"
                @contextmenu="handleUserAvatarContextMenu"/>
-          <div class="avatar-placeholder" @click="userActionsModal = true" v-else>
+          <div class="avatar-placeholder" @contextmenu="handleUserAvatarContextMenu" @click="userActionsModal = true" v-else>
             {{ userInformation.username.charAt(0).toUpperCase() }}
           </div>
         </div>
@@ -139,6 +139,7 @@
   <login-modal/>
   <register-modal/>
   <tips-bind-mcid/>
+  <term-modal/>
 </template>
 
 <script lang="ts" setup>
@@ -165,6 +166,7 @@ import getAshconResponse from "~/utils/getAshconResponse";
 import ContextMenu from "~/components/context-menu.vue";
 import BindMcidSuggestionModal from "~/components/bind-mcid-suggestion-modal.vue";
 import TipsBindMcid from "~/components/tips-modal/tips-bind-mcid.vue";
+import TermModal from "~/components/term-modal.vue";
 
 const username = getUsername();
 const token = getToken();
