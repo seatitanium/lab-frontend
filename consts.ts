@@ -44,3 +44,5 @@ export const GlobalRegex = {
     email: /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/,
     password: /^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9]).{6,20})\S$/
 }
+
+export const COSEndpoint = "https://d.seati.cc"

@@ -1,6 +1,6 @@
 <template>
   <div class="player-avatar" :class="{loading: (!uuid || uuid.length === 0) && !steve}">
-    <img v-if="uuid && uuid.length > 0" :src="`https://crafatar.com/avatars/${uuid || uuidLocal}`"/>
+    <img v-if="(uuid && uuid.length > 0) || uuidLocal" :src="`https://crafatar.com/avatars/${uuid || uuidLocal}`"/>
     <img src="~/assets/images/steve.png" v-else-if="steve"/>
     <circle-spinner v-else :size="loadingSize"/>
     <div class="hover-name-overlay" v-if="hoverName && name">

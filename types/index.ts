@@ -162,22 +162,32 @@ declare global {
     }
 
     interface Term {
-        tag: string;
-        version: string;
-        theme: string;
-        themeAlt?: string;
-        packVersion?: string;
-        type: string;
-        author: string;
-        link?: string;
-        startAt: string;
-        endAt?: string;
-        created: string;
-        image?: string;
+        tag: string,
+        version: string,
+        theme: string,
+        themeAlt?: string,
+        packVersion?: string,
+        type: string,
+        author: string,
+        link?: string,
+        startAt: string,
+        endAt?: string,
+        created: string,
+        image?: string,
+        downloads: {
+            world: TermDownloadItem,
+            pack: TermDownloadItem,
+            mods: TermDownloadItem,
+        }
     }
 
     interface ServerPlayer {
         uuid: string,
         name: string
+    }
+
+    interface TermDownloadItem {
+        name: string,
+        size: string
     }
 }

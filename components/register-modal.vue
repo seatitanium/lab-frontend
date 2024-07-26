@@ -40,6 +40,7 @@ import {mdiInformationOutline} from "@mdi/js";
 import {BackendCodes} from "~/consts";
 import {useLocalStorage} from "@vueuse/core";
 import getAfterRegisterNoticeConfig from "~/utils/getAfterRegisterNoticeConfig";
+import doLogin from "~/utils/requests/doLogin";
 
 const loginModalState = useState('login-modal');
 const registerModalState = useState('register-modal', () => false);

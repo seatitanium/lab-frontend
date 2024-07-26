@@ -90,12 +90,13 @@ function handleClick() {
   }
 
   &.small {
-    padding: 2px 10px;
-    font-size: 12px;
+    padding: 8px 16px;
+    font-size: 14px;
     gap: 4px;
 
     &:not(.icon) svg {
-      width: 15px;
+      width: 16px;
+      height: 16px;
     }
   }
 

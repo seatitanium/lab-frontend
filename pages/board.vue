@@ -135,8 +135,12 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+</style>
 
-  img {
+<style lang="less">
+.page-board {
+  .player-avatar img {
     height: 20px;
   }
 }
