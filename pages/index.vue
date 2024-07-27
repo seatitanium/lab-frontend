@@ -81,7 +81,7 @@
         </btn>
       </div>
     </section>
-    <section>
+    <section v-if="currentTerm">
       <div class="index-term-information">
         <card class="equalp">
           <card-right-top>
@@ -105,31 +105,31 @@
                   <term-icon num="13"/>
                 </div>
                 <div class="sub">
-                  <icon :path="mdiCardsPlaying"/>
-                  进行中 · {{ termTimeDelta }}
+                  <icon color="#004d40" :path="mdiCardsPlaying"/>
+                  <strong>进行中</strong> · {{ termTimeDelta }}
                 </div>
               </div>
               <div class="term-information">
                 <ul>
                   <li>
                     <icon :path="mdiMinecraft"/>
-                    Minecraft
-                    <slim>Java 1.20.1</slim>
+                    Minecraft 版本
+                    <slim>{{ currentTerm.version }}</slim>
                   </li>
                   <li>
                     <icon :path="mdiAnvil"/>
-                    Forge
-                    <slim>24.9.2</slim>
+                    Forge 版本
+                    <slim>{{ currentTermSet.forge }}</slim>
                   </li>
                   <li>
                     <icon :path="mdiMemory"/>
                     分配内存
-                    <slim>8GiB 或以上</slim>
+                    <slim>{{ currentTermSet.ram }}GB 或以上</slim>
                   </li>
                   <li>
                     <icon :path="mdiLanguageJava"/>
-                    Java
-                    <slim>21 或以上</slim>
+                    Java 版本
+                    <slim>{{ currentTermSet.java }} 或以上</slim>
                   </li>
                 </ul>
               </div>
@@ -138,7 +138,7 @@
         </card>
       </div>
     </section>
-    <section>
+    <section v-if="currentTerm">
       <div class="index-pack-information">
         <card class="equalp">
           <card-right-top>
@@ -151,27 +151,15 @@
               <div class="pack-name">
                 <img class="pack-logo" src="../assets/images/pack-logo.png"/>
                 <div class="right">
-                  <div class="main">All the Mods 9 <small>ATM9</small></div>
-                  <div class="sub">整合包 / 2022 / ATMTeam</div>
+                  <div class="main">{{ currentTerm.theme }} <small v-if="currentTerm.themeAlt">{{ currentTerm.themeAlt }}</small></div>
+                  <div class="sub">{{ currentTerm.type }} / {{ currentTerm.created}} 年 / {{ currentTerm.author }} 制作</div>
                 </div>
               </div>
             </div>
-            <div class="pack-description">
-              <p>ATM9 has over 400 mods and countless quests and a built in proper endgame. Can you craft the ATM Star?
-                Do
-                you dare take on the Gregstar?</p>
-              <p>All the Mods started out as a private pack for just a few friends of mine that turned into something
-                others wanted to play! It has all the basics that most other "big name" packs include but with a nice
-                mix
-                of some of newer or lesser-known mods as well.
-              </p>
-              <p>In All the Mods 9 we will continue the tradition adding many new mods while going for more
-                stability.</p>
-              <p> Does "All the Mods" really contain ALL THE MODS? No, of course not.</p>
-            </div>
+            <div class="pack-description" v-html="currentTermSet.description"/>
           </card-content>
-          <modal-actions style="position: absolute;bottom: 32px; right: 32px;" class="nopadding absolute">
-            <btn class="without-bg--primary hover--dim">在 CurseForge 上了解更多
+          <modal-actions v-if="currentTerm.link" style="position: absolute;bottom: 32px; right: 32px;" class="nopadding absolute">
+            <btn :href="currentTerm.link" class="without-bg--primary hover--dim">在 MCMOD 中打开
               <icon :path="mdiLaunch"/>
             </btn>
           </modal-actions>
@@ -196,6 +184,8 @@ import {useState} from "#app";
 import formatTimeStringFromStringPartialYM from "../utils/formatTimeStringFromStringPartialYM";
 import MgUserAnalytics from "~/components/modal-groups/mg-user-analytics.vue";
 import MgIndexBadges from "~/components/modal-groups/mg-index-badges.vue";
+import {BackendCodes} from "~/consts";
+import getCurrentTerm from "~/utils/getCurrentTerm";
 
 definePageMeta({
   requireLogin: true
@@ -204,9 +194,6 @@ definePageMeta({
 const modalForgeDesc = useState('modal-forge-description', () => false);
 const modalJavaDesc = useState('modal-java-description', () => false);
 const modalOnlineModeDesc = useState('modal-online-mode-description', () => false);
-
-const termBgn = '2024-05-01';
-const termTimeDelta = ref(formatSeconds(new Date().getTime() - new Date(termBgn).getTime()));
 
 const modalPlaytime = useState('modal-playtime', () => false);
 const modalLoginRecord = useState('modal-login-record', () => false);
@@ -217,10 +204,31 @@ const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
 
 const userInformation = useState<UserExtended>('user-data');
 const userLoginState = useState('user-login-state');
+const currentTerm = computed(() => getCurrentTerm());
+
+const termTimeDelta = ref(formatSeconds(currentTerm.value ? (new Date().getTime() - new Date(currentTerm.value.startAt).getTime()) : 0))
+
+const currentTermSet = reactive<TermSet>({
+  tag: "",
+  forge: "",
+  ram: "",
+  java: "",
+  description: ""
+});
+
+async function getTermSet() {
+  const result = await get<TermSet>(`/api/server/current-term-set`);
+
+  if (result.code === BackendCodes.OK) {
+    Object.assign(currentTermSet, result.data);
+  }
+}
 
 onMounted(() => {
+  getTermSet();
+
   setInterval(() => {
-    termTimeDelta.value = formatSeconds(new Date().getTime() - new Date(termBgn).getTime());
+    termTimeDelta.value = formatSeconds(currentTerm.value ? (new Date().getTime() - new Date(currentTerm.value.startAt).getTime()) : 0);
   }, 1000);
 })
 </script>

@@ -190,4 +190,12 @@ declare global {
         name: string,
         size: string
     }
+
+    interface TermSet {
+        tag: string,
+        forge: string,
+        ram: string,
+        java: string,
+        description: string
+    }
 }
