@@ -10,7 +10,7 @@
         <div class="value">{{ termInformation.length }}</div>
       </div>
       <div class="term-a">
-        <div class="name">总参与玩家</div>
+        <div class="name">总参与玩家<icon @click="totalInvolvingPlayersPopup = true" :path="mdiHelpCircleOutline"/></div>
         <div class="value">{{ totalInvolvedPlayers.length }}</div>
       </div>
       <div class="term-a">
@@ -18,7 +18,7 @@
         <div class="value">{{ totalOpeningDays }}d</div>
       </div>
       <div class="term-a">
-        <div class="name">资金消耗</div>
+        <div class="name">资金消耗<icon @click="consumptionPopup = true" :path="mdiHelpCircleOutline"/></div>
         <div class="value">{{ totalConsumption }}<span class="rmb">RMB</span></div>
       </div>
     </section>
@@ -29,6 +29,12 @@
         </template>
       </term-card>
     </section>
+    <anywhere-popup :code="false" v-model="consumptionPopup">
+      <p>资金消耗的数据来自阿里云，统计的是自 ST1（2022-02）以来的服务器本体计费费用，不包含流量费、对象存储费以及网站服务器费用。</p>
+    </anywhere-popup>
+    <anywhere-popup :code="false" v-model="totalInvolvingPlayersPopup">
+      <p>该数字为 ST7 以来所有登入过服务器的玩家的数量，不计重复。</p>
+    </anywhere-popup>
   </div>
 </template>
 <script setup lang="ts">
@@ -36,7 +42,10 @@ import {useState} from "#app";
 import {BackendCodes, PeriodTag} from "~/consts";
 import getTermPeriod from "~/utils/getTermPeriod";
 import TermCard from "~/components/term-card.vue";
-import {mdiLinkVariantPlus} from "@mdi/js";
+import {mdiHelpCircleOutline, mdiLinkVariantPlus} from "@mdi/js";
+
+const consumptionPopup = ref(false);
+const totalInvolvingPlayersPopup = ref(false);
 
 const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
 
@@ -99,6 +108,15 @@ onMounted(() => {
     .name {
       padding-bottom: 8px;
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      svg {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+      }
     }
 
     .value {
