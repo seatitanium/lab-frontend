@@ -1,7 +1,7 @@
 <template>
   <div class="term-info">
     <div class="term-title">
-      <nuxt-img :src="currentTerm.image" v-if="currentTerm.image"/>
+      <nuxt-img class="term-image" :src="currentTerm.image" v-if="currentTerm.image"/>
       <div class="right">
         <h2>
           <term-icon no-click :num="num || termNumber || '7'"/>
@@ -105,6 +105,10 @@ watch(num, () => {
 
 <style lang="less" scoped>
 @import "assets/var";
+
+.term-image {
+  box-shadow: 0 5px 0 rgba(0, 0, 0, .1);
+}
 
 .term-info {
   position: relative;
