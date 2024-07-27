@@ -31,7 +31,7 @@
   }
 
   &.with-bg--primary {
-    background: @primaryl;
+    background: rgba(@primaryl, .5);
 
     svg, path {
       fill: @primary;

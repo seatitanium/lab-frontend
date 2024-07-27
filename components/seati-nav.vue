@@ -140,6 +140,7 @@
   <register-modal/>
   <tips-bind-mcid/>
   <term-modal/>
+  <term-info-popups/>
 </template>
 
 <script lang="ts" setup>
@@ -147,7 +148,7 @@ import setLocation from "~/utils/setLocation";
 import {
   mdiAccountConvertOutline,
   mdiAccountHeartOutline,
-  mdiAccountOffOutline, mdiAlertOutline, mdiCreationOutline,
+  mdiAccountOffOutline, mdiAlertOutline, mdiCards, mdiCardsOutline, mdiCardsPlaying, mdiCreationOutline,
   mdiEmailEditOutline,
   mdiHome,
   mdiLinkVariant, mdiLinkVariantPlus, mdiLockReset, mdiLogout,
@@ -167,6 +168,7 @@ import ContextMenu from "~/components/context-menu.vue";
 import BindMcidSuggestionModal from "~/components/bind-mcid-suggestion-modal.vue";
 import TipsBindMcid from "~/components/tips-modal/tips-bind-mcid.vue";
 import TermModal from "~/components/term-modal.vue";
+import TermInfoPopups from "~/components/popup-groups/term-info-popups.vue";
 
 const username = getUsername();
 const token = getToken();
@@ -227,12 +229,22 @@ const modalUserAction_password = useState('modal-user-action-password', () => fa
 const modalUserAction_delete = useState('modal-user-action-delete', () => false);
 
 const userLoginState = useState('user-login-state', () => false);
-const userLoading = ref(true);
 
-async function checkUser() {
+async function initTermData() {
+  const termResult = await get<Term[]>(`/api/server/terms`);
+
+  if (termResult.code === BackendCodes.OK) {
+    Object.assign(termInformation.value, termResult.data)
+  } else {
+    someProblemModal.value = true;
+    errorInformationContent.value = JSON.stringify(termResult);
+    return;
+  }
+}
+
+async function initUserData() {
   if (username.value === '' || token.value === '') {
     userLoginState.value = false;
-    userLoading.value = false;
     userInformation.value.loading = false;
     return;
   }
@@ -241,25 +253,14 @@ async function checkUser() {
 
   userLoginState.value = result.code === BackendCodes.OK;
 
-  if (userLoginState.value) {
-    await initUser();
-  }
+  if (!userLoginState.value) return;
 
-  userLoading.value = false;
-}
-
-async function initUser() {
   const userResult = await get<User>(`/api/user/profile?username=${username.value}`);
-
-  const termResult = await get<Term[]>(`/api/server/terms`);
-
-  if (termResult.code === BackendCodes.OK) {
-    Object.assign(termInformation.value, termResult.data)
-  }
 
   if (userResult.code !== BackendCodes.OK) {
     someProblemModal.value = true;
     errorInformationContent.value = JSON.stringify(userResult);
+    return;
   } else {
     Object.assign(userInformation.value, userResult.data);
 
@@ -308,7 +309,8 @@ async function initUser() {
 const afterRegisterNoticeConfig = getAfterRegisterNoticeConfig();
 
 async function initPage() {
-  await checkUser();
+  await initTermData();
+  await initUserData();
   if (afterRegisterNoticeConfig.value.ready) {
     if (afterRegisterNoticeConfig.value.mcid === true) {
       registerCompleteNoticeModal.value = true;
@@ -331,7 +333,7 @@ onMounted(() => {
 
 onUpdated(() => {
   initPage();
-})
+});
 
 const navigation = [
   {
@@ -348,6 +350,11 @@ const navigation = [
     name: "排行榜",
     route: "/board",
     icon: mdiPodium
+  },
+  {
+    name: "周目",
+    route: "/terms",
+    icon: mdiCardsPlaying
   }
 ]
 
@@ -558,5 +565,20 @@ function logout() {
 
 main {
   padding-top: @navbar-height;
+}
+</style>
+
+<style lang="less">
+.anywhere-popup-layer.resource-explanation {
+  strong {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
 }
 </style>

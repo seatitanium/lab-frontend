@@ -3,7 +3,7 @@
     if (!noClick) {
       termModalNum = num; model = true
     }
-  }" :class="[`st${num}`, noClick ? 'noclick' : '', text ? 'text' : ''].join(' ')" :style="{background: TermBGColors[num], color: TermFGWhite.includes(num) ? 'white' : 'black'}">
+  }" :class="[`st${num}`, noClick ? 'noclick' : '', text ? 'text' : '', display ? 'display' : ''].join(' ')" :style="{background: TermBGColors[num], color: TermFGWhite.includes(num) ? 'white' : 'black'}">
     {{ num }}
   </div>
 
@@ -26,6 +26,10 @@ const props = defineProps({
   text: {
     type: Boolean,
     default: false,
+  },
+  display: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -48,6 +52,14 @@ const model = useState('term-modal');
   border-radius: 12px;
   font-size: 85%;
   font-weight: normal;
+  box-sizing: border-box;
+
+  &.display {
+    width: 100px;
+    height: 100px;
+    font-size: 56px;
+    border-radius: 25px;
+  }
 
   &.noclick {
     pointer-events: none;
