@@ -307,8 +307,8 @@ async function initUser() {
 
 const afterRegisterNoticeConfig = getAfterRegisterNoticeConfig();
 
-onMounted(() => {
-  checkUser();
+async function initPage() {
+  await checkUser();
   if (afterRegisterNoticeConfig.value.ready) {
     if (afterRegisterNoticeConfig.value.mcid === true) {
       registerCompleteNoticeModal.value = true;
@@ -318,13 +318,19 @@ onMounted(() => {
 
     afterRegisterNoticeConfig.value.ready = false;
   }
+  if (useRoute().meta.requireLogin === true) {
+    if (!userLoginState.value) {
+      loginModalState.value = true;
+    }
+  }
+}
+
+onMounted(() => {
+  initPage();
 });
 
-watch(() => useRoute().fullPath, async () => {
-  await checkUser();
-  if (!userLoginState.value) {
-    loginModalState.value = true;
-  }
+onUpdated(() => {
+  initPage();
 })
 
 const navigation = [
@@ -344,18 +350,6 @@ const navigation = [
     icon: mdiPodium
   }
 ]
-
-watch(userLoading, v => {
-  if (!v) {
-    if (useRoute().meta.requireLogin === true) {
-      if (!userLoginState.value) {
-        loginModalState.value = true;
-      }
-    }
-  }
-}, {
-  immediate: true
-})
 
 function handleUserAvatarContextMenu(e: MouseEvent) {
   e.preventDefault();
