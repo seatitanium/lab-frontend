@@ -12,7 +12,8 @@ export const BackendCodes = {
     ServerError: 1301,
     DatabaseError: 1302,
     AliyunError: 1303,
-    OperationNotApplied: 1304
+    OperationNotApplied: 1304,
+    Offline: 1401
 }
 
 export const SupportEmail = "i@seati.cc";

@@ -70,7 +70,8 @@ declare global {
         local: {
             instance_id: string,
             instance_type: string,
-            region_id: string
+            region_id: string,
+            zone_id: string
         },
         retrieved: {
             creation_time: string,

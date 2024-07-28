@@ -37,9 +37,9 @@
       </h2>
       <h2 class="value ip" v-else>
         {{
-          instanceInformation.retrieved.public_ip_address !== null ? instanceInformation.retrieved.public_ip_address[0] : '暂无 IP 地址'
+          instanceInformation.retrieved.public_ip_address ? (instanceInformation.retrieved.public_ip_address[0] || '...') : '暂无 IP 地址'
         }}
-        <btn class="small with-border without-bg--primary"
+        <btn class="with-border without-bg--primary copy-btn"
              v-if="instanceInformation.retrieved.public_ip_address !== null">单击复制
           <icon :path="mdiClipboardTextOutline"/>
         </btn>
@@ -85,7 +85,7 @@
             {{
               isInstanceExist ? instanceInformation.local.instance_id : '暂未创建'
             }}
-            <btn v-if="isInstanceExist" class="small with-border without-bg--primary">单击复制
+            <btn v-if="isInstanceExist" class="copy-btn with-border without-bg--primary">单击复制
               <icon :path="mdiClipboardTextOutline"/>
             </btn>
           </h2>
@@ -112,6 +112,7 @@
               </span>
               <span class="right">
                 {{ instanceInformation.local.region_id }}
+                <icon :path="getMdiAlpha(instanceInformation.local.zone_id) || mdiAlphaZ"/>
               </span>
             </metabar-item>
           </metabar>
@@ -250,7 +251,7 @@
       <btn class="without-bg--primary hover--dim" @click="modalConfirm = false">取消</btn>
     </modal-actions>
   </modal>
-  <modal v-model="modalDeploy" class="with-bg--darken equalp">
+  <modal v-model="modalDeploy" class="with-bg--darken equalp deploy-modal">
     <modal-title>部署结果</modal-title>
     <modal-content>
       <div class="deploy-results"
@@ -314,19 +315,38 @@
 </template>
 <script setup lang="ts">
 import {
-  mdiAccountGroupOutline, mdiAlertOutline,
-  mdiCheckAll, mdiCheckCircleOutline,
+  mdiAccountGroupOutline,
+  mdiAlertOutline,
+  mdiAlphaA,
+  mdiAlphaB,
+  mdiAlphaC,
+  mdiAlphaD,
+  mdiAlphaE,
+  mdiAlphaF,
+  mdiAlphaG,
+  mdiAlphaH,
+  mdiAlphaI,
+  mdiAlphaJ,
+  mdiAlphaK,
+  mdiAlphaZ,
+  mdiCheckAll,
+  mdiCheckCircleOutline,
   mdiClipboardTextOutline,
-  mdiClockOutline, mdiClockPlusOutline,
+  mdiClockOutline,
+  mdiClockPlusOutline,
   mdiClose,
-  mdiCloseOctagonOutline, mdiCloudClockOutline, mdiCloudQuestionOutline,
+  mdiCloseOctagonOutline,
+  mdiCloudClockOutline,
+  mdiCloudQuestionOutline,
   mdiCog,
   mdiCogBox,
-  mdiCreationOutline, mdiHelpCircleOutline,
+  mdiCreationOutline,
+  mdiHelpCircleOutline,
   mdiMessageTextOutline,
   mdiNavigationVariantOutline,
   mdiRestart,
-  mdiTrashCanOutline, mdiWebOff
+  mdiTrashCanOutline,
+  mdiWebOff
 } from "@mdi/js";
 import {getUsername} from "#imports";
 import {BackendCodes, ServerWebSocketURL} from "~/consts";
@@ -361,7 +381,8 @@ const instanceInformation = reactive<DescribeInstanceRes>({
   local: {
     instance_id: '',
     instance_type: '',
-    region_id: ''
+    region_id: '',
+    zone_id: ''
   },
   retrieved: {
     creation_time: '',
@@ -422,7 +443,7 @@ function getInstanceDeployStatusName(instanceDeploySatatus: DeploymentStatus) {
     case "Failed":
       return "失败";
     default:
-      return "";
+      return "加载中";
   }
 }
 
@@ -482,17 +503,33 @@ function getIMStatusNameAndIcon(imStatus: UnwrapRef<InstantMessageStatus>): {
   }[imStatus]
 }
 
+function getMdiAlpha(str: string) {
+  switch (str.slice(-1)) {
+    case 'a': return mdiAlphaA;
+    case 'b': return mdiAlphaB;
+    case 'c': return mdiAlphaC;
+    case 'd': return mdiAlphaD;
+    case 'e': return mdiAlphaE;
+    case 'f': return mdiAlphaF;
+    case 'g': return mdiAlphaG;
+    case 'h': return mdiAlphaH;
+    case 'i': return mdiAlphaI;
+    case 'j': return mdiAlphaJ;
+    case 'k': return mdiAlphaK;
+  }
+}
+
 async function confirmAction() {
   confirmActionLoading.value = true;
 
   switch (actionToConfirm.value) {
     case 'create': {
       let result = await get('/api/ecs/create');
+      modalConfirm.value = false;
 
       confirmActionLoading.value = false;
 
       if (result.code === BackendCodes.OK) {
-        modalConfirm.value = false;
         modalCreationStarted.value = true;
         // Supressing IDE warning for not using await here by adding a `finally` call
         startRefreshDeploymentResult().finally();
@@ -634,8 +671,8 @@ async function startRefreshServerStatus() {
   // noinspection InfiniteLoopJS
   while (true) {
     if (!enableRefreshServerStatus.value) continue;
-    const result = await get<ServerStatus>(`/api/server/status?ip=127.0.0.1`);
-    if (result.code === BackendCodes.OK) {
+    const result = await get<Nullable<ServerStatus>>(`/api/server/status?ip=127.0.0.1`);
+    if (result.code === BackendCodes.OK || result.code === BackendCodes.Offline) {
       if (result.data !== null) {
         const r = result.data.players.sample.map(x => x.name_clean).filter(x => x !== 'Anonymous Player');
         if (!r.every(x => onlinePlayers.data.includes(x)) || r.length === 0) onlinePlayers.data = r;
@@ -778,7 +815,70 @@ watch(() => userInformation.value.loading, v => {
 })
 </script>
 
+<style lang="less">
+.deploy-modal {
+  min-width: 800px;
+}
+
+.instance-status {
+  border-radius: 100px;
+  padding: 6px 20px;
+  background: rgb(244, 244, 244);
+  color: black;
+
+  &.Pending {
+    background: #fff8e1;
+    color: #ffc107;
+  }
+
+  &.Running {
+    background: #e8f5e9;
+    color: #4caf50;
+  }
+
+  &.Stopping {
+    background: #f3e5f5;
+    color: #9c27b0;
+    svg {
+      .path {
+        stroke: #9c27b0 !important;
+      }
+    }
+  }
+
+  &.Starting {
+    background: #e0f2f1;
+    color: #009688;
+  }
+
+  &.Stopped {
+    background: #ffebee;
+    color: #f44336;
+  }
+}
+</style>
+
 <style lang="less" scoped>
+@import "assets/var";
+
+.copy-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  gap: 4px;
+  transition: all .2s ease;
+
+  svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  &:hover {
+    background: @primary;
+    color: white;
+    border-color: transparent;
+  }
+}
+
 .deploy-results {
   white-space: break-spaces;
   font-variation-settings: 'MONO' 1;
@@ -811,39 +911,6 @@ h2.value {
 
 h2.value.ip {
   font-size: 40px;
-}
-
-
-.instance-status {
-  border-radius: 100px;
-  padding: 6px 20px;
-  background: rgb(244, 244, 244);
-  color: black;
-
-  &.Pending {
-    background: #fff8e1;
-    color: #ffc107;
-  }
-
-  &.Running {
-    background: #e8f5e9;
-    color: #4caf50;
-  }
-
-  &.Stopping {
-    background: #f3e5f5;
-    color: #9c27b0;
-  }
-
-  &.Starting {
-    background: #e0f2f1;
-    color: #009688;
-  }
-
-  &.Stopped {
-    background: #ffebee;
-    color: #f44336;
-  }
 }
 
 .section__online_players .card-label small {
