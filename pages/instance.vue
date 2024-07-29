@@ -744,7 +744,9 @@ onMounted(async () => {
 });
 
 onBeforeRouteLeave(() => {
-  ws.close();
+  if (ws) {
+    ws.close();
+  }
 })
 
 function getRandomExclamation() {
