@@ -25,6 +25,7 @@
     "typewriter-vue": "^0.5.19",
     "vite-svg-loader": "^5.1.0",
     "vue": "^3.4.21",
+    "vue-number-animation": "^2.0.2",
     "vue-router": "^4.3.0"
   },
   "devDependencies": {

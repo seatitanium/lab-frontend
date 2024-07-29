@@ -229,4 +229,16 @@ declare global {
         java: string,
         description: string
     }
+
+    interface Donation {
+        name: string,
+        amount: number
+    }
+
+    interface Consumption {
+        ecs: number,
+        oss: number,
+        yundisk: number,
+        sum: number
+    }
 }

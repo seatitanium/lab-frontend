@@ -7,19 +7,19 @@
     <section class="term-analytics">
       <div class="term-a">
         <div class="name">总周目数</div>
-        <div class="value">{{ termInformation.length }}</div>
+        <div class="value"><counter :value="termInformation.length"/></div>
       </div>
       <div class="term-a">
         <div class="name">总参与玩家<icon @click="totalInvolvingPlayersPopup = true" :path="mdiHelpCircleOutline"/></div>
-        <div class="value">{{ totalInvolvedPlayers.length }}</div>
+        <div class="value"><counter :value="totalInvolvedPlayers.length"/></div>
       </div>
       <div class="term-a">
         <div class="name">总跨度</div>
-        <div class="value">{{ totalOpeningDays }}d</div>
+        <div class="value"><counter :value="totalOpeningDays"/>d</div>
       </div>
       <div class="term-a">
         <div class="name">资金消耗<icon @click="consumptionPopup = true" :path="mdiHelpCircleOutline"/></div>
-        <div class="value">{{ totalConsumption }}<span class="rmb">RMB</span></div>
+        <div class="value"><counter v-if="totalConsumption.sum" :value="totalConsumption.sum"/><span v-else>--</span><span class="rmb">RMB</span></div>
       </div>
     </section>
     <section class="term-list" v-if="termInformation.length > 0">
@@ -29,8 +29,27 @@
         </template>
       </term-card>
     </section>
-    <anywhere-popup :code="false" v-model="consumptionPopup">
-      <p>资金消耗的数据来自阿里云，统计的是自 ST1（2022-02）以来的服务器本体计费费用，不包含流量费、对象存储费以及网站服务器费用。</p>
+    <anywhere-popup class="consumption-popup" :code="false" v-model="consumptionPopup">
+      <p>资金消耗的数据来自阿里云，统计的是自 ST1（2022-02）以来的服务器本体计费费用，不包含流量费和网站服务器费用。</p>
+      <p>数据更新会随阿里云系统出现延迟，账期截至本月（{{ `${new Date().getFullYear()}-${withLeadingZero(new Date().getMonth()+1)}`}}）。</p>
+      <p><strong><icon :path="mdiPercentCircleOutline"/>平均数据</strong></p>
+      <ul>
+        <li>平均日花费 AVGD=¥{{ (totalConsumption.sum / totalOpeningDays).toFixed(2) }}</li>
+        <li>平均周目花费 AVGT=¥{{ (totalConsumption.sum /  termInformation.length).toFixed(2)}}</li>
+        <li>平均玩家花费 AVGP=¥{{ (totalConsumption.sum / totalInvolvedPlayers.length).toFixed(2) }}</li>
+        <li>平均玩家每日花费 AVGPD=¥{{ (totalConsumption.sum / (totalInvolvedPlayers.length * totalOpeningDays)).toFixed(2) }}</li>
+      </ul>
+      <p><strong><icon :path="mdiShapeOutline"/>支出分类</strong></p>
+      <ul>
+        <li>服务器费用 ECS=¥{{ totalConsumption.ecs.toFixed(2) }}</li>
+        <li>对象存储费用 OSS=¥{{totalConsumption.oss.toFixed(2)}}</li>
+        <li>云盘费用 DISK=¥{{ totalConsumption.yundisk.toFixed(2) }}</li>
+      </ul>
+      <p><strong><icon :path="mdiHeartOutline"/>捐助相关</strong></p>
+      <ul>
+        <li>收到的捐助额 DNT=¥{{ totalDonations }} <nuxt-link target="_blank" to="/about">查看所有捐助者<icon :path="mdiLaunch"/></nuxt-link></li>
+        <li>扣除捐助额后的总支出 NCT=¥{{ (totalConsumption.sum - totalDonations).toFixed(2) }}</li>
+      </ul>
     </anywhere-popup>
     <anywhere-popup :code="false" v-model="totalInvolvingPlayersPopup">
       <p>该数字为 ST7 以来所有登入过服务器的玩家的数量，不计重复。</p>
@@ -39,10 +58,16 @@
 </template>
 <script setup lang="ts">
 import {useState} from "#app";
-import {BackendCodes, PeriodTag} from "~/consts";
+import {BackendCodes} from "~/consts";
 import getTermPeriod from "~/utils/getTermPeriod";
 import TermCard from "~/components/term-card.vue";
-import {mdiHelpCircleOutline, mdiLinkVariantPlus} from "@mdi/js";
+import {
+  mdiHeartOutline,
+  mdiHelpCircleOutline,
+  mdiLaunch,
+  mdiLinkVariantPlus, mdiPercentCircleOutline, mdiShapeOutline
+} from "@mdi/js";
+import Counter from "~/components/counter.vue";
 
 const consumptionPopup = ref(false);
 const totalInvolvingPlayersPopup = ref(false);
@@ -51,9 +76,16 @@ const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
 
 const termInformation = useState<Term[]>('term-information', () => [])
 const termInformationReversed = computed(() => termInformation.value.toReversed());
-let totalInvolvedPlayers = ref<ServerPlayer[]>([]);
+const totalInvolvedPlayers = ref<ServerPlayer[]>([]);
 const totalOpeningDays = computed(() => termInformation.value.map(x => getTermPeriod(x)).reduce((a, b) => a + b, 0))
-const totalConsumption = ref(0);
+const totalConsumption = reactive<Consumption>({
+  ecs: 0,
+  oss: 0,
+  yundisk: 0,
+  sum: 0
+});
+const donations = ref<Donation[]>([]);
+const totalDonations = computed(() => donations.value.map(x => x.amount).reduce((a, b) => a + b, 0));
 
 async function getTotalInvolvedPlayers() {
   const uniqueResult = await get<ServerPlayer[]>(`/api/server/involved-players?unique=true`);
@@ -64,16 +96,23 @@ async function getTotalInvolvedPlayers() {
 }
 
 async function getTotalConsumptions() {
-  const consumptionResult = await get<number>(`/api/bss/consumption`);
+  const consumptionResult = await get<Consumption>(`/api/bss/consumption`);
 
   if (consumptionResult.code === BackendCodes.OK) {
-    totalConsumption.value = consumptionResult.data;
+    Object.assign(totalConsumption, consumptionResult.data);
   }
+}
+
+async function getDonations() {
+  const donationResult  = await get(`/api/donations`);
+
+  donations.value = donationResult as unknown as Donation[];
 }
 
 function getData() {
   getTotalInvolvedPlayers();
   getTotalConsumptions();
+  getDonations();
 }
 
 onMounted(() => {
@@ -86,6 +125,23 @@ onMounted(() => {
 
 .page-terms {
   padding: 32px 0;
+}
+
+.consumption-popup {
+  ul {
+    padding: 0 0 0 20px;
+  }
+
+  strong {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
 }
 
 .term-list {
