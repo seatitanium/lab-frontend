@@ -112,7 +112,7 @@
               </span>
               <span class="right">
                 {{ instanceInformation.local.region_id }}
-                <icon :path="getMdiAlpha(instanceInformation.local.zone_id) || mdiAlphaZ"/>
+                <icon :path="translateLetterIcon(instanceInformation.local.zone_id ? instanceInformation.local.zone_id.slice(-1) as Letter : 'z')"/>
               </span>
             </metabar-item>
           </metabar>
@@ -240,7 +240,7 @@
   <modal v-model="modalConfirm" class="with-bg--darken">
     <modal-title>确认操作</modal-title>
     <modal-content>
-      <p>确定要<strong>{{ getActionName() }}</strong>服务器吗？</p>
+      <p>确定要<strong>{{ translateInstanceActionName(actionToConfirm) }}</strong>服务器吗？</p>
       <p v-if="actionToConfirm === 'stop_force'">
         强制关闭服务器将忽略服务器目前的状态，直接执行断电操作，存在数据丢失的风险。单击确定之前，请确保已经做好数据备份工作。</p>
     </modal-content>
@@ -255,7 +255,7 @@
     <modal-title>部署结果</modal-title>
     <modal-content>
       <div class="deploy-results"
-           v-text="deployResult.code === BackendCodes.TargetNotExist ? '等待部署信息返回中...' : deployResult.data.content"/>
+           v-text="instanceLastInvokeResult.status === 'Pending' ? '等待部署信息返回中...' : instanceLastInvokeResult.content"/>
     </modal-content>
     <modal-actions class="right">
       <btn class="without-bg--primary hover--dim" @click="modalDeploy = false">关闭</btn>
@@ -352,24 +352,21 @@ import DukeWaving from '~/assets/icons/duke-waving.svg'
 import sleep from "~/utils/sleep";
 import formatTimeString from "../utils/formatTimeStringFromString";
 import del from "~/utils/del";
-import type {UnwrapRef} from "vue";
 import formatTimeStringFromDate from "~/utils/formatTimeStringFromDate";
 import BottomNavigation from "~/components/bottom-navigation.vue";
 import randomInclusive from "~/utils/randInclusive";
 import ScreenfetchContent from "~/components/screenfetch-content.vue";
 import {useLocalStorage} from "@vueuse/core";
 import {useState} from "#app";
+import {
+  translateInstanceActionName,
+  translateInstanceDeploymentStatus,
+  translateInstanceStatus,
+  translateInstanceStatusIcon, translateInstantMessageStatus, translateInstantMessageStatusIcon, translateLetterIcon
+} from "~/translation";
 
 let onlinePlayers = ref<string[]>([]);
 
-type InstanceAction = 'start' | 'reboot' | 'stop' | 'stop_force' | 'create' | 'delete' | 'delete_force';
-
-let instantMessages = reactive<{ content: string, time: string }[]>([])
-const instantMessageString = computed(() => instantMessages.map(x => `<span style="color: #aaa">[${x.time}]</span> ${x.content}`).join("\n"));
-const instantMessageToSend = ref('');
-const username = ref('');
-const userInformation = useState<UserExtended>('user-data');
-const confirmActionLoading = ref(false);
 const instanceInformation = reactive<DescribeInstanceRes>({
   local: {
     instance_id: '',
@@ -384,10 +381,13 @@ const instanceInformation = reactive<DescribeInstanceRes>({
     status: ''
   }
 });
-const instanceDeployStatusName = computed(() =>
-    isInstanceBeingDeployed.value ? getInstanceDeployStatusName(deployResult.data.status) : '');
-const isInstanceExist = computed(() => instanceInformation.retrieved.exist);
-const instanceStatusLastUpdated = ref('');
+
+
+const username = ref('');
+const userInformation = useState<UserExtended>('user-data');
+
+const confirmActionLoading = ref(false);
+
 const modalDebianDesc = ref(false);
 const modalJavaDesc = ref(false);
 const modalCpuDesc = ref(false);
@@ -398,130 +398,44 @@ const modalError = ref(false);
 const modalCreationStarted = ref(false);
 const modalDeleteChoice = ref(false);
 const modalInstanceStarted = ref(false);
-const deployTime = ref(0);
-const deployResult = reactive<Resp<GetLastInvokeRes>>({
-  code: 0,
-  msg: '',
-  data: {} as GetLastInvokeRes
+
+const instanceDeployTime = ref(0);
+const instanceLastInvokeResult = reactive<GetLastInvokeRes>({
+  status: 'Pending',
+  content: '',
+  errorInfo: '',
+  startTime: '',
+  finishedTime: ''
 });
 const isInstanceBeingDeployed = ref(false);
+
 const actionToConfirm = ref<OrEmpty<InstanceAction>>('');
 const errorInformationContent = ref('');
+
 const enableRefreshInstanceInformation = ref(true);
+
 const firstDescribeInstanceFetchedTimeOut = ref(false);
 
+let instantMessages = reactive<{ content: string, time: string }[]>([])
+const instantMessageString = computed(() => instantMessages.map(x => `<span style="color: #aaa">[${x.time}]</span> ${x.content}`).join("\n"));
+const instantMessageToSend = ref('');
+
+const instanceDeployStatusName = computed(() => {
+  if (!isInstanceBeingDeployed.value) return '等待中';
+  return translateInstanceDeploymentStatus(instanceLastInvokeResult.status);
+});
+
+const isInstanceExist = computed(() => instanceInformation.retrieved.exist);
+const instanceStatusLastUpdated = ref('');
 const instanceStatusName = computed(() => {
   if (!isInstanceExist.value) return '未创建';
-  switch (instanceInformation.retrieved.status) {
-    case "Pending":
-      return '准备中'
-    case "Running":
-      return serverStatus.online ? '在线' : '空转';
-    case "Stopping":
-      return '关闭中'
-    case "Stopped":
-      return '离线'
-    case "Starting":
-      return '启动中'
-    case "":
-      return '未知'
-  }
+  return translateInstanceStatus(instanceInformation.retrieved.status, serverStatus.online);
 })
 
 const instanceStatusIcon = computed(() => {
   if (!isInstanceExist.value) return mdiHelpCircleOutline;
-  switch (instanceInformation.retrieved.status) {
-    case "Pending":
-      return mdiClockOutline;
-    case "Starting":
-      return 'wait';
-    case "Stopping":
-      return 'wait';
-    case 'Stopped':
-      return mdiClose;
-    case 'Running':
-      return serverStatus.online ? mdiCheck : mdiAlertOutline;
-    case '':
-      return '未知';
-  }
+  return translateInstanceStatusIcon(instanceInformation.retrieved.status, serverStatus.online);
 })
-
-function getActionName() {
-  return {
-    'create': '创建并启动',
-    'start': '启动',
-    'reboot': '重启',
-    'stop': '关闭',
-    'stop_force': '强制关闭',
-    'delete': '删除',
-    'delete_force': '强制删除',
-    '': '??'
-  }[actionToConfirm.value];
-}
-
-function getInstanceDeployStatusName(instanceDeploySatatus: DeploymentStatus) {
-  switch (instanceDeploySatatus) {
-    case "Pending":
-      return "准备中";
-    case "Running":
-      return "部署中";
-    case "Failed":
-      return "失败";
-    default:
-      return "加载中";
-  }
-}
-
-function getIMStatusNameAndIcon(imStatus: UnwrapRef<InstantMessageStatus>): {
-  icon: string,
-  name: string
-} {
-  return {
-    'connected': {
-      icon: mdiCheckCircleOutline,
-      name: '已连接'
-    },
-    'error': {
-      icon: mdiAlertOutline,
-      name: '错误'
-    },
-    'disconnected': {
-      icon: mdiWebOff,
-      name: '未连接'
-    },
-    'pending': {
-      icon: mdiClockOutline,
-      name: '等待中'
-    }
-  }[imStatus]
-}
-
-function getMdiAlpha(str: string) {
-  switch (str.slice(-1)) {
-    case 'a':
-      return mdiAlphaA;
-    case 'b':
-      return mdiAlphaB;
-    case 'c':
-      return mdiAlphaC;
-    case 'd':
-      return mdiAlphaD;
-    case 'e':
-      return mdiAlphaE;
-    case 'f':
-      return mdiAlphaF;
-    case 'g':
-      return mdiAlphaG;
-    case 'h':
-      return mdiAlphaH;
-    case 'i':
-      return mdiAlphaI;
-    case 'j':
-      return mdiAlphaJ;
-    case 'k':
-      return mdiAlphaK;
-  }
-}
 
 async function confirmAction() {
   confirmActionLoading.value = true;
@@ -612,6 +526,7 @@ async function confirmAction() {
 async function startRefreshDeploymentResult() {
   while (true) {
     const result = await get<GetLastInvokeRes>(`/api/ecs/last-invoke`);
+
     if (result.code !== BackendCodes.OK && result.code !== BackendCodes.TargetNotExist) {
       // Close "possible" active modal
       modalOK.value = false;
@@ -623,15 +538,16 @@ async function startRefreshDeploymentResult() {
       break;
     }
 
-    Object.assign(deployResult, result)
+    Object.assign(instanceLastInvokeResult, result.data);
 
-    if (result.code !== BackendCodes.TargetNotExist) {
+    if (result.code === BackendCodes.OK) {
       if (result.data.status === 'Success') {
+        Object.assign(instanceLastInvokeResult, result.data);
         break;
       }
     }
 
-    deployTime.value++;
+    instanceDeployTime.value++;
     await sleep(1000);
   }
 }
@@ -704,17 +620,18 @@ const serverStatus = reactive<{
 async function startRefreshServerStatus() {
   // noinspection InfiniteLoopJS
   while (true) {
-    if (!enableRefreshServerStatus.value) continue;
-    const result = await get<ServerStatus>(`/api/server/status?ip=127.0.0.1`);
-    if (result.code === BackendCodes.OK) {
-      serverStatus.online = true;
-      Object.assign(serverStatus.data, result.data);
-      const r = result.data.players.sample.map(x => x.name_clean).filter(x => x !== 'Anonymous Player');
-      if (!r.every(x => onlinePlayers.value.includes(x)) || r.length === 0) onlinePlayers.value = r;
-    } else if (result.code === BackendCodes.Offline) {
-      serverStatus.online = false;
-    } else {
-      console.warn("Cannot retrieve server status", result);
+    if (enableRefreshServerStatus.value && instanceInformation.retrieved.public_ip_address) {
+      const result = await get<ServerStatus>(`/api/server/status?ip=${instanceInformation.retrieved.public_ip_address}`);
+      if (result.code === BackendCodes.OK) {
+        serverStatus.online = true;
+        Object.assign(serverStatus.data, result.data);
+        const r = result.data.players.sample.map(x => x.name_clean).filter(x => x !== 'Anonymous Player');
+        if (!r.every(x => onlinePlayers.value.includes(x)) || r.length === 0) onlinePlayers.value = r;
+      } else if (result.code === BackendCodes.Offline) {
+        serverStatus.online = false;
+      } else {
+        console.warn("Cannot retrieve server status", result);
+      }
     }
     await sleep(2000);
   }
@@ -773,10 +690,9 @@ function sendInstantMessage() {
 
 const isSendingInstantMessage = ref(false);
 const instantMessageInput = ref<HTMLInputElement | null>(null);
-type InstantMessageStatus = "connected" | "error" | "disconnected" | "pending";
 const instantMessageStatus = ref<InstantMessageStatus>('pending');
-const imStatusName = computed(() => getIMStatusNameAndIcon(instantMessageStatus.value).name);
-const imStatusIcon = computed(() => getIMStatusNameAndIcon(instantMessageStatus.value).icon);
+const imStatusName = computed(() => translateInstantMessageStatus(instantMessageStatus.value));
+const imStatusIcon = computed(() => translateInstantMessageStatusIcon(instantMessageStatus.value));
 
 let randomExclamation = ref('');
 let randomAbsence = ref('');

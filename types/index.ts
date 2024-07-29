@@ -5,6 +5,36 @@ declare global {
     type OrEmpty<T extends string> = Either<T, ''>;
     type Either<K, T> = K | T;
 
+    type Letter =
+        'a'
+        | 'b'
+        | 'c'
+        | 'd'
+        | 'e'
+        | 'f'
+        | 'g'
+        | 'h'
+        | 'i'
+        | 'j'
+        | 'k'
+        | 'l'
+        | 'm'
+        | 'n'
+        | 'o'
+        | 'p'
+        | 'q'
+        | 'r'
+        | 's'
+        | 't'
+        | 'u'
+        | 'v'
+        | 'w'
+        | 'x'
+        | 'y'
+        | 'z';
+
+    type InstanceAction = 'start' | 'reboot' | 'stop' | 'stop_force' | 'create' | 'delete' | 'delete_force';
+    type InstantMessageStatus = "connected" | "error" | "disconnected" | "pending";
     type InstanceStatus = 'Pending' | 'Running' | 'Stopping' | 'Stopped' | 'Starting'
     type DeploymentStatus =
         'Pending'

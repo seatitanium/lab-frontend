@@ -41,5 +41,3 @@
   animation: FlowUp .4s ease;
 }
 </style>
-<script setup lang="ts">
-</script>
