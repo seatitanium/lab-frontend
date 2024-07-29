@@ -37,7 +37,7 @@
       </h2>
       <h2 class="value ip" v-else>
         {{
-          instanceInformation.retrieved.public_ip_address ? (instanceInformation.retrieved.public_ip_address[0] || '...') : '暂无 IP 地址'
+          instanceInformation.retrieved.public_ip_address ? (instanceInformation.retrieved.public_ip_address[0] || '暂无 IP 地址') : '暂无 IP 地址'
         }}
         <btn class="with-border without-bg--primary copy-btn"
              v-if="instanceInformation.retrieved.public_ip_address !== null">单击复制
@@ -52,7 +52,7 @@
             获取中...
           </span>
         </metabar-item>
-        <metabar-item v-else class="instance-status" :class="instanceInformation.retrieved.status">
+        <metabar-item v-else class="instance-status" :class="`${instanceInformation.retrieved.status} ${serverStatus.online ? 'online' : 'offline'}`">
           <span class="center">
             <icon v-if="instanceStatusIcon !== 'wait'" :path="instanceStatusIcon"/>
             <circle-spinner size="12" v-else/>
@@ -151,12 +151,12 @@
       <card class="narrow">
         <card-label>
           <icon :path="mdiAccountGroupOutline"/>
-          在线玩家 ({{ onlinePlayers.data.length }})
+          在线玩家 ({{ onlinePlayers.length }})
           <small>ST13 历史最高 · {{ peakServerOnlineSnapshot.count }}</small>
         </card-label>
         <card-content>
-          <div class="players" v-if="onlinePlayers.data.length > 0">
-            <div class="player" v-for="x in onlinePlayers.data">
+          <div class="players" v-if="onlinePlayers.length > 0">
+            <div class="player" v-for="x in onlinePlayers">
               <div class="avatar">
                 <player-avatar :name="x"/>
               </div>
@@ -328,16 +328,13 @@ import {
   mdiAlphaI,
   mdiAlphaJ,
   mdiAlphaK,
-  mdiAlphaZ,
-  mdiCheckAll,
+  mdiAlphaZ, mdiCheck,
   mdiCheckCircleOutline,
   mdiClipboardTextOutline,
   mdiClockOutline,
   mdiClockPlusOutline,
   mdiClose,
   mdiCloseOctagonOutline,
-  mdiCloudClockOutline,
-  mdiCloudQuestionOutline,
   mdiCog,
   mdiCogBox,
   mdiCreationOutline,
@@ -363,11 +360,7 @@ import ScreenfetchContent from "~/components/screenfetch-content.vue";
 import {useLocalStorage} from "@vueuse/core";
 import {useState} from "#app";
 
-let onlinePlayers = reactive<{
-  data: string[]
-}>({
-  data: []
-})
+let onlinePlayers = ref<string[]>([]);
 
 type InstanceAction = 'start' | 'reboot' | 'stop' | 'stop_force' | 'create' | 'delete' | 'delete_force';
 
@@ -391,10 +384,6 @@ const instanceInformation = reactive<DescribeInstanceRes>({
     status: ''
   }
 });
-const instanceStatusIcon = computed(() =>
-    isInstanceExist.value ? getInstanceStatusNameAndIcon(instanceInformation.retrieved.status).icon : mdiCloudQuestionOutline);
-const instanceStatusName = computed(() =>
-    isInstanceExist.value ? getInstanceStatusNameAndIcon(instanceInformation.retrieved.status).name : '未创建');
 const instanceDeployStatusName = computed(() =>
     isInstanceBeingDeployed.value ? getInstanceDeployStatusName(deployResult.data.status) : '');
 const isInstanceExist = computed(() => instanceInformation.retrieved.exist);
@@ -421,6 +410,42 @@ const errorInformationContent = ref('');
 const enableRefreshInstanceInformation = ref(true);
 const firstDescribeInstanceFetchedTimeOut = ref(false);
 
+const instanceStatusName = computed(() => {
+  if (!isInstanceExist.value) return '未创建';
+  switch (instanceInformation.retrieved.status) {
+    case "Pending":
+      return '准备中'
+    case "Running":
+      return serverStatus.online ? '在线' : '空转';
+    case "Stopping":
+      return '关闭中'
+    case "Stopped":
+      return '离线'
+    case "Starting":
+      return '启动中'
+    case "":
+      return '未知'
+  }
+})
+
+const instanceStatusIcon = computed(() => {
+  if (!isInstanceExist.value) return mdiHelpCircleOutline;
+  switch (instanceInformation.retrieved.status) {
+    case "Pending":
+      return mdiClockOutline;
+    case "Starting":
+      return 'wait';
+    case "Stopping":
+      return 'wait';
+    case 'Stopped':
+      return mdiClose;
+    case 'Running':
+      return serverStatus.online ? mdiCheck : mdiAlertOutline;
+    case '':
+      return '未知';
+  }
+})
+
 function getActionName() {
   return {
     'create': '创建并启动',
@@ -445,38 +470,6 @@ function getInstanceDeployStatusName(instanceDeploySatatus: DeploymentStatus) {
     default:
       return "加载中";
   }
-}
-
-function getInstanceStatusNameAndIcon(instanceStatus: UnwrapRef<OrEmpty<InstanceStatus>>): {
-  icon: string;
-  name: string
-} {
-  return {
-    'Pending': {
-      icon: mdiCloudClockOutline,
-      name: '准备中'
-    },
-    'Starting': {
-      icon: 'wait',
-      name: '启动中'
-    },
-    'Stopping': {
-      icon: 'wait',
-      name: '停止中'
-    },
-    'Stopped': {
-      icon: mdiClose,
-      name: '离线'
-    },
-    'Running': {
-      icon: mdiCheckAll,
-      name: '在线'
-    },
-    '': {
-      icon: mdiHelpCircleOutline,
-      name: '未知'
-    }
-  }[instanceStatus]
 }
 
 function getIMStatusNameAndIcon(imStatus: UnwrapRef<InstantMessageStatus>): {
@@ -505,17 +498,28 @@ function getIMStatusNameAndIcon(imStatus: UnwrapRef<InstantMessageStatus>): {
 
 function getMdiAlpha(str: string) {
   switch (str.slice(-1)) {
-    case 'a': return mdiAlphaA;
-    case 'b': return mdiAlphaB;
-    case 'c': return mdiAlphaC;
-    case 'd': return mdiAlphaD;
-    case 'e': return mdiAlphaE;
-    case 'f': return mdiAlphaF;
-    case 'g': return mdiAlphaG;
-    case 'h': return mdiAlphaH;
-    case 'i': return mdiAlphaI;
-    case 'j': return mdiAlphaJ;
-    case 'k': return mdiAlphaK;
+    case 'a':
+      return mdiAlphaA;
+    case 'b':
+      return mdiAlphaB;
+    case 'c':
+      return mdiAlphaC;
+    case 'd':
+      return mdiAlphaD;
+    case 'e':
+      return mdiAlphaE;
+    case 'f':
+      return mdiAlphaF;
+    case 'g':
+      return mdiAlphaG;
+    case 'h':
+      return mdiAlphaH;
+    case 'i':
+      return mdiAlphaI;
+    case 'j':
+      return mdiAlphaJ;
+    case 'k':
+      return mdiAlphaK;
   }
 }
 
@@ -666,17 +670,49 @@ async function startRefreshDescribeInstanceResult() {
 }
 
 const enableRefreshServerStatus = ref(true);
+const serverStatus = reactive<{
+  online: boolean,
+  data: ServerStatus
+}>({
+  online: false,
+  data: {
+    version: {
+      name_raw: '',
+      name_clean: '',
+      name_html: '',
+      protocol: 0
+    },
+    players: {
+      max: 0,
+      online: 0,
+      sample: []
+    },
+    motd: {
+      raw: '',
+      clean: '',
+      html: ''
+    },
+    favicon: '',
+    srv_result: [],
+    mod_info: {
+      type: '',
+      mods: []
+    }
+  }
+})
 
 async function startRefreshServerStatus() {
   // noinspection InfiniteLoopJS
   while (true) {
     if (!enableRefreshServerStatus.value) continue;
-    const result = await get<Nullable<ServerStatus>>(`/api/server/status?ip=127.0.0.1`);
-    if (result.code === BackendCodes.OK || result.code === BackendCodes.Offline) {
-      if (result.data !== null) {
-        const r = result.data.players.sample.map(x => x.name_clean).filter(x => x !== 'Anonymous Player');
-        if (!r.every(x => onlinePlayers.data.includes(x)) || r.length === 0) onlinePlayers.data = r;
-      }
+    const result = await get<ServerStatus>(`/api/server/status?ip=127.0.0.1`);
+    if (result.code === BackendCodes.OK) {
+      serverStatus.online = true;
+      Object.assign(serverStatus.data, result.data);
+      const r = result.data.players.sample.map(x => x.name_clean).filter(x => x !== 'Anonymous Player');
+      if (!r.every(x => onlinePlayers.value.includes(x)) || r.length === 0) onlinePlayers.value = r;
+    } else if (result.code === BackendCodes.Offline) {
+      serverStatus.online = false;
     } else {
       console.warn("Cannot retrieve server status", result);
     }
@@ -822,7 +858,7 @@ watch(() => userInformation.value.loading, v => {
 
 .instance-status {
   border-radius: 100px;
-  padding: 6px 20px;
+  padding: 6px 14px;
   background: rgb(244, 244, 244);
   color: black;
 
@@ -832,13 +868,21 @@ watch(() => userInformation.value.loading, v => {
   }
 
   &.Running {
-    background: #e8f5e9;
-    color: #4caf50;
+    &.offline {
+      background: #fff3e0;
+      color: #ff9800;
+    }
+
+    &.online {
+      background: #e8f5e9;
+      color: #4caf50;
+    }
   }
 
   &.Stopping {
     background: #f3e5f5;
     color: #9c27b0;
+
     svg {
       .path {
         stroke: #9c27b0 !important;
