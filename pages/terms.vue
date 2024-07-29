@@ -7,15 +7,15 @@
     <section class="term-analytics">
       <div class="term-a">
         <div class="name">总周目数</div>
-        <div class="value"><counter :value="termInformation.length"/></div>
+        <div class="value"><counter v-if="termInformation.length" :value="termInformation.length"/><span v-else>--</span></div>
       </div>
       <div class="term-a">
         <div class="name">总参与玩家<icon @click="totalInvolvingPlayersPopup = true" :path="mdiHelpCircleOutline"/></div>
-        <div class="value"><counter :value="totalInvolvedPlayers.length"/></div>
+        <div class="value"><counter v-if="totalInvolvedPlayers.length" :value="totalInvolvedPlayers.length"/><span v-else>--</span></div>
       </div>
       <div class="term-a">
         <div class="name">总跨度</div>
-        <div class="value"><counter :value="totalOpeningDays"/>d</div>
+        <div class="value"><counter v-if="totalOpeningDays" :value="totalOpeningDays"/><span v-else>--</span>d</div>
       </div>
       <div class="term-a">
         <div class="name">资金消耗<icon @click="consumptionPopup = true" :path="mdiHelpCircleOutline"/></div>
@@ -50,6 +50,7 @@
         <li>收到的捐助额 DNT=¥{{ totalDonations }} <nuxt-link target="_blank" to="/about">查看所有捐助者<icon :path="mdiLaunch"/></nuxt-link></li>
         <li>扣除捐助额后的总支出 NCT=¥{{ (totalConsumption.sum - totalDonations).toFixed(2) }}</li>
       </ul>
+      <p>以上数据准确性截至 {{ refreshTime }}</p>
     </anywhere-popup>
     <anywhere-popup :code="false" v-model="totalInvolvingPlayersPopup">
       <p>该数字为 ST7 以来所有登入过服务器的玩家的数量，不计重复。</p>
@@ -68,6 +69,9 @@ import {
   mdiLinkVariantPlus, mdiPercentCircleOutline, mdiShapeOutline
 } from "@mdi/js";
 import Counter from "~/components/counter.vue";
+import {formatTimeStringFromDate} from "../.nuxt/imports";
+
+const refreshTime = formatTimeStringFromDate(new Date());
 
 const consumptionPopup = ref(false);
 const totalInvolvingPlayersPopup = ref(false);
