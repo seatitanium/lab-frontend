@@ -652,6 +652,8 @@ get<SnapshotOnlinePlayers>(`/api/server/peak-online-history`).then(r => {
 let ws: WebSocket;
 
 function initializeWebSocketConnection(url: string) {
+  addInstantMessage("Connecting to server...");
+
   ws = new WebSocket(url);
 
   ws.onopen = () => {
@@ -681,6 +683,13 @@ function initializeWebSocketConnection(url: string) {
 
 function sendWebSocketMessage(message: string) {
   ws.send(message);
+}
+
+function addInstantMessage(content: string) {
+  instantMessages.push({
+    content,
+    time: formatTimeStringFromDate(new Date())
+  });
 }
 
 function sendInstantMessage() {
@@ -753,10 +762,13 @@ definePageMeta({
   requireLogin: true
 })
 
-watch(() => userInformation.value.loading, v => {
-  if (v === false) {
+watch(() => !userInformation.value.loading && serverStatus.online, v => {
+  if (v) {
     const token = useLocalStorage('tisea-auth-token', '');
     initializeWebSocketConnection(userInformation.value.hasBoundValidMCID ? `${ServerWebSocketURL}?token=${token.value}&displayname=${userInformation.value.mcid}` : ServerWebSocketURL);
+  } else if (serverStatus.online === false)  {
+    instantMessageStatus.value = 'disconnected';
+    addInstantMessage("Server is not running now.")
   }
 }, {
   immediate: true
