@@ -705,17 +705,10 @@ onMounted(async () => {
   startRefreshDescribeInstanceResult().finally();
   startRefreshServerStatus().finally();
 
-  instantMessages.push({
-    content: "Connecting to server...",
-    time: formatTimeStringFromDate(new Date())
-  });
+  const deploymentStatusResp = await get<DeploymentStatus>('/api/ecs/deploy-status');
 
-  const deployStatus = await get<DeploymentStatus>('/api/ecs/deploy-status');
-  if (deployStatus.code !== BackendCodes.OK) {
-    console.warn('Cannot prepare deployment status.');
-    console.warn(deployStatus)
-  } else {
-    switch (deployStatus.data) {
+  if (deploymentStatusResp.code === BackendCodes.OK) {
+    switch (deploymentStatusResp.data) {
       case 'Pending':
       case 'Running': {
         isInstanceBeingDeployed.value = true;
@@ -726,6 +719,9 @@ onMounted(async () => {
       default:
         isInstanceBeingDeployed.value = false;
     }
+  } else if (deploymentStatusResp.code !== BackendCodes.TargetNotExist) {
+    console.warn("unexpected response getting deploy status");
+    console.warn(deploymentStatusResp)
   }
 
   if (instantMessageInput.value !== null) {
