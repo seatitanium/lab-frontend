@@ -148,7 +148,7 @@ import setLocation from "~/utils/setLocation";
 import {
   mdiAccountConvertOutline,
   mdiAccountHeartOutline,
-  mdiAccountOffOutline, mdiAlertOutline, mdiCards, mdiCardsOutline, mdiCardsPlaying, mdiCreationOutline,
+  mdiAccountOffOutline, mdiAlertOutline, mdiCardsPlaying, mdiCreationOutline,
   mdiEmailEditOutline,
   mdiHome,
   mdiLinkVariant, mdiLinkVariantPlus, mdiLockReset, mdiLogout,
