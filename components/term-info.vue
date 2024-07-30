@@ -147,7 +147,11 @@ watch(num, () => {
       line-height: 1.7;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 10px;
+
+      @media (max-width: 1200px) {
+        font-size: 36px;
+      }
 
       .badge {
         font-size: 20px;

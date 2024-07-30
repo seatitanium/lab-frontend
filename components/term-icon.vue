@@ -54,6 +54,12 @@ const model = useState('term-modal');
   font-weight: normal;
   box-sizing: border-box;
 
+  @media (max-width: 1200px) {
+    width: 45px;
+    height: 45px;
+    font-size: 80%;
+  }
+
   &.display {
     width: 100px;
     height: 100px;

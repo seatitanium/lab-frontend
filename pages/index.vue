@@ -393,10 +393,18 @@ onMounted(() => {
         color: @primaryd;
         font-size: 38px;
 
+        @media (max-width: 1200px) {
+          font-size: 32px;
+        }
+
         .afk {
           font-size: 12px;
           font-weight: normal;
           color: #aaa;
+
+          @media (max-width: 1200px) {
+            font-size: 10px;
+          }
         }
       }
     }

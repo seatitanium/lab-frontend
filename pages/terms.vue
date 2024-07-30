@@ -184,10 +184,18 @@ onMounted(() => {
       color: @primaryd;
       font-size: 38px;
 
+      @media (max-width: 1200px) {
+        font-size: 32px;
+      }
+
       .rmb {
         font-size: 24px;
         font-weight: normal;
         margin-left: 8px;
+
+        @media (max-width: 1200px) {
+          font-size: 16px;
+        }
       }
     }
   }
