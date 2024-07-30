@@ -99,6 +99,7 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
     border-radius: 20px;
     padding: 20px;
     cursor: pointer;
+    max-width: 70%;
     animation: RotateInPlace 2.2s linear .4s infinite, PopAppear .3s ease;
     transform: translateX(2px);
 
