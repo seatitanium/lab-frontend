@@ -30,6 +30,15 @@
   position: fixed;
   bottom: 5px;
   width: 50vw;
+
+  @media (max-width: 1600px) {
+    width: 65vw;
+  }
+
+  @media (max-width: 1200px) {
+    width: 75vw;
+  }
+
   left: 50%;
   transform: translateX(-50%);
   padding: 0;

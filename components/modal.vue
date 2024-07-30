@@ -92,7 +92,6 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
 }
 
 .describe .modal {
-
   max-width: 450px;
 
   .modal-content {
@@ -165,6 +164,13 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
 
 .modal-overlay[class*="w"] .modal {
   min-width: unset;
+}
+
+.modal-group:not(.describe) .modal {
+  @media (max-width: 1450px) {
+    min-width: 800px;
+    max-width: 1200px;
+  }
 }
 
 .modal {

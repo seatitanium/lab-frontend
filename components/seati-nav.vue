@@ -402,8 +402,8 @@ function logout() {
 
 .logo--navbar {
   cursor: pointer;
-  font-variation-settings: 'CASL' 1, 'slnt' -10, 'wght' 800;
   font-size: 40px;
+  .logo-variation;
 }
 
 .container {

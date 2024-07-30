@@ -44,6 +44,10 @@
   }
 }
 
+.logo-variation {
+  font-variation-settings: 'CASL' 1, 'slnt' -10, 'wght' 800;
+}
+
 .textshadow--default {
   text-shadow: 0 2px 4px rgba(0, 0, 0, .5);
 }
@@ -110,4 +114,14 @@
 
 .animation--RotateInPlace {
   animation: RotateInPlace 2.2s linear .4s infinite, PopAppear .3s ease;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }

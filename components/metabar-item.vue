@@ -9,6 +9,7 @@
 
 .metabar-item {
   font-size: 14px;
+
   svg {
     height: 16px;
     width: 16px;
