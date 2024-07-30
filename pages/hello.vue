@@ -21,12 +21,12 @@
 
       <section class="section__here_you_can">
         <div class="card-grid">
-          <img :class="{card1Animation: card1Visible}" ref="card1" style="grid-area: a"
+          <img class="card1Animation main-image" ref="card1" style="grid-area: a"
                src="@/assets/images/2023-07-20_01.06.06.jpg"/>
-          <card :class="{card2Animation: card2Visible}" ref="card2" @mouseenter="stateKaifangScreen = true"
+          <card ref="card2" @mouseenter="stateKaifangScreen = true"
                 @mouseleave="stateKaifangScreen = false"
                 style="grid-area: b"
-                class="with-bg--primary">
+                class="card2Animation with-bg--primary">
             <card-title>开放</card-title>
             <card-content>
               <p>Lab 是一个开放的平台。所有注册过的玩家可以在这里零距离体验服务器的管理功能，尽情发挥主观能动性。</p>
@@ -37,10 +37,10 @@
             </card-bg-text>
           </card>
 
-          <card :class="{card3Animation: card3Visible}" ref="card3" @mouseenter="stateMianfeiScreen = true"
+          <card ref="card3" @mouseenter="stateMianfeiScreen = true"
                 @mouseleave="stateMianfeiScreen = false"
                 style="grid-area: c"
-                class="with-bg--blue">
+                class="card3Animation with-bg--blue">
             <card-title>
               免费
             </card-title>
@@ -52,9 +52,9 @@
             </card-bg-icon>
           </card>
 
-          <card :class="{card4Animation: card4Visibile}" ref="card4" @mouseenter="stateBianjieScreen = true"
+          <card ref="card4" @mouseenter="stateBianjieScreen = true"
                 @mouseleave="stateBianjieScreen = false"
-                style="grid-area: d" class="with-bg--green">
+                style="grid-area: d" class="card4Animation with-bg--green">
             <card-title>便捷</card-title>
             <card-content>
               <p>简明而有力的用户界面与功能设计，使得任何具有基础能力的玩家得以迅速上手
@@ -96,7 +96,7 @@
       </div>
       <typewriter class="typewriter--no-cursor" :type-interval="10">
         <p>无论是 Lab 还是 Seati 均为免费性质，这是一个<strong>不以盈利为目的的业余兴趣项目</strong>。</p>
-        <p>当然，我们仍然接受自愿的捐助，这一过程将保持<strong>公开透明</strong>，我们会专门<strong>编写页面</strong>记录这方面的内容。
+        <p>当然，我们仍然接受自愿的捐助，这一过程将保持<strong>公开透明</strong>。
         </p>
       </typewriter>
     </screen-content>
@@ -112,7 +112,7 @@
       <typewriter class="typewriter--no-cursor" :type-interval="10">
         <p>Lab 的设计标准倾向于将<strong>没必要的繁杂隐去</strong>、<strong>有必要的繁杂放在幕后</strong>，而将最为有效且直观的内容放在眼前<strong>触手可及</strong>的位置。
         </p>
-        <p>我们希望<strong>无论哪种</strong>计算机水平的玩家都能够轻松愉悦、无障碍地使用 Lab，理解 Lab 与 Seati 服务器的紧密联系。
+        <p>我们希望<strong>任何</strong>水平的玩家都能够轻松愉悦、无障碍地使用 Lab。
         </p>
       </typewriter>
     </screen-content>
@@ -142,12 +142,6 @@ const kaifangScreenDescription = ref(false);
 const kaifangScreenBackgroundSvg = ref(null);
 
 const [card1, card2, card3, card4] = [ref(null), ref(null), ref(null), ref(null)];
-const [card1Visible, card2Visible, card3Visible, card4Visibile] = [
-  useElementVisibility(card1),
-  useElementVisibility(card2),
-  useElementVisibility(card3),
-  useElementVisibility(card4)
-]
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -205,6 +199,10 @@ watch(stateKaifangScreen, async v => {
 </script>
 
 <style lang="less" scoped>
+.main-image {
+  box-shadow: 0 1.5px 3px rgba(0, 0, 0, .3);
+}
+
 @keyframes Card1 {
   0% {
     opacity: 0;
