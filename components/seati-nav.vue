@@ -155,7 +155,7 @@ import {
   mdiMinecraft, mdiPodium, mdiRenameOutline
 } from "@mdi/js";
 import getUsername from "~/utils/getUsername";
-import {useRoute, useState} from "#app";
+import {navigateTo, useRoute, useState} from "#app";
 import {BackendCodes, LocalStorageAuthTokenKey, LocalStorageAuthUsernameKey} from "~/consts";
 import playernameToSkin from "~/utils/playernameToSkin";
 import {playernameToUUID} from "#imports";
@@ -169,6 +169,7 @@ import BindMcidSuggestionModal from "~/components/bind-mcid-suggestion-modal.vue
 import TipsBindMcid from "~/components/tips-modal/tips-bind-mcid.vue";
 import TermModal from "~/components/term-modal.vue";
 import TermInfoPopups from "~/components/popup-groups/term-info-popups.vue";
+import {useLocalStorage} from "@vueuse/core";
 
 const username = getUsername();
 const token = getToken();
@@ -311,6 +312,7 @@ const afterRegisterNoticeConfig = getAfterRegisterNoticeConfig();
 async function initPage() {
   await initTermData();
   await initUserData();
+
   if (afterRegisterNoticeConfig.value.ready) {
     if (afterRegisterNoticeConfig.value.mcid === true) {
       registerCompleteNoticeModal.value = true;
@@ -320,6 +322,15 @@ async function initPage() {
 
     afterRegisterNoticeConfig.value.ready = false;
   }
+
+  const firstAccess = useLocalStorage('tisea-first-access-lab', () => true);
+
+  if (firstAccess.value && useRoute().path !== '/hello' && !userLoginState.value) {
+    navigateTo('/hello');
+    firstAccess.value = false;
+    return;
+  }
+
   if (useRoute().meta.requireLogin === true) {
     if (!userLoginState.value) {
       loginModalState.value = true;
