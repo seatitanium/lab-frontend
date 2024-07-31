@@ -1,0 +1,42 @@
+name: Build frontend and upload to server
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Yarn with Node 18
+      uses: DerYeger/yarn-setup-action@v1.0.1
+      with:
+        node-version: 18
+
+    - name: Setup SSH private key
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.PRIVKEY }}
+
+    - name: Build
+      run: yarn && yarn build
+
+    - name: Copy ecosystem.config.js
+      run: mv ecosystem.config.js .output
+
+    - name: Configure git
+      run: git config --global user.name actions && git config --global user.email i@seati.cc
+
+    - name: Upload files
+      run: |
+        git clone git@github.com:seatitanium/lab-frontend-production.git
+        cp -r .output/** lab-frontend-production
+        cd lab-frontend-production
+        git add *
+        git commit -m 'update'
+        git push origin main
