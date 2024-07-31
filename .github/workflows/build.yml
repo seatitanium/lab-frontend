@@ -33,4 +33,10 @@ jobs:
       run: git config --global user.name actions && git config --global user.email i@seati.cc
 
     - name: Upload files
-      run: cd .output && git init && git remote add origin git@github.com:seatitanium/lab-frontend-production.git && git add * && git commit -m 'upload' && git push -f origin main
+      run: |
+        cd .output
+        git init
+        git remote add origin git@github.com:seatitanium/lab-frontend-production.git
+        git add *
+        git commit -m 'upload'
+        git push -f origin HEAD:main
