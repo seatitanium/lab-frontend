@@ -346,7 +346,7 @@ import {
   mdiWebOff
 } from "@mdi/js";
 import {getUsername} from "#imports";
-import {BackendCodes, ServerWebSocketURL} from "~/consts";
+import {BackendCodes, ServerWebSocketPort} from "~/consts";
 import DebianLogo from '~/assets/icons/debian.svg';
 import DukeWaving from '~/assets/icons/duke-waving.svg'
 import sleep from "~/utils/sleep";
@@ -767,7 +767,8 @@ definePageMeta({
 watch(() => !userInformation.value.loading && serverStatus.online, v => {
   if (v) {
     const token = useLocalStorage('tisea-auth-token', '');
-    initializeWebSocketConnection(userInformation.value.hasBoundValidMCID ? `${ServerWebSocketURL}?token=${token.value}&displayname=${userInformation.value.mcid}` : ServerWebSocketURL);
+    const url = `${instanceInformation.retrieved.public_ip_address}:${ServerWebSocketPort}`;
+    initializeWebSocketConnection(userInformation.value.hasBoundValidMCID ? `${url}?token=${token.value}&displayname=${userInformation.value.mcid}` : url);
   } else if (serverStatus.online === false)  {
     instantMessageStatus.value = 'disconnected';
     addInstantMessage("Server is not running now.")

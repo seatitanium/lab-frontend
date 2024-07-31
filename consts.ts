@@ -18,7 +18,7 @@ export const BackendCodes = {
 
 export const SupportEmail = "i@seati.cc";
 
-export const ServerWebSocketURL = "ws://localhost:23322";
+export const ServerWebSocketPort = 23322;
 
 export const PeriodTag = "st13";
 
