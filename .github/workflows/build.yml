@@ -27,7 +27,7 @@ jobs:
       run: yarn && yarn build
 
     - name: Copy ecosystem.config.js
-      run: mv ecosystem.conf.js .output
+      run: mv ecosystem.config.js .output
 
     - name: Configure git
       run: git config --global user.name actions
