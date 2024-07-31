@@ -7,7 +7,7 @@ export default async function post<T>(url: string, body: object): Promise<Resp<T
         body,
         ignoreResponseError: true,
         headers: {
-            'Token': useLocalStorage('tisea-auth-token', '').value
+            'Authorization': useLocalStorage('tisea-auth-token', '').value
         }
     });
 }

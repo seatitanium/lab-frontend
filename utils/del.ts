@@ -6,7 +6,7 @@ export default async function del<T>(url: string, withToken = true): Promise<Res
         method: 'delete',
         ignoreResponseError: true,
         headers: withToken ? {
-            'Token': useLocalStorage('tisea-auth-token', '').value
+            'Authorization': useLocalStorage('tisea-auth-token', '').value
         } : {}
     });
 }
