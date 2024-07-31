@@ -442,7 +442,7 @@ async function confirmAction() {
 
   switch (actionToConfirm.value) {
     case 'create': {
-      let result = await get('/api/ecs/create');
+      let result = await get('/ecs/create');
       modalConfirm.value = false;
 
       confirmActionLoading.value = false;
@@ -461,7 +461,7 @@ async function confirmAction() {
 
     case 'stop':
     case 'stop_force': {
-      let result = await get(`/api/ecs/stop?force=${actionToConfirm.value === 'stop' ? 'false' : 'true'}`);
+      let result = await get(`/ecs/stop?force=${actionToConfirm.value === 'stop' ? 'false' : 'true'}`);
       modalConfirm.value = false;
       confirmActionLoading.value = false;
 
@@ -476,7 +476,7 @@ async function confirmAction() {
     }
 
     case 'reboot': {
-      let result = await get('/api/ecs/reboot');
+      let result = await get('/ecs/reboot');
       modalConfirm.value = false;
       confirmActionLoading.value = false;
 
@@ -491,7 +491,7 @@ async function confirmAction() {
     }
 
     case 'start': {
-      let result = await get('/api/ecs/start');
+      let result = await get('/ecs/start');
       modalConfirm.value = false;
       confirmActionLoading.value = false;
 
@@ -507,7 +507,7 @@ async function confirmAction() {
 
     case 'delete':
     case 'delete_force': {
-      let result = await del(`/api/ecs/delete?force=${actionToConfirm.value === 'delete' ? 'false' : 'true'}`);
+      let result = await del(`/ecs/delete?force=${actionToConfirm.value === 'delete' ? 'false' : 'true'}`);
       modalConfirm.value = false;
       confirmActionLoading.value = false;
 
@@ -525,7 +525,7 @@ async function confirmAction() {
 
 async function startRefreshDeploymentResult() {
   while (true) {
-    const result = await get<GetLastInvokeRes>(`/api/ecs/last-invoke`);
+    const result = await get<GetLastInvokeRes>(`/ecs/last-invoke`);
 
     if (result.code !== BackendCodes.OK && result.code !== BackendCodes.TargetNotExist) {
       // Close "possible" active modal
@@ -571,7 +571,7 @@ async function startRefreshDescribeInstanceResult() {
   // noinspection InfiniteLoopJS
   while (true) {
     if (!enableRefreshInstanceInformation.value) continue;
-    const result = await get<DescribeInstanceRes>('/api/ecs/describe');
+    const result = await get<DescribeInstanceRes>('/ecs/describe');
     firstDescribeInstanceFetched.value = true;
     if (result.code === BackendCodes.OK) {
       instanceStatusLastUpdated.value = formatTimeStringFromDate(new Date());
@@ -621,7 +621,7 @@ async function startRefreshServerStatus() {
   // noinspection InfiniteLoopJS
   while (true) {
     if (enableRefreshServerStatus.value && instanceInformation.retrieved.public_ip_address) {
-      const result = await get<ServerStatus>(`/api/server/status?ip=${instanceInformation.retrieved.public_ip_address}`);
+      const result = await get<ServerStatus>(`/server/status?ip=${instanceInformation.retrieved.public_ip_address}`);
       if (result.code === BackendCodes.OK) {
         serverStatus.online = true;
         Object.assign(serverStatus.data, result.data);
@@ -644,7 +644,7 @@ const peakServerOnlineSnapshot = reactive<SnapshotOnlinePlayers>({
   created_at: ''
 });
 
-get<SnapshotOnlinePlayers>(`/api/server/peak-online-history`).then(r => {
+get<SnapshotOnlinePlayers>(`/server/peak-online-history`).then(r => {
   if (r.code === BackendCodes.OK) Object.assign(peakServerOnlineSnapshot, r.data);
   else console.warn(r)
 });
@@ -714,7 +714,7 @@ onMounted(async () => {
   startRefreshDescribeInstanceResult().finally();
   startRefreshServerStatus().finally();
 
-  const deploymentStatusResp = await get<DeploymentStatus>('/api/ecs/deploy-status');
+  const deploymentStatusResp = await get<DeploymentStatus>('/ecs/deploy-status');
 
   if (deploymentStatusResp.code === BackendCodes.OK) {
     switch (deploymentStatusResp.data) {

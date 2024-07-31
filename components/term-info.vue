@@ -88,7 +88,7 @@ const termResourcesExplanationPopup = useState('popup-term-resources-explanation
 const userInformation = useState<UserExtended>('user-data');
 
 async function getCurrentTermServerPlayers() {
-  const result = await get<ServerPlayer[]>(`/api/server/involved-players?term=${num.value || props.termNumber}`);
+  const result = await get<ServerPlayer[]>(`/server/involved-players?term=${num.value || props.termNumber}`);
 
   if (result.code === BackendCodes.OK) {
     currentTermPlayers.value = result.data;

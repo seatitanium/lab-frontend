@@ -92,7 +92,7 @@ const donations = ref<Donation[]>([]);
 const totalDonations = computed(() => donations.value.map(x => x.amount).reduce((a, b) => a + b, 0));
 
 async function getTotalInvolvedPlayers() {
-  const uniqueResult = await get<ServerPlayer[]>(`/api/server/involved-players?unique=true`);
+  const uniqueResult = await get<ServerPlayer[]>(`/server/involved-players?unique=true`);
 
   if (uniqueResult.code === BackendCodes.OK) {
     totalInvolvedPlayers.value = uniqueResult.data;
@@ -100,7 +100,7 @@ async function getTotalInvolvedPlayers() {
 }
 
 async function getTotalConsumptions() {
-  const consumptionResult = await get<Consumption>(`/api/bss/consumption`);
+  const consumptionResult = await get<Consumption>(`/bss/consumption`);
 
   if (consumptionResult.code === BackendCodes.OK) {
     Object.assign(totalConsumption, consumptionResult.data);
@@ -108,7 +108,7 @@ async function getTotalConsumptions() {
 }
 
 async function getDonations() {
-  const donationResult  = await get(`/api/donations`);
+  const donationResult  = await get(`/donations`);
 
   donations.value = donationResult as unknown as Donation[];
 }

@@ -232,7 +232,7 @@ const modalUserAction_delete = useState('modal-user-action-delete', () => false)
 const userLoginState = useState('user-login-state', () => false);
 
 async function initTermData() {
-  const termResult = await get<Term[]>(`/api/server/terms`);
+  const termResult = await get<Term[]>(`/server/terms`);
 
   if (termResult.code === BackendCodes.OK) {
     Object.assign(termInformation.value, termResult.data)
@@ -250,13 +250,13 @@ async function initUserData() {
     return;
   }
 
-  const result = await get(`/api/auth/check?token=${token.value}`);
+  const result = await get(`/auth/check?token=${token.value}`);
 
   userLoginState.value = result.code === BackendCodes.OK;
 
   if (!userLoginState.value) return;
 
-  const userResult = await get<User>(`/api/user/profile?username=${username.value}`);
+  const userResult = await get<User>(`/user/profile?username=${username.value}`);
 
   if (userResult.code !== BackendCodes.OK) {
     someProblemModal.value = true;
@@ -274,17 +274,17 @@ async function initUserData() {
       if (skinResp) userInformation.value.skinBase64 = skinResp.data;
       userInformation.value.uuid = await playernameToUUID(userInformation.value.mcid);
 
-      const loginTotalCountResp = await get<number>(`/api/user/stats/login/total?playername=${userInformation.value.mcid}`);
+      const loginTotalCountResp = await get<number>(`/user/stats/login/total?playername=${userInformation.value.mcid}`);
       if (loginTotalCountResp.code === BackendCodes.OK) {
         userInformation.value.analytics.loginCount = loginTotalCountResp.data;
       }
 
-      const loginRecordsResp = await get<LoginRecord[]>(`/api/user/stats/login?playername=${userInformation.value.mcid}`);
+      const loginRecordsResp = await get<LoginRecord[]>(`/user/stats/login?playername=${userInformation.value.mcid}`);
       if (loginRecordsResp.code === BackendCodes.OK) {
         Object.assign(userInformation.value.analytics.loginRecords, loginRecordsResp.data);
       }
 
-      const playtimeRecordResp = await get<PlaytimeRecord>(`/api/user/stats/playtime?playername=${userInformation.value.mcid}`);
+      const playtimeRecordResp = await get<PlaytimeRecord>(`/user/stats/playtime?playername=${userInformation.value.mcid}`);
       if (playtimeRecordResp.code === BackendCodes.OK) {
         userInformation.value.analytics.playtime.total = playtimeRecordResp.data.total;
         userInformation.value.playtimeTotalMillis = playtimeRecordResp.data.total * 1000;
@@ -292,12 +292,12 @@ async function initUserData() {
         userInformation.value.playtimeAfkMillis = playtimeRecordResp.data.afk * 1000;
       }
 
-      const firstLoginRecordResp = await get<LoginRecord>(`/api/user/first-login?playername=${userInformation.value.mcid}`);
+      const firstLoginRecordResp = await get<LoginRecord>(`/user/first-login?playername=${userInformation.value.mcid}`);
       if (firstLoginRecordResp.code === BackendCodes.OK) {
         Object.assign(userInformation.value.analytics.firstLoginRecord, firstLoginRecordResp.data);
       }
 
-      const termsInvolvedResp = await get<Term[]>(`/api/user/terms-involved?playername=${userInformation.value.mcid}`);
+      const termsInvolvedResp = await get<Term[]>(`/user/terms-involved?playername=${userInformation.value.mcid}`);
       if (termsInvolvedResp.code === BackendCodes.OK) {
         Object.assign(userInformation.value.analytics.termsInvolved, termsInvolvedResp.data);
       }

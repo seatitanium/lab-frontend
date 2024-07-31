@@ -83,7 +83,7 @@ const registerLoading = ref(false);
 async function register() {
   registerLoading.value = true;
 
-  const result = await post(`/api/auth/register`, {
+  const result = await post(`/auth/register`, {
     'username': username.value,
     'password': password.value,
     'email': email.value,

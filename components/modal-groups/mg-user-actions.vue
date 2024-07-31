@@ -193,7 +193,7 @@ async function updateProfile(object: {[prop: string]: any}, onSuccess: () => voi
 async function bindPassword() {
   loading.value = true;
 
-  const loginResult = await post("/api/auth/login", {
+  const loginResult = await post("/auth/login", {
     username: userInformation.value.username,
     password: oldPassword.value
   });

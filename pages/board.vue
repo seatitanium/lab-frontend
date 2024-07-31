@@ -102,7 +102,7 @@ const loginRecordBoard = reactive<LoginRecordBoard[]>([]);
 const playtimeBoard = reactive<PlaytimeBoard[]>([]);
 
 async function getLoginBoard() {
-  const result = await get<LoginRecordBoard[]>(`/api/server/board/login?tag=${PeriodTag}`);
+  const result = await get<LoginRecordBoard[]>(`/server/board/login?tag=${PeriodTag}`);
 
   if (result.code === BackendCodes.OK) {
     Object.assign(loginRecordBoard, result.data);
@@ -110,7 +110,7 @@ async function getLoginBoard() {
 }
 
 async function getPlaytimeBoard() {
-  const result = await get<PlaytimeBoard[]>(`/api/server/board/playtime?tag=${PeriodTag}`);
+  const result = await get<PlaytimeBoard[]>(`/server/board/playtime?tag=${PeriodTag}`);
 
   if (result.code === BackendCodes.OK) {
     result.data.forEach(x => x.timeValid = x.timeTotal - x.timeAfk);

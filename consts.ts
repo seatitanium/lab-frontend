@@ -47,3 +47,5 @@ export const GlobalRegex = {
 }
 
 export const COSEndpoint = "https://d.seati.cc"
+
+export const APIEndpoint = "https://api.seati.cc/v1"
