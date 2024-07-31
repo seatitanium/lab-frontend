@@ -1,4 +1,4 @@
-name: Build frontend and upload
+name: Build frontend and upload to server
 
 on:
   push:
