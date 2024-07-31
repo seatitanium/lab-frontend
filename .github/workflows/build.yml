@@ -35,7 +35,7 @@ jobs:
     - name: Upload files
       run: |
         git clone git@github.com:seatitanium/lab-frontend-production.git
-        cp .output/** lab-frontend-production
+        cp -r .output/** lab-frontend-production
         cd lab-frontend-production
         git add *
         git commit -m 'update'
