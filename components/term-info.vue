@@ -35,7 +35,7 @@
         <small>参与人数</small>
       </div>
     </section>
-    <p v-if="currentTermPlayers.length > 0">玩家列表&emsp;<span v-for="(x, i) in currentTermPlayers"><a :href="`https://namemc.com/profile/${x.uuid}`" target="_blank">{{ x.name }}</a><span v-if="i !== currentTermPlayers.length - 1">, </span></span></p>
+    <p v-if="currentTermPlayers.length > 0">玩家列表&emsp;<span v-for="(x, i) in currentTermPlayers"><a v-if="x.uuid" :href="`https://namemc.com/profile/${x.uuid}`" target="_blank">{{ x.name }}</a><span v-else>{{ x.name }}</span><span v-if="i !== currentTermPlayers.length - 1">, </span></span></p>
     <section v-if="currentTermPlayers.length > 0" class="player-list" :class="{'narrow-avatars': narrowAvatars}">
       <player-avatar :hover-scale="narrowAvatars" v-for="x in currentTermPlayers" :uuid="x.uuid" :name="x.name" hover-name steve/>
     </section>
