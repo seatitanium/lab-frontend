@@ -276,17 +276,17 @@ async function initUserData() {
       if (skinResp) userInformation.value.skinBase64 = skinResp.data;
       userInformation.value.uuid = await playernameToUUID(userInformation.value.mcid);
 
-      const loginTotalCountResp = await get<number>(`/user/stats/login/total?playername=${userInformation.value.mcid}`);
+      const loginTotalCountResp = await get<number>(`/user/stats/login/total?username=${userInformation.value.username}`);
       if (loginTotalCountResp.code === BackendCodes.OK) {
         userInformation.value.analytics.loginCount = loginTotalCountResp.data;
       }
 
-      const loginRecordsResp = await get<LoginRecord[]>(`/user/stats/login?playername=${userInformation.value.mcid}`);
+      const loginRecordsResp = await get<LoginRecord[]>(`/user/stats/login?username=${userInformation.value.username}`);
       if (loginRecordsResp.code === BackendCodes.OK) {
         Object.assign(userInformation.value.analytics.loginRecords, loginRecordsResp.data);
       }
 
-      const playtimeRecordResp = await get<PlaytimeRecord>(`/user/stats/playtime?playername=${userInformation.value.mcid}`);
+      const playtimeRecordResp = await get<PlaytimeRecord>(`/user/stats/playtime?username=${userInformation.value.username}`);
       if (playtimeRecordResp.code === BackendCodes.OK) {
         userInformation.value.analytics.playtime.total = playtimeRecordResp.data.total;
         userInformation.value.playtimeTotalMillis = playtimeRecordResp.data.total * 1000;
@@ -294,12 +294,12 @@ async function initUserData() {
         userInformation.value.playtimeAfkMillis = playtimeRecordResp.data.afk * 1000;
       }
 
-      const firstLoginRecordResp = await get<LoginRecord>(`/user/first-login?playername=${userInformation.value.mcid}`);
+      const firstLoginRecordResp = await get<LoginRecord>(`/user/first-login?username=${userInformation.value.username}`);
       if (firstLoginRecordResp.code === BackendCodes.OK) {
         Object.assign(userInformation.value.analytics.firstLoginRecord, firstLoginRecordResp.data);
       }
 
-      const termsInvolvedResp = await get<Term[]>(`/user/terms-involved?playername=${userInformation.value.mcid}`);
+      const termsInvolvedResp = await get<Term[]>(`/user/terms-involved?username=${userInformation.value.username}`);
       if (termsInvolvedResp.code === BackendCodes.OK) {
         Object.assign(userInformation.value.analytics.termsInvolved, termsInvolvedResp.data);
       }
