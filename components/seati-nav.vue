@@ -9,6 +9,7 @@
           <div class="navigation-item" v-for="x in navigation">
             <btn class="nav-btn hover--dim"
                  :class="useRoute().fullPath === x.route ? 'with-bg--primary' : 'with-bg--white'"
+                 v-if="!x.hidden || useRoute().fullPath === x.route"
                  @click="navigateTo(x.route)">
               <icon :path="x.icon"/>
               {{ x.name }}
@@ -21,7 +22,8 @@
           <img @click="userActionsModal = true" draggable="false" v-else-if="userInformation.hasBoundValidMCID"
                :src="`https://crafatar.com/avatars/${userInformation.uuid}`"
                @contextmenu="handleUserAvatarContextMenu"/>
-          <div class="avatar-placeholder" @contextmenu="handleUserAvatarContextMenu" @click="userActionsModal = true" v-else>
+          <div class="avatar-placeholder" @contextmenu="handleUserAvatarContextMenu" @click="userActionsModal = true"
+               v-else>
             {{ userInformation.username.charAt(0).toUpperCase() }}
           </div>
         </div>
@@ -148,9 +150,9 @@ import setLocation from "~/utils/setLocation";
 import {
   mdiAccountConvertOutline,
   mdiAccountHeartOutline,
-  mdiAccountOffOutline, mdiAlertOutline, mdiCardsPlaying, mdiCreationOutline,
+  mdiAccountOffOutline, mdiAlertOutline, mdiCardsPlaying, mdiCreation, mdiCreationOutline,
   mdiEmailEditOutline,
-  mdiHome,
+  mdiHome, mdiInformation, mdiInformationVariant, mdiInformationVariantCircle, mdiInformationVariantCircleOutline,
   mdiLinkVariant, mdiLinkVariantPlus, mdiLockReset, mdiLogout,
   mdiMinecraft, mdiPodium, mdiRenameOutline
 } from "@mdi/js";
@@ -366,6 +368,18 @@ const navigation = [
     name: "周目",
     route: "/terms",
     icon: mdiCardsPlaying
+  },
+  {
+    name: "你好",
+    route: "/hello",
+    icon: mdiCreation,
+    hidden: true
+  },
+  {
+    name: "关于",
+    route: "/about",
+    icon: mdiInformationVariantCircle,
+    hidden: true
   }
 ]
 
