@@ -5,7 +5,7 @@
         <NuxtPage/>
       </NuxtLayout>
       <div class="not-enough-width-warn" v-else>
-        <div class="content">
+        <div class="txt">
           <h2>显示不兼容</h2>
           <p>你的屏幕宽度不足以显示 Lab 的界面。请在宽度<strong>大于或等于 1100px</strong> 的设备或窗口上访问本页面，1500px 以上宽度访问效果最佳。</p>
           <p>通常情况下，1080p 及以上的显示器都可以满足该要求。</p>
@@ -36,7 +36,7 @@ onMounted(() => {
   width: 100vw;
   height: 100vh;
 
-  .content {
+  .txt {
     width: 80%;
     height: 100%;
     margin: 0 auto;
