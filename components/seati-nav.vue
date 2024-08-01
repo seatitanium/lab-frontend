@@ -1,5 +1,5 @@
 <template>
-  <header>
+  <header v-if="!firstAccess">
     <nav class="navbar">
       <div class="container">
         <div @click="setLocation('/')" class="logo--navbar">
@@ -231,6 +231,8 @@ const modalUserAction_delete = useState('modal-user-action-delete', () => false)
 
 const userLoginState = useState('user-login-state', () => false);
 
+const firstAccess = useLocalStorage('tisea-first-access-lab', () => true);
+
 async function initTermData() {
   const termResult = await get<Term[]>(`/server/terms`);
 
@@ -322,8 +324,6 @@ async function initPage() {
 
     afterRegisterNoticeConfig.value.ready = false;
   }
-
-  const firstAccess = useLocalStorage('tisea-first-access-lab', () => true);
 
   if (firstAccess.value && useRoute().path !== '/hello' && !userLoginState.value) {
     navigateTo('/hello');
