@@ -32,10 +32,10 @@
       </btn>
     </bottom-navigation>
     <section class="section__inst_basic_information">
-      <h2 class="value ip" v-if="!firstDescribeInstanceFetchedTimeOut && !firstDescribeInstanceFetched">
+      <h1 class="value ip" v-if="!firstDescribeInstanceFetchedTimeOut && !firstDescribeInstanceFetched">
         Waiting...
-      </h2>
-      <h2 class="value ip" v-else>
+      </h1>
+      <h1 class="value ip" v-else>
         {{
           instanceInformation.retrieved.public_ip_address ? (instanceInformation.retrieved.public_ip_address[0] || '暂无 IP 地址') : '暂无 IP 地址'
         }}
@@ -43,7 +43,7 @@
              v-if="instanceInformation.retrieved.public_ip_address !== null">单击复制
           <icon :path="mdiClipboardTextOutline"/>
         </btn>
-      </h2>
+      </h1>
       <metabar>
         <metabar-item class="instance-status"
                       v-if="!firstDescribeInstanceFetchedTimeOut && !firstDescribeInstanceFetched">
@@ -880,8 +880,9 @@ h2.value {
   margin: 8px 0;
 }
 
-h2.value.ip {
+h1.ip {
   font-size: 40px;
+  margin: 16px 0;
 }
 
 .section__online_players .card-label small {
