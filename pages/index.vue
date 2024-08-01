@@ -186,7 +186,6 @@ import MgUserAnalytics from "~/components/modal-groups/mg-user-analytics.vue";
 import MgIndexBadges from "~/components/modal-groups/mg-index-badges.vue";
 import {BackendCodes} from "~/consts";
 import getCurrentTerm from "~/utils/getCurrentTerm";
-import {useLocalStorage} from "@vueuse/core";
 
 definePageMeta({
   requireLogin: true

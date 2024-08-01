@@ -114,7 +114,7 @@ import NuxtLogo from '~/assets/icons/nuxt-green-black.svg';
 import VueLogo from '~/assets/icons/vue.svg';
 import GitHubLogo from '~/assets/icons/github-mark.svg';
 import PictogrammersLogo from '~/assets/icons/pictogrammers-full.svg';
-import {mdiCurrencyUsd, mdiFormatFont, mdiGoogleChrome, mdiLaunch} from "@mdi/js";
+import {mdiCurrencyUsd, mdiFormatFont, mdiLaunch} from "@mdi/js";
 
 const candidateImages = [Image1, Image2, Image3, Image4, Image5, Image6];
 

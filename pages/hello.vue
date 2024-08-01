@@ -129,7 +129,6 @@ import LoginModal from "~/components/login-modal.vue";
 import anime from "animejs";
 import OpenBg from '~/assets/images/hello/open.svg?component';
 import typewriter from 'typewriter-vue/src/components/Typewriter.vue';
-import {useElementVisibility} from "@vueuse/core";
 
 const stateLoginModal = useState('login-modal');
 const stateKaifangScreen = ref(false);

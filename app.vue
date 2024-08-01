@@ -24,7 +24,7 @@ const widthQualified = ref(true);
 
 onMounted(() => {
   widthQualified.value = window.innerWidth > 1100;
-  window.addEventListener('resize', e => {
+  window.addEventListener('resize', () => {
     widthQualified.value = window.innerWidth > 1100;
   })
 })

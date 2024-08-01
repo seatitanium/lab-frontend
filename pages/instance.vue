@@ -316,20 +316,6 @@
 <script setup lang="ts">
 import {
   mdiAccountGroupOutline,
-  mdiAlertOutline,
-  mdiAlphaA,
-  mdiAlphaB,
-  mdiAlphaC,
-  mdiAlphaD,
-  mdiAlphaE,
-  mdiAlphaF,
-  mdiAlphaG,
-  mdiAlphaH,
-  mdiAlphaI,
-  mdiAlphaJ,
-  mdiAlphaK,
-  mdiAlphaZ, mdiCheck,
-  mdiCheckCircleOutline,
   mdiClipboardTextOutline,
   mdiClockOutline,
   mdiClockPlusOutline,
@@ -342,8 +328,7 @@ import {
   mdiMessageTextOutline,
   mdiNavigationVariantOutline,
   mdiRestart,
-  mdiTrashCanOutline,
-  mdiWebOff
+  mdiTrashCanOutline
 } from "@mdi/js";
 import {getUsername} from "#imports";
 import {BackendCodes, ServerWebSocketPort} from "~/consts";
