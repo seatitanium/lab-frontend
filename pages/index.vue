@@ -217,7 +217,7 @@ const currentTermSet = reactive<TermSet>({
 });
 
 async function getTermSet() {
-  const result = await get<TermSet>(`/api/server/current-term-set`);
+  const result = await get<TermSet>(`/server/current-term-set`);
 
   if (result.code === BackendCodes.OK) {
     Object.assign(currentTermSet, result.data);
