@@ -47,7 +47,7 @@
           <player-skin-viewer :skin="userInformation.skinBase64" :width="200"
                               :height="400"/>
         </div>
-        <div class="right">
+        <div class="right" :class="{fullWidth: !userInformation.hasBoundValidMCID}">
           <div class="top">
             <h2 :class="{mcid: userInformation.hasBoundValidMCID}">
               {{ userInformation.hasBoundValidMCID ? userInformation.mcid : userInformation.username }}</h2>
@@ -456,6 +456,10 @@ function logout() {
   gap: 32px;
 
   .right {
+    &.fullWidth {
+      width: 100%;
+    }
+
     .top {
       display: flex;
       align-items: baseline;
