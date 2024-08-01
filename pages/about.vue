@@ -41,9 +41,9 @@
 
     <section class="section__developers">
       <h2>Credits</h2>
-      <p>Subilan（前端、后端）</p>
-      <p>WindSpiritSR（后端）</p>
-      <small>欢迎有兴趣的同伴一同参与维护 / Any contribution is welcome and appreciated<br/>
+      <p>Subilan <small>前端 后端</small></p>
+      <p>WindSpiritSR <small>后端</small></p>
+      <small>欢迎有兴趣的朋友一同参与维护 / Any contribution is welcome and appreciated<br/>
         <a target="_blank" href="https://github.com/seatitanium/lab-frontend">repo-frontend</a> · <a target="_blank" href="https://github.com/seatitanium/lab-backend">repo-backend</a></small>
     </section>
 
@@ -79,7 +79,7 @@
         </div>
       </div>
       <p v-else>Loading donations...</p>
-      <small>排名不分先后 / Not listed in order</small>
+      <small>排名不分先后 / Not listed in order<br/>Data since 2022</small>
       <div class="total">
         <span class="money">
           <span class="symbol">¥</span><counter :value="donations.map(x => x.amount).reduce((a, b) => a + b, 0)"/>
@@ -98,6 +98,13 @@
       <h2>Copyright</h2>
       <p>Gin-Gonic Framework Logo by <a href="https://github.com/javierprovecho" target="_blank">Javier Provecho</a> is licensed under a <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution 4.0 International License</a>. The Go gopher eyes were designed by <a href="https://reneefrench.blogspot.com/" target="_blank">Renee French</a>.</p>
       <p>Recursive Font: Copyright 2020 The Recursive Project Authors (<a href="https://github.com/arrowtype/recursive">https://github.com/arrowtype/recursive</a>)<br/>This Font Software is licensed under the SIL Open Font License, Version 1.1.</p>
+      <p>This site is open-source with its code stored in two public GitHub repositories under <a href="https://github.com/seatitanium" target="_blank">seatitanium</a>. The original part of this project is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution 4.0 International License</a>.</p>
+    </section>
+
+    <section class="section__contact">
+      <h2>Contact Us</h2>
+      <p>如在使用过程中有任何问题，或者对页面或功能有建议，欢迎发信至 <a href="mailto:i@seati.cc">i@seati.cc</a></p>
+      <p>If you encounter any issues or have suggestions for the design or functionality, please contact us at <a href="mailto:i@seati.cc">i@seati.cc</a>. </p>
     </section>
   </div>
 </template>
@@ -318,5 +325,9 @@ section {
   a:hover span {
     text-decoration: underline;
   }
+}
+
+small {
+  line-height: 1.8;
 }
 </style>
