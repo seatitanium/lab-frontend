@@ -1,12 +1,12 @@
 <template>
   <div class="modal-group">
     <Transition name="modal-trans">
-      <div v-if="model" class="modal" :style="{background, color}">
-        <btn @click="model = false" icon v-if="withCloseBtn" class="hover--dim with-bg--white close-btn">
-          <icon :path="mdiClose"/>
-        </btn>
-        <slot/>
-      </div>
+        <div v-if="model" class="modal" :style="{background, color}">
+          <btn @click="model = false" icon v-if="withCloseBtn" class="hover--dim with-bg--white close-btn">
+            <icon :path="mdiClose"/>
+          </btn>
+          <slot/>
+        </div>
     </Transition>
     <Transition name="overlay-trans">
       <div v-if="model" class="modal-overlay" @click="model = !allowEsc">
@@ -176,8 +176,6 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
 .modal {
   background: white;
   border-radius: 20px;
-  min-width: 400px;
-  max-width: 800px;
   padding: 40px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
   position: fixed;
