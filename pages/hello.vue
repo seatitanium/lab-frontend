@@ -257,7 +257,7 @@ watch(stateKaifangScreen, async v => {
 }
 
 @cardAnimationDuration: .7s;
-@cardAnimationFunction: cubic-bezier(.61,0,.32,1.04);
+@cardAnimationFunction: cubic-bezier(.61, 0, .32, 1.04);
 
 .card1Animation {
   animation: Card1 @cardAnimationDuration @cardAnimationFunction;
@@ -393,7 +393,8 @@ section {
 
   .card-grid {
     display: grid;
-    grid-template: "a a b" "c d d";
+    grid-template-areas: "a a b" "c d d";
+    grid-template-columns: repeat(3, 1fr);
     grid-gap: 20px;
 
     > img:not([class*="Animation"]), > .card:not([class*="Animation"]) {
@@ -403,6 +404,7 @@ section {
     img {
       display: block;
       width: 100%;
+      height: 100%;
       object-fit: cover;
       border-radius: 20px;
     }
