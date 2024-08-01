@@ -98,7 +98,7 @@
       <h2>Copyright</h2>
       <p>Gin-Gonic Framework Logo by <a href="https://github.com/javierprovecho" target="_blank">Javier Provecho</a> is licensed under a <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution 4.0 International License</a>. The Go gopher eyes were designed by <a href="https://reneefrench.blogspot.com/" target="_blank">Renee French</a>.</p>
       <p>Recursive Font: Copyright 2020 The Recursive Project Authors (<a href="https://github.com/arrowtype/recursive">https://github.com/arrowtype/recursive</a>)<br/>This Font Software is licensed under the SIL Open Font License, Version 1.1.</p>
-      <p>This site is open-source with its code stored in two public GitHub repositories under <a href="https://github.com/seatitanium" target="_blank">seatitanium</a>. The original part of this project is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution 4.0 International License</a>.</p>
+      <p>This site is open-source with its code stored in two public GitHub repositories under <a href="https://github.com/seatitanium" target="_blank">seatitanium</a>. The original source code of this project is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution 4.0 International License</a>. </p>
     </section>
 
     <section class="section__contact">
