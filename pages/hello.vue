@@ -6,7 +6,7 @@
           <h1>
             👋 欢迎来到 <em>TiLab</em>！
           </h1>
-          <p>Seati 为玩家搭建的一站式服务器信息获取与控制平台</p>
+          <p>一站式服务器信息获取与控制平台</p>
         </div>
 
         <div class="apply">
@@ -29,8 +29,8 @@
                 class="card2Animation with-bg--primary">
             <card-title>开放</card-title>
             <card-content>
-              <p>Lab 是一个开放的平台。所有注册过的玩家可以在这里零距离体验服务器的管理功能，尽情发挥主观能动性。</p>
-              <p>随着游玩时间、信用等级的提升，你将能够操控服务器的更多功能。</p>
+              <p>Lab 是一个开放的平台，所有注册玩家都可以对服务器进行操作。</p>
+              <p>无论是有关新功能新设计的好点子💡还是针对现状的改进建议，随时欢迎你的提出。</p>
             </card-content>
             <card-bg-text class="--extraEnlarged --classicFont">
               Open
@@ -45,7 +45,7 @@
               免费
             </card-title>
             <card-content>
-              <p>免费的不仅是平台，更是游戏。Seati 运营成本=服主投入+玩家自愿捐助，简洁明了，没有其余收费项目。</p>
+              <p>Lab 免费开放给所有玩家使用。Seati 是公益服务器，也不会有任何形式的游戏内收费项目。</p>
             </card-content>
             <card-bg-icon class="--centralSkewed">
               <icon :path="mdiCurrencyUsdOff"/>
@@ -57,9 +57,8 @@
                 style="grid-area: d" class="card4Animation with-bg--green">
             <card-title>便捷</card-title>
             <card-content>
-              <p>简明而有力的用户界面与功能设计，使得任何具有基础能力的玩家得以迅速上手
-                Lab，轻松获取到有用信息。</p>
-              <p>经过优化的沉浸式用户体验，让任何操作都变得无比灵活敏捷。</p>
+              <p>我们借助互联网技术，为玩家提供一个便捷的平台。随时随地只要有可以上网的电脑，便可以与服务器互动。</p>
+              <p>除此之外，不断优化的 UI 设计将帮助玩家更无障碍地使用平台。</p>
             </card-content>
             <card-bg-icon class="--enlarged">
               <icon :path="mdiCursorDefaultGestureOutline"/>
@@ -81,7 +80,7 @@
         <p>我们不仅开放了<strong>大多数 API</strong>，还编写了<strong>相关文档</strong>。网站的可个性化程度也在不断提高。
         </p>
         <p>在保证 Seati <strong>公平、安全</strong>运行的前提下的<strong>大部分</strong>权限，也都被分配到了玩家手中。</p>
-        <p>除此之外，我们愿意广泛收集<strong>所有人</strong>——不仅是玩家，更可能是同好，甚至是路人——的建议，来让 Seati 变得更好。
+        <p>我们愿意广泛收集建议，让 Seati 变得更好。
         </p>
       </typewriter>
     </screen-content>
@@ -95,8 +94,8 @@
         <img :src="getImageURL('mianfei', 4)" alt="mianfei"/>
       </div>
       <typewriter class="typewriter--no-cursor" :type-interval="10">
-        <p>无论是 Lab 还是 Seati 均为免费性质，这是一个<strong>不以盈利为目的的业余兴趣项目</strong>。</p>
-        <p>当然，我们仍然接受自愿的捐助，这一过程将保持<strong>公开透明</strong>。
+        <p>无论是 Lab 还是 Seati 均为免费性质，这是一个<strong>不以盈利为目的的兴趣项目</strong>。</p>
+        <p>我们仍然接受自愿的捐助，这一过程将保持<strong>公开透明</strong>。
         </p>
       </typewriter>
     </screen-content>
@@ -110,9 +109,9 @@
         <img :src="getImageURL('bianjie', 4)" alt="bianjie"/>
       </div>
       <typewriter class="typewriter--no-cursor" :type-interval="10">
-        <p>Lab 的设计标准倾向于将<strong>没必要的繁杂隐去</strong>、<strong>有必要的繁杂放在幕后</strong>，而将最为有效且直观的内容放在眼前<strong>触手可及</strong>的位置。
+        <p>Lab 的设计标准倾向于将<strong>没必要的繁杂隐去</strong>，而将最为有效的内容直观地放在眼前<strong>触手可及</strong>的位置。
         </p>
-        <p>我们希望<strong>任何</strong>水平的玩家都能够轻松愉悦、无障碍地使用 Lab。
+        <p>我们希望<strong>任何</strong>玩家都能够轻松愉悦、无障碍地使用 Lab。
         </p>
       </typewriter>
     </screen-content>
@@ -336,6 +335,7 @@ watch(stateKaifangScreen, async v => {
 .home-screen-text {
   max-width: 300px;
   position: relative;
+  margin-bottom: 32px;
 
   img {
     width: 100%;
