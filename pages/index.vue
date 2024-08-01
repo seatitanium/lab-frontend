@@ -12,7 +12,7 @@
           <p>加载用户信息中</p>
         </div>
       </div>
-      <div class="user-profile empty" v-if="!userLoginState">
+      <div class="user-profile empty" v-else-if="!userLoginState">
         <div class="text textaligncenter">
           <h2>请登录后查看个人统计信息</h2>
           <p>个人统计信息仅在绑定 Minecraft ID 且登录状态下可用</p>
