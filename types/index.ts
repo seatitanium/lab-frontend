@@ -67,6 +67,7 @@ declare global {
         createdAt: number,
         updatedAt: number,
         mcidVerified: boolean,
+        admin: boolean
     }
 
     interface UserExtended extends User {

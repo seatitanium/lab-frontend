@@ -7,25 +7,25 @@
         <icon :path="mdiCreationOutline"/>
         {{ isInstanceExist ? '开启' : '创建并开启' }}
       </btn>
-      <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'"
+      <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running' || !userInformation.admin"
            class="with-bg--white hover--dim"
            @click="actionToConfirm = 'reboot'; modalConfirm = true;">
         <icon :path="mdiRestart"/>
         重启
       </btn>
-      <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'"
+      <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running' || !userInformation.admin"
            class="with-bg--white hover--dim"
            @click="actionToConfirm = 'stop'; modalConfirm = true;">
         <icon :path="mdiClose"/>
         关机
       </btn>
-      <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running'"
+      <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running' || userInformation.admin"
            class="with-bg--white hover--dim"
            @click="actionToConfirm = 'stop_force'; modalConfirm = true;">
         <icon :path="mdiCloseOctagonOutline"/>
         强制停机
       </btn>
-      <btn :disabled="!isInstanceExist" class="with-bg--white hover--dim"
+      <btn :disabled="!isInstanceExist || !userInformation.admin" class="with-bg--white hover--dim"
            @click="modalDeleteChoice = true">
         <icon :path="mdiTrashCanOutline"/>
         删除
