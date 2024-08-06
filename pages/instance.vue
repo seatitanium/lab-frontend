@@ -711,7 +711,7 @@ onMounted(async () => {
 
   const deploymentStatusResp = await get<DeploymentStatus>('/ecs/deploy-status');
 
-  addInstantMessage('Loading WebSocket module...');
+  if (userInformation.value.loading || serverStatusLoading.value) addInstantMessage('Loading WebSocket module...');
 
   if (deploymentStatusResp.code === BackendCodes.OK) {
     switch (deploymentStatusResp.data) {
@@ -762,14 +762,18 @@ definePageMeta({
 })
 
 watch(() => !userInformation.value.loading && !serverStatusLoading.value, v => {
-  if (serverStatus.online) {
-    const token = useLocalStorage('tisea-auth-token', '');
-    const url = `ws://${instanceInformation.retrieved.public_ip_address}:${ServerWebSocketPort}`;
-    initializeWebSocketConnection(userInformation.value.hasBoundValidMCID ? `${url}?token=${token.value}&displayname=${userInformation.value.mcid}` : url);
-  } else {
-    instantMessageStatus.value = 'disconnected';
-    addInstantMessage("Server is not running now.")
+  if (v) {
+    if (serverStatus.online) {
+      const token = useLocalStorage('tisea-auth-token', '');
+      const url = `ws://${instanceInformation.retrieved.public_ip_address}:${ServerWebSocketPort}`;
+      initializeWebSocketConnection(userInformation.value.hasBoundValidMCID ? `${url}?token=${token.value}&displayname=${userInformation.value.mcid}` : url);
+    } else {
+      instantMessageStatus.value = 'disconnected';
+      addInstantMessage("Server is not running now.")
+    }
   }
+}, {
+  immediate: true
 });
 </script>
 
