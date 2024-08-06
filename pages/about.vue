@@ -94,6 +94,13 @@
       </div>
     </section>
 
+    <section class="section__special_thanks">
+      <h2>Special Thanks to</h2>
+      <p>所有的捐助者<small>（名单见 Kind Donator 一节）</small></p>
+      <p>123JK 提供优美的过往周目内摄影作品</p>
+      <p>所有忠实的玩家们</p>
+    </section>
+
     <section class="section__copyright">
       <h2>Copyright</h2>
       <p>Gin-Gonic Framework Logo by <a href="https://github.com/javierprovecho" target="_blank">Javier Provecho</a> is licensed under a <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution 4.0 International License</a>. The Go gopher eyes were designed by <a href="https://reneefrench.blogspot.com/" target="_blank">Renee French</a>.</p>
