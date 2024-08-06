@@ -181,7 +181,14 @@ const contextMenuX = ref(0);
 const contextMenuY = ref(0);
 
 const termInformation = useState<Term[]>('term-information', () => [])
-
+const totalConsumption = useState<Consumption>('total-consumption', () => {
+  return {
+    ecs: 0,
+    oss: 0,
+    yundisk: 0,
+    sum: 0
+  }
+})
 const userInformation = useState<UserExtended>('user-data', () => {
   return {
     id: -1,
@@ -214,7 +221,8 @@ const userInformation = useState<UserExtended>('user-data', () => {
     loading: true,
     mcidVerified: false,
     playtimeAfkMillis: 0,
-    playtimeTotalMillis: 0
+    playtimeTotalMillis: 0,
+    admin: false
   };
 });
 
@@ -246,6 +254,15 @@ async function initTermData() {
     return;
   }
 }
+
+async function cacheTotalConsumptions() {
+  const consumptionResult = await get<Consumption>(`/bss/consumption`);
+
+  if (consumptionResult.code === BackendCodes.OK) {
+    Object.assign(totalConsumption.value, consumptionResult.data);
+  }
+}
+
 
 async function initUserData() {
   if (username.value === '' || token.value === '') {
@@ -316,6 +333,7 @@ const afterRegisterNoticeConfig = getAfterRegisterNoticeConfig();
 async function initPage() {
   await initTermData();
   await initUserData();
+  await cacheTotalConsumptions();
 
   if (afterRegisterNoticeConfig.value.ready) {
     if (afterRegisterNoticeConfig.value.mcid === true) {

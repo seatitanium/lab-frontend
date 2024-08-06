@@ -82,28 +82,15 @@ const termInformation = useState<Term[]>('term-information', () => [])
 const termInformationReversed = computed(() => termInformation.value.toReversed());
 const totalInvolvedPlayers = ref<ServerPlayer[]>([]);
 const totalOpeningDays = computed(() => termInformation.value.map(x => getTermPeriod(x)).reduce((a, b) => a + b, 0))
-const totalConsumption = reactive<Consumption>({
-  ecs: 0,
-  oss: 0,
-  yundisk: 0,
-  sum: 0
-});
 const donations = ref<Donation[]>([]);
 const totalDonations = computed(() => donations.value.map(x => x.amount).reduce((a, b) => a + b, 0));
+const totalConsumption = useState<Consumption>('total-consumption');
 
 async function getTotalInvolvedPlayers() {
   const uniqueResult = await get<ServerPlayer[]>(`/server/involved-players?unique=true`);
 
   if (uniqueResult.code === BackendCodes.OK) {
     totalInvolvedPlayers.value = uniqueResult.data;
-  }
-}
-
-async function getTotalConsumptions() {
-  const consumptionResult = await get<Consumption>(`/bss/consumption`);
-
-  if (consumptionResult.code === BackendCodes.OK) {
-    Object.assign(totalConsumption, consumptionResult.data);
   }
 }
 
@@ -115,7 +102,6 @@ async function getDonations() {
 
 function getData() {
   getTotalInvolvedPlayers();
-  getTotalConsumptions();
   getDonations();
 }
 
