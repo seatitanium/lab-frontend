@@ -18,7 +18,7 @@
         <div class="value"><counter v-if="totalOpeningDays" :value="totalOpeningDays"/><span v-else>--</span>d</div>
       </div>
       <div class="term-a">
-        <div class="name">资金消耗<icon @click="consumptionPopup = true" :path="mdiHelpCircleOutline"/></div>
+        <div class="name">资金消耗<icon v-if="totalConsumption.sum" @click="consumptionPopup = true" :path="mdiHelpCircleOutline"/></div>
         <div class="value"><counter v-if="totalConsumption.sum" :value="totalConsumption.sum"/><span v-else>--</span><span class="rmb">RMB</span></div>
       </div>
     </section>
