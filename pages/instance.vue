@@ -52,7 +52,7 @@
             获取中...
           </span>
         </metabar-item>
-        <metabar-item v-else class="instance-status" :class="`${serverStatus.loading ? 'server-loading' : instanceInformation.retrieved.status} ${serverStatus.online ? 'online' : 'offline'}`">
+        <metabar-item v-else class="instance-status" :class="`${serverStatusLoading ? 'server-loading' : instanceInformation.retrieved.status} ${serverStatus.online ? 'online' : 'offline'}`">
           <span class="center">
             <icon v-if="instanceStatusIcon !== 'wait'" :path="instanceStatusIcon"/>
             <circle-spinner size="12" v-else/>
@@ -420,13 +420,13 @@ const isInstanceExist = computed(() => instanceInformation.retrieved.exist);
 const instanceStatusLastUpdated = ref('');
 const instanceStatusName = computed(() => {
   if (!isInstanceExist.value) return '未创建';
-  if (serverStatus.loading) return '等待服务器响应';
+  if (serverStatusLoading.value) return '等待服务器响应';
   return translateInstanceStatus(instanceInformation.retrieved.status, serverStatus.online);
 })
 
 const instanceStatusIcon = computed(() => {
   if (!isInstanceExist.value) return mdiHelpCircleOutline;
-  if (serverStatus.loading) return 'wait';
+  if (serverStatusLoading.value) return 'wait';
   return translateInstanceStatusIcon(instanceInformation.retrieved.status, serverStatus.online);
 })
 
@@ -579,10 +579,10 @@ async function startRefreshDescribeInstanceResult() {
 }
 
 const enableRefreshServerStatus = ref(true);
+const serverStatusLoading = ref(false);
 const serverStatus = reactive<{
   online: boolean,
   data: ServerStatus,
-  loading: boolean,
 }>({
   online: false,
   data: {
@@ -608,8 +608,7 @@ const serverStatus = reactive<{
       type: '',
       mods: []
     }
-  },
-  loading: true
+  }
 })
 
 async function startRefreshServerStatus() {
@@ -617,7 +616,7 @@ async function startRefreshServerStatus() {
   while (true) {
     if (enableRefreshServerStatus.value && instanceInformation.retrieved.public_ip_address) {
       const result = await get<ServerStatus>(`/server/status?ip=${instanceInformation.retrieved.public_ip_address}`);
-      serverStatus.loading = false;
+      serverStatusLoading.value = false;
       if (result.code === BackendCodes.OK) {
         serverStatus.online = true;
         Object.assign(serverStatus.data, result.data);
@@ -762,12 +761,12 @@ definePageMeta({
   requireLogin: true
 })
 
-watch(() => !userInformation.value.loading && serverStatus.online, v => {
-  if (v) {
+watch(() => !userInformation.value.loading && !serverStatusLoading.value, v => {
+  if (serverStatus.online) {
     const token = useLocalStorage('tisea-auth-token', '');
     const url = `ws://${instanceInformation.retrieved.public_ip_address}:${ServerWebSocketPort}`;
     initializeWebSocketConnection(userInformation.value.hasBoundValidMCID ? `${url}?token=${token.value}&displayname=${userInformation.value.mcid}` : url);
-  } else if (serverStatus.online === false)  {
+  } else {
     instantMessageStatus.value = 'disconnected';
     addInstantMessage("Server is not running now.")
   }
@@ -782,8 +781,10 @@ watch(() => !userInformation.value.loading && serverStatus.online, v => {
 .instance-status {
   border-radius: 100px;
   padding: 6px 14px;
-  background: rgb(244, 244, 244);
-  color: black;
+  &, &.server-loading {
+    background: rgb(244, 244, 244);
+    color: black;
+  }
 
   &.Pending {
     background: #fff8e1;
@@ -813,7 +814,7 @@ watch(() => !userInformation.value.loading && serverStatus.online, v => {
     }
   }
 
-  &.Starting, &.server-loading {
+  &.Starting {
     background: #e0f2f1;
     color: #009688;
   }
