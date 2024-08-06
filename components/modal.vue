@@ -174,6 +174,8 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
 }
 
 .modal {
+  min-width: 400px;
+  max-width: 800px;
   background: white;
   border-radius: 20px;
   padding: 40px;
