@@ -19,7 +19,7 @@
         <icon :path="mdiClose"/>
         关机
       </btn>
-      <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running' || userInformation.admin"
+      <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running' || !userInformation.admin"
            class="with-bg--white hover--dim"
            @click="actionToConfirm = 'stop_force'; modalConfirm = true;">
         <icon :path="mdiCloseOctagonOutline"/>
