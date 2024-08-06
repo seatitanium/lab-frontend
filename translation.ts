@@ -43,19 +43,34 @@ export function translateInstanceDeploymentStatus(status: DeploymentStatus) {
         case "Cancelled":
             return "已取消"
         case "Stopping":
-            return "结束中";
+            return "结束中...";
         case "Terminated":
             return "已中止";
         case "Scheduled":
             return "已计划";
         case "Pending":
-            return "准备中";
+            return "准备中...";
         case "Running":
-            return "部署中";
+            return "部署中...";
         case "Failed":
             return "失败";
         default:
             return "未知";
+    }
+}
+
+export function translateInstanceDeploymentStatusIcon(status: DeploymentStatus) {
+    switch (status) {
+        case 'Pending':
+        case 'Running':
+        case 'Stopping':
+            return 'wait';
+
+        case 'Success':
+            return mdiCheck;
+
+        default:
+            return mdiClose;
     }
 }
 

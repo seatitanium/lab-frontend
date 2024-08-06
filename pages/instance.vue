@@ -52,7 +52,7 @@
             获取中...
           </span>
         </metabar-item>
-        <metabar-item v-else class="instance-status" :class="`${instanceInformation.retrieved.status} ${serverStatus.online ? 'online' : 'offline'}`">
+        <metabar-item v-else class="instance-status" :class="`${serverStatus.loading ? 'server-loading' : instanceInformation.retrieved.status} ${serverStatus.online ? 'online' : 'offline'}`">
           <span class="center">
             <icon v-if="instanceStatusIcon !== 'wait'" :path="instanceStatusIcon"/>
             <circle-spinner size="12" v-else/>
@@ -140,8 +140,9 @@
               Platinum 6462C
             </div>
             <div class="badge" v-if="isInstanceBeingDeployed" @click="modalDeploy=true">
-              <circle-spinner size="15"/>
-              {{ instanceDeployStatusName }}...
+              <circle-spinner v-if="instanceDeployStatusIcon === 'wait'" size="15"/>
+              <icon v-else :path="instanceDeployStatusIcon"/>
+              {{ instanceDeployStatusName }}
             </div>
           </div>
         </card-right-top>
@@ -345,7 +346,7 @@ import {useLocalStorage} from "@vueuse/core";
 import {useState} from "#app";
 import {
   translateInstanceActionName,
-  translateInstanceDeploymentStatus,
+  translateInstanceDeploymentStatus, translateInstanceDeploymentStatusIcon,
   translateInstanceStatus,
   translateInstanceStatusIcon, translateInstantMessageStatus, translateInstantMessageStatusIcon, translateLetterIcon
 } from "~/translation";
@@ -410,15 +411,22 @@ const instanceDeployStatusName = computed(() => {
   return translateInstanceDeploymentStatus(instanceLastInvokeResult.status);
 });
 
+const instanceDeployStatusIcon = computed(() => {
+  if (!isInstanceBeingDeployed.value) return 'wait';
+  return translateInstanceDeploymentStatusIcon(instanceLastInvokeResult.status);
+})
+
 const isInstanceExist = computed(() => instanceInformation.retrieved.exist);
 const instanceStatusLastUpdated = ref('');
 const instanceStatusName = computed(() => {
   if (!isInstanceExist.value) return '未创建';
+  if (serverStatus.loading) return '等待服务器响应';
   return translateInstanceStatus(instanceInformation.retrieved.status, serverStatus.online);
 })
 
 const instanceStatusIcon = computed(() => {
   if (!isInstanceExist.value) return mdiHelpCircleOutline;
+  if (serverStatus.loading) return 'wait';
   return translateInstanceStatusIcon(instanceInformation.retrieved.status, serverStatus.online);
 })
 
@@ -573,7 +581,8 @@ async function startRefreshDescribeInstanceResult() {
 const enableRefreshServerStatus = ref(true);
 const serverStatus = reactive<{
   online: boolean,
-  data: ServerStatus
+  data: ServerStatus,
+  loading: boolean,
 }>({
   online: false,
   data: {
@@ -599,7 +608,8 @@ const serverStatus = reactive<{
       type: '',
       mods: []
     }
-  }
+  },
+  loading: true
 })
 
 async function startRefreshServerStatus() {
@@ -607,6 +617,7 @@ async function startRefreshServerStatus() {
   while (true) {
     if (enableRefreshServerStatus.value && instanceInformation.retrieved.public_ip_address) {
       const result = await get<ServerStatus>(`/server/status?ip=${instanceInformation.retrieved.public_ip_address}`);
+      serverStatus.loading = false;
       if (result.code === BackendCodes.OK) {
         serverStatus.online = true;
         Object.assign(serverStatus.data, result.data);
@@ -701,6 +712,8 @@ onMounted(async () => {
 
   const deploymentStatusResp = await get<DeploymentStatus>('/ecs/deploy-status');
 
+  addInstantMessage('Loading WebSocket module...');
+
   if (deploymentStatusResp.code === BackendCodes.OK) {
     switch (deploymentStatusResp.data) {
       case 'Pending':
@@ -752,15 +765,13 @@ definePageMeta({
 watch(() => !userInformation.value.loading && serverStatus.online, v => {
   if (v) {
     const token = useLocalStorage('tisea-auth-token', '');
-    const url = `${instanceInformation.retrieved.public_ip_address}:${ServerWebSocketPort}`;
+    const url = `ws://${instanceInformation.retrieved.public_ip_address}:${ServerWebSocketPort}`;
     initializeWebSocketConnection(userInformation.value.hasBoundValidMCID ? `${url}?token=${token.value}&displayname=${userInformation.value.mcid}` : url);
   } else if (serverStatus.online === false)  {
     instantMessageStatus.value = 'disconnected';
     addInstantMessage("Server is not running now.")
   }
-}, {
-  immediate: true
-})
+});
 </script>
 
 <style lang="less">
@@ -802,7 +813,7 @@ watch(() => !userInformation.value.loading && serverStatus.online, v => {
     }
   }
 
-  &.Starting {
+  &.Starting, &.server-loading {
     background: #e0f2f1;
     color: #009688;
   }
