@@ -281,7 +281,7 @@
   <modal v-model="modalCreationStarted" class="with-bg--darken">
     <modal-title>成功</modal-title>
     <modal-content>
-      <p>实例已经创建。实例在正常工作之前，需要经过<strong> 2~5 分钟</strong>的部署，请耐心等待。</p>
+      <p>实例已经创建。实例在正常工作之前，需要经过<strong> 5~10 分钟</strong>的部署，请耐心等待。</p>
     </modal-content>
     <modal-actions>
       <btn class="with-bg--primary hover--dim" @click="modalCreationStarted = false">关闭</btn>
