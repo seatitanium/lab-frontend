@@ -119,7 +119,7 @@
                 暂时没有活跃的实例，因此没有相关的信息可供显示。要创建并启动一个实例，请单击控制栏的「<strong>创建并开启</strong>」按钮。
               </p>
             </div>
-            <screenfetch-content/>
+            <screenfetch-content :instance-type="instanceInformation.local.instance_type"/>
           </div>
         </card-content>
         <card-right-top>
