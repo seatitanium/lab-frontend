@@ -5,11 +5,11 @@
               _,met$$$$$gg.           root@seati-game
            ,g$$$$$$$$$$$$$$$P.        OS: Debian 12 bookworm
          ,g$$P""       """Y$$.".      Kernel: x86_64 Linux 6.1.0-20-amd64
-        ,$$P'              `$$$.      Packages: 691
-       ',$$P       ,ggs.     `$$b:    Shell: bash 5.2.15
-       `d$$'     ,$P"'   .    $$$     CPU: Intel Xeon Platinum 8163 @ 12x 2.5GHz
-        $$P      d$'     ,    $$P     RAM: 18651MiB / 23646MiB
-        $$:      $$.   -    ,d$$'
+        ,$$P'              `$$$.      Shell: bash 5.2.15
+       ',$$P       ,ggs.     `$$b:    CPU: {{screenfetchData.cpu}}
+       `d$$'     ,$P"'   .    $$$     RAM: {{ screenfetchData.ram }}
+        $$P      d$'     ,    $$P
+        $$:      $$.   -    ,d$$'     Unimportant information is omitted.
         $$\;      Y$b._   _,d$P'
         Y$$.    `.`"Y$$$$P"'
         `$$b      "-.__
@@ -41,6 +41,11 @@
 import {mdiConsole} from "@mdi/js";
 
 const screenfetchModal = ref(false);
+
+const screenfetchData = reactive({
+  cpu: 'Intel Xeon Platinum 8369HC @ 4x 4.2GHz',
+  ram: '~ MiB / 15339MiB'
+})
 </script>
 
 <style lang="less" scoped>
