@@ -331,7 +331,7 @@ import {
   mdiRestart,
   mdiTrashCanOutline
 } from "@mdi/js";
-import {getUsername} from "#imports";
+import {definePageMeta, getUsername} from "#imports";
 import {BackendCodes, ServerWebSocketPort} from "~/consts";
 import DebianLogo from '~/assets/icons/debian.svg';
 import DukeWaving from '~/assets/icons/duke-waving.svg'
@@ -775,6 +775,10 @@ watch(() => !userInformation.value.loading && !serverStatusLoading.value, v => {
 }, {
   immediate: true
 });
+
+definePageMeta({
+  title: '服务器管理'
+})
 </script>
 
 <style lang="less">

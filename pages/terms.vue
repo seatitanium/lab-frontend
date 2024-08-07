@@ -70,6 +70,7 @@ import {
 } from "@mdi/js";
 import Counter from "~/components/counter.vue";
 import {formatTimeStringFromDate} from "../.nuxt/imports";
+import {definePageMeta} from "#imports";
 
 const refreshTime = formatTimeStringFromDate(new Date());
 
@@ -107,6 +108,10 @@ function getData() {
 
 onMounted(() => {
   getData();
+})
+
+definePageMeta({
+  title: '周目信息'
 })
 </script>
 

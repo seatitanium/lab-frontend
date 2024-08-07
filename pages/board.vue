@@ -84,6 +84,7 @@
 <script lang="ts" setup>
 import {mdiCheckDecagramOutline, mdiClock, mdiClockOutline, mdiLogin, mdiTagOutline, mdiUpdate} from "@mdi/js";
 import {BackendCodes, PeriodTag} from "~/consts";
+import {definePageMeta} from "#imports";
 
 const loginBoardTableHeads = {
   'player': '玩家 PLAYER',
@@ -121,6 +122,10 @@ async function getPlaytimeBoard() {
 onMounted(() => {
   getLoginBoard();
   getPlaytimeBoard();
+})
+
+definePageMeta({
+  title: '排行榜'
 })
 </script>
 

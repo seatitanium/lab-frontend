@@ -31,5 +31,15 @@ export default defineNuxtConfig({
         }
     },
 
-    modules: ["nuxt-route-meta", "@nuxt/image"]
+    modules: ["nuxt-route-meta", "@nuxt/image"],
+
+    app: {
+        head: {
+            link: [{
+                rel: 'icon',
+                type: 'image/png',
+                href: '/favicon-black.png'
+            }]
+        }
+    }
 });

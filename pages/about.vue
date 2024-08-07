@@ -129,6 +129,7 @@ import VueLogo from '~/assets/icons/vue.svg';
 import GitHubLogo from '~/assets/icons/github-mark.svg';
 import PictogrammersLogo from '~/assets/icons/pictogrammers-full.svg';
 import {mdiCurrencyUsd, mdiFormatFont, mdiLaunch} from "@mdi/js";
+import {definePageMeta} from "#imports";
 
 const candidateImages = [Image1, Image2, Image3, Image4, Image5, Image6];
 
@@ -146,6 +147,10 @@ async function getDonations() {
 
 onMounted(() => {
   getDonations();
+})
+
+definePageMeta({
+  title: '关于'
 })
 </script>
 
