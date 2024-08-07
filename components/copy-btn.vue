@@ -1,5 +1,5 @@
 <template>
-  <btn v-if="hiddenIfEmpty ? !!value : true" @click="copy" class="copy-btn with-bg--white with-border">
+  <btn v-if="hiddenIfEmpty ? (value ? value.length > 0 : false) : true" @click="copy" class="copy-btn with-bg--white with-border">
     <icon :path="copyIcon"/>
     {{ copyText }}
   </btn>
