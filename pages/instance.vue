@@ -136,7 +136,9 @@
               <img draggable="false" src="~/assets/icons/intel-xeon.png"/>
               Platinum 6462C
             </div>
-            <div class="badge" v-if="isInstanceBeingDeployed" @click="modalDeploy=true">
+            <div class="badge"
+                 :class="instanceDeployStatusIcon===mdiCheck ? 'preset--green' : (instanceDeployStatusIcon === mdiClose ? 'preset--red' : '')"
+                 v-if="isInstanceBeingDeployed" @click="modalDeploy = true">
               <circle-spinner v-if="instanceDeployStatusIcon === 'wait'" size="15"/>
               <icon v-else :path="instanceDeployStatusIcon"/>
               {{ instanceDeployStatusName }}
@@ -313,7 +315,7 @@
 </template>
 <script setup lang="ts">
 import {
-  mdiAccountGroupOutline,
+  mdiAccountGroupOutline, mdiCheck,
   mdiClipboardTextOutline,
   mdiClockOutline,
   mdiClockPlusOutline,

@@ -205,6 +205,7 @@ slim {
 
     svg {
       height: 20px;
+      width: auto;
     }
 
     img {
@@ -220,9 +221,15 @@ slim {
       border: none;
     }
 
-    &.preset--online {
+    &.preset--online, &.preset--green {
       background: #e8f5e9;
       color: #4caf50;
+      border: none;
+    }
+
+    &.preset--red {
+      background: #ffebee;
+      color: #f44336;
       border: none;
     }
   }
