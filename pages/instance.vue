@@ -759,8 +759,15 @@ definePageMeta({
   requireLogin: true
 })
 
-watch(() => !userInformation.value.loading && !serverStatusLoading.value, v => {
-  if (v) {
+const userLoadingOrServerLoading = reactive({
+  user: userInformation,
+  serverLoading: serverStatusLoading
+})
+const userLoadingOrServerLoadingOnce = ref(true);
+
+watch(userLoadingOrServerLoading, v => {
+  if (!userLoadingOrServerLoadingOnce.value) return;
+  if (!v.user.loading && !v.serverLoading) {
     if (serverStatus.online) {
       const token = useLocalStorage('tisea-auth-token', '');
       const url = `ws://${instanceInformation.retrieved.public_ip_address}:${ServerWebSocketPort}`;
@@ -769,9 +776,14 @@ watch(() => !userInformation.value.loading && !serverStatusLoading.value, v => {
       instantMessageStatus.value = 'disconnected';
       addInstantMessage("Server is not running now.")
     }
+  } else if (!v.serverLoading) {
+    if (!serverStatus.online) {
+      instantMessageStatus.value = 'disconnected';
+      addInstantMessage("Server is not running now.")
+    }
   }
-}, {
-  immediate: true
+
+  userLoadingOrServerLoadingOnce.value = false;
 });
 
 definePageMeta({
