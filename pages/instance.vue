@@ -39,10 +39,7 @@
         {{
           instanceInformation.retrieved.public_ip_address ? (instanceInformation.retrieved.public_ip_address[0] || '暂无 IP 地址') : '暂无 IP 地址'
         }}
-        <btn class="with-border without-bg--primary copy-btn"
-             v-if="instanceInformation.retrieved.public_ip_address !== null">单击复制
-          <icon :path="mdiClipboardTextOutline"/>
-        </btn>
+        <copy-btn hidden-if-empty :value="instanceInformation.retrieved.public_ip_address"/>
       </h1>
       <metabar>
         <metabar-item class="instance-status"
@@ -52,7 +49,8 @@
             获取中...
           </span>
         </metabar-item>
-        <metabar-item v-else class="instance-status" :class="`${serverStatusLoading ? 'server-loading' : instanceInformation.retrieved.status} ${serverStatus.online ? 'online' : 'offline'}`">
+        <metabar-item v-else class="instance-status"
+                      :class="`${serverStatusLoading ? 'server-loading' : instanceInformation.retrieved.status} ${serverStatus.online ? 'online' : 'offline'}`">
           <span class="center">
             <icon v-if="instanceStatusIcon !== 'wait'" :path="instanceStatusIcon"/>
             <circle-spinner size="12" v-else/>
@@ -85,9 +83,7 @@
             {{
               isInstanceExist ? instanceInformation.local.instance_id : '暂未创建'
             }}
-            <btn v-if="isInstanceExist" class="copy-btn with-border without-bg--primary">单击复制
-              <icon :path="mdiClipboardTextOutline"/>
-            </btn>
+            <copy-btn hidden-if-empty :value="instanceInformation.local.instance_id"/>
           </h2>
           <metabar v-if="isInstanceExist">
             <metabar-item>
@@ -112,7 +108,8 @@
               </span>
               <span class="right">
                 {{ instanceInformation.local.region_id }}
-                <icon :path="translateLetterIcon(instanceInformation.local.zone_id ? instanceInformation.local.zone_id.slice(-1) as Letter : 'z')"/>
+                <icon
+                    :path="translateLetterIcon(instanceInformation.local.zone_id ? instanceInformation.local.zone_id.slice(-1) as Letter : 'z')"/>
               </span>
             </metabar-item>
           </metabar>
@@ -350,6 +347,7 @@ import {
   translateInstanceStatus,
   translateInstanceStatusIcon, translateInstantMessageStatus, translateInstantMessageStatusIcon, translateLetterIcon
 } from "~/translation";
+import CopyBtn from "~/components/copy-btn.vue";
 
 let onlinePlayers = ref<string[]>([]);
 
@@ -789,6 +787,7 @@ definePageMeta({
 .instance-status {
   border-radius: 100px;
   padding: 6px 14px;
+
   &, &.server-loading {
     background: rgb(244, 244, 244);
     color: black;
@@ -836,24 +835,6 @@ definePageMeta({
 
 <style lang="less" scoped>
 @import "assets/var";
-
-.copy-btn {
-  padding: 4px 12px;
-  font-size: 12px;
-  gap: 4px;
-  transition: all .2s ease;
-
-  svg {
-    width: 15px;
-    height: 15px;
-  }
-
-  &:hover {
-    background: @primary;
-    color: white;
-    border-color: transparent;
-  }
-}
 
 .deploy-results {
   white-space: break-spaces;
