@@ -130,7 +130,7 @@
       <icon :path="mdiLogout"/>
       退出登录
     </context-menu-item>
-    <context-menu-item @click="loginModalState = true">
+    <context-menu-item @click="loginModal = true">
       <icon :path="mdiAccountConvertOutline "/>
       切换账户
     </context-menu-item>
@@ -227,7 +227,7 @@ const userInformation = useState<UserExtended>('user-data', () => {
 });
 
 const someProblemModal = useState('error-modal-state', () => false);
-const loginModalState = useState('login-modal');
+const loginModal = useState('login-modal');
 const errorInformationContent = useState('error-modal-content', () => '');
 const userActionsModal = ref(false);
 const bindSuggestionModal = ref(false);
@@ -243,6 +243,7 @@ const userLoginState = useState('user-login-state', () => false);
 
 const firstAccess = useLocalStorage('tisea-first-access-lab', () => true);
 
+// @alters termInformation
 async function initTermData() {
   const termResult = await get<Term[]>(`/server/terms`);
 
@@ -255,6 +256,7 @@ async function initTermData() {
   }
 }
 
+// @alters totalConsumption
 async function cacheTotalConsumptions() {
   const consumptionResult = await get<Consumption>(`/bss/consumption`);
 
@@ -263,7 +265,7 @@ async function cacheTotalConsumptions() {
   }
 }
 
-
+// @alters userLoginState, userInformation
 async function initUserData() {
   if (username.value === '' || token.value === '') {
     userLoginState.value = false;
@@ -330,6 +332,10 @@ async function initUserData() {
 
 const afterRegisterNoticeConfig = getAfterRegisterNoticeConfig();
 
+/**
+ * @alters afterRegisterNoticeConfig, firstAccess
+ * @modals registerCompleteNoticeModal, bindSuggestionModal, loginModal
+ */
 async function initPage() {
   await initTermData();
   await initUserData();
@@ -353,7 +359,7 @@ async function initPage() {
 
   if (useRoute().meta.requireLogin === true) {
     if (!userLoginState.value) {
-      loginModalState.value = true;
+      loginModal.value = true;
     }
   }
 }
