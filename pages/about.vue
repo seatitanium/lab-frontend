@@ -98,6 +98,7 @@
       <h2>Special Thanks to</h2>
       <p>所有的捐助者<small>（名单见 Kind Donator 一节）</small></p>
       <p>123JK 提供优美的过往周目内摄影作品</p>
+      <p><a href="https://bottle.moe" target="_blank">SomeBottle</a> 的灵感启发</p>
       <p>所有忠实的玩家们</p>
     </section>
 
