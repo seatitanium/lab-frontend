@@ -27,6 +27,9 @@
             {{ userInformation.username.charAt(0).toUpperCase() }}
           </div>
         </div>
+        <div v-else>
+          <btn @click="loginModalState = true" class="with-bg--primary hover--dim" small>登录</btn>
+        </div>
       </div>
     </nav>
   </header>
@@ -130,7 +133,7 @@
       <icon :path="mdiLogout"/>
       退出登录
     </context-menu-item>
-    <context-menu-item @click="loginModal = true">
+    <context-menu-item @click="loginModalState = true">
       <icon :path="mdiAccountConvertOutline "/>
       切换账户
     </context-menu-item>
@@ -227,7 +230,7 @@ const userInformation = useState<UserExtended>('user-data', () => {
 });
 
 const someProblemModal = useState('error-modal-state', () => false);
-const loginModal = useState('login-modal');
+const loginModalState = useState('login-modal');
 const errorInformationContent = useState('error-modal-content', () => '');
 const userActionsModal = ref(false);
 const bindSuggestionModal = ref(false);
@@ -333,11 +336,19 @@ const afterRegisterNoticeConfig = getAfterRegisterNoticeConfig();
 
 /**
  * @alters afterRegisterNoticeConfig, firstAccess
- * @modals registerCompleteNoticeModal, bindSuggestionModal, loginModal
+ * @modals registerCompleteNoticeModal, bindSuggestionModal, loginModalState
  */
 async function initPage() {
-  await initTermData();
+
   await initUserData();
+
+  if (useRoute().meta.requireLogin === true) {
+    if (!userLoginState.value) {
+      loginModalState.value = true;
+    }
+  }
+
+  await initTermData();
   await cacheTotalConsumptions();
 
   if (afterRegisterNoticeConfig.value.ready) {
@@ -355,12 +366,6 @@ async function initPage() {
     firstAccess.value = false;
     return;
   }
-
-  if (useRoute().meta.requireLogin === true) {
-    if (!userLoginState.value) {
-      loginModal.value = true;
-    }
-  }
 }
 
 onMounted(() => {
@@ -371,7 +376,12 @@ onUpdated(() => {
   initPage();
 });
 
-const navigation = [
+const navigation: {
+  name: string,
+  route: string,
+  icon: string,
+  hidden?: boolean
+}[] = [
   {
     name: "主页",
     route: "/",
