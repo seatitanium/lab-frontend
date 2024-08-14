@@ -638,8 +638,9 @@ async function startRefreshServerStatus() {
         if (instantMessageStatus.value !== 'connecting' && instantMessageStatus.value !== 'connected' && instantMessageStatus.value !== 'error' && !userInformation.value.loading) {
           const token = useLocalStorage('tisea-auth-token', '');
           const url = `ws://${instanceInformation.retrieved.public_ip_address}:${ServerWebSocketPort}`;
-          instantMessageStatus.value = 'connecting';
-          initializeWebSocketConnection(userInformation.value.hasBoundValidMCID ? `${url}?token=${token.value}&displayname=${userInformation.value.mcid}` : url);
+          addInstantMessage('This functionality is disabled temporarily due to technical failure. This will be fixed in the future.');
+          // instantMessageStatus.value = 'connecting';
+          // initializeWebSocketConnection(userInformation.value.hasBoundValidMCID ? `${url}?token=${token.value}&displayname=${userInformation.value.mcid}` : url);
         }
       } else if (result.code === BackendCodes.Offline) {
         serverStatus.online = false;
