@@ -11,27 +11,32 @@
             <p class="copyright"><small>&copy; 2024 Seati · Built with Nuxt 3 with 🤔</small></p>
           </div>
         </div>
-        <div class="second col">
-          <h2>更多</h2>
-          <nuxt-link to="/about">关于 TiLab</nuxt-link>
-          <nuxt-link to="/hello">欢迎页面</nuxt-link>
-          <nuxt-link to="/messageboard">留言板</nuxt-link>
-          <nuxt-link to="/article/faq">常见问题 FAQ</nuxt-link>
-          <a>用户手册</a>
-          <a href="https://t.me/seati_lab" target="_blank">Telegram 频道</a>
-        </div>
-        <div class="third col">
-          <h2>系列站点</h2>
-          <a href="https://wiki.seati.cc">Seati Wiki</a>
-          <a href="https://seati.cc">官网</a>
-          <a href="https://moment.seati.cc">Moment 图库</a>
-          <a>API 文档</a>
-        </div>
-        <div class="third col">
-          <h2>Mod 生态</h2>
-          <a target="_blank" href="https://www.mcmod.cn">MCMOD 百科</a>
-          <a target="_blank" href="https://www.curseforge.com/">CurseForge</a>
-          <a target="_blank" href="https://modrinth.com/">Modrinth</a>
+        <div class="links">
+          <div class="col">
+            <h2>更多页面 &raquo;</h2>
+            <nuxt-link to="/about">关于 TiLab</nuxt-link>
+            <nuxt-link to="/hello">欢迎页面</nuxt-link>
+            <nuxt-link to="/messageboard">留言板</nuxt-link>
+            <nuxt-link to="/article/faq">常见问题 FAQ</nuxt-link>
+            <ax>用户手册</ax>
+          </div>
+          <div class="col">
+            <h2>Seati 系列站点 &raquo;</h2>
+            <ax href="https://wiki.seati.cc">Seati Wiki</ax>
+            <ax href="https://seati.cc">官网</ax>
+            <ax href="https://moment.seati.cc">Moment 图库</ax>
+            <ax>API 文档</ax>
+          </div>
+          <div class="col">
+            <h2>模组生态 &raquo;</h2>
+            <ax href="https://www.mcmod.cn">MCMOD 百科</ax>
+            <ax href="https://www.curseforge.com/">CurseForge</ax>
+            <ax href="https://modrinth.com/">Modrinth</ax>
+          </div>
+          <div class="col">
+            <h2>Lab 发展 &raquo;</h2>
+            <ax href="https://t.me/seati_lab" target="_blank">Telegram 频道</ax>
+          </div>
         </div>
       </div>
     </div>
@@ -40,6 +45,7 @@
 
 <script lang="ts" setup>
 import LogoSvg from '~/assets/icons/seati/seati-white.svg?component';
+import Ax from "~/components/ax.vue";
 </script>
 
 <style lang="less" scoped>
@@ -65,34 +71,46 @@ footer {
 .footer-cols {
   display: flex;
   align-items: flex-start;
-  gap: 3rem;
+  gap: 10rem;
 
-  .col.first {
+  > .col {
     width: 30%;
   }
 
-  .col:not(.first) {
-    width: 20%;
+  .links {
+    width: 70%;
     display: flex;
+    align-items: center;
     flex-direction: column;
-    gap: 8px;
-  }
+    gap: 10px;
 
-  .col {
-    h2 {
-      font-size: 18px;
-      margin: 0 0 8px;
-    }
+    .col {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
 
-    a {
-      color: white;
-      opacity: .6;
-      font-size: 16px;
-      transition: all .2s ease;
+      h2 {
+        font-size: 16px;
+        margin: 0 32px 0 0;
+      }
 
-      &:hover {
-        opacity: 1;
-        text-decoration: none;
+      a {
+        color: white;
+        opacity: .6;
+        font-size: 14px;
+        transition: all .2s ease;
+
+        &:hover {
+          opacity: 1;
+          text-decoration: none;
+        }
+
+        &:not(:last-of-type):after {
+          content: '·';
+          margin: 0 8px;
+          opacity: .4;
+        }
       }
     }
   }
