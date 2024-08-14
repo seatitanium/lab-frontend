@@ -6,7 +6,7 @@
            ,g$$$$$$$$$$$$$$$P.        OS: Debian 12 bookworm
          ,g$$P""       """Y$$.".      Kernel: x86_64 Linux 6.1.0-20-amd64
         ,$$P'              `$$$.      Shell: bash 5.2.15
-       ',$$P       ,ggs.     `$$b:    CPU: {{ screenfetchData.cpu }}
+       ',$$P       ,ggs.     `$$b:    CPU: {{ screenfetchData.cpu }} @ {{ screenfetchData.cpuf }}
        `d$$'     ,$P"'   .    $$$     RAM: {{ screenfetchData.ram }}
         $$P      d$'     ,    $$P
         $$:      $$.   -    ,d$$'     Unimportant information is omitted.
@@ -39,6 +39,7 @@
 
 <script lang="ts" setup>
 import {mdiConsole} from "@mdi/js";
+import {translateInstanceType} from "~/translation";
 
 const props = defineProps({
   instanceType: {
@@ -49,27 +50,7 @@ const props = defineProps({
 
 const screenfetchModal = ref(false);
 
-function getDataFromInstanceType(type: string): {
-  cpu: string,
-  ram: string
-} {
-  switch (type) {
-    case "ecs.hfg8i.xlarge": return {
-      cpu: "Intel Xeon(Sapphire Rapids) Platinum 6462C @ 4x 3.9GHz",
-      ram: '16GiB'
-    }
-    case "ecs.hfg7.xlarge": return {
-      cpu: 'Intel Xeon Platinum 8369HC @ 4x 4.2GHz',
-      ram: '16GiB'
-    }
-    default: return {
-      cpu: '[NOT CREATED]',
-      ram: '[NOT CREATED]'
-    }
-  }
-}
-
-const screenfetchData = computed(() => getDataFromInstanceType(props.instanceType));
+const screenfetchData = computed(() => translateInstanceType(props.instanceType, '[NOT CREATED]'));
 </script>
 
 <style lang="less" scoped>

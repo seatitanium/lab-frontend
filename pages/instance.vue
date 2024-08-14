@@ -134,7 +134,7 @@
             </div>
             <div class="badge" @click="modalCpuDesc = true">
               <img draggable="false" src="~/assets/icons/intel-xeon.png"/>
-              Platinum 6462C
+              {{ instanceTypeDetail.cpuu }}
             </div>
             <div class="badge"
                  :class="instanceDeployStatusIcon===mdiCheck ? 'preset--green' : (instanceDeployStatusIcon === mdiClose ? 'preset--red' : '')"
@@ -231,7 +231,8 @@
     <modal-content>
       <img src="~/assets/icons/intel-xeon.png"/>
       <h1>Intel Xeon&reg; Platinum</h1>
-      <p>服务器采用英特尔至强处理器（型号为 Intel Xeon Platinum 6462C）作为 CPU 运载 Minecraft 服务端</p>
+      <p>服务器采用英特尔至强处理器作为 CPU 运载 Minecraft 服务端</p>
+      <p>当前实例使用的 CPU 型号为 {{ instanceTypeDetail.cpu }}</p>
     </modal-content>
     <modal-actions>
       <btn class="with-bg--primary hover--dim" @click="modalCpuDesc = false">确定</btn>
@@ -345,11 +346,18 @@ import {useLocalStorage} from "@vueuse/core";
 import {useState} from "#app";
 import {
   translateInstanceActionName,
-  translateInstanceDeploymentStatus, translateInstanceDeploymentStatusIcon,
+  translateInstanceDeploymentStatus,
+  translateInstanceDeploymentStatusIcon,
   translateInstanceStatus,
-  translateInstanceStatusIcon, translateInstantMessageStatus, translateInstantMessageStatusIcon, translateLetterIcon
+  translateInstanceStatusIcon,
+  translateInstanceType,
+  translateInstantMessageStatus,
+  translateInstantMessageStatusIcon,
+  translateLetterIcon
 } from "~/translation";
 import CopyBtn from "~/components/copy-btn.vue";
+
+const instanceTypeDetail = computed(() => translateInstanceType(instanceInformation.local.instance_type));
 
 let onlinePlayers = ref<string[]>([]);
 

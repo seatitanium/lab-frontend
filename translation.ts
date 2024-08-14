@@ -208,3 +208,32 @@ export function translateLetterIcon(letter: Letter) {
 
     }
 }
+
+export function translateInstanceType(type: string, withPlaceholderIfEmpty?: string): {
+    cpu: string,
+    ram: string,
+    cpuu: string,
+    cpuf: string
+} {
+    if (!withPlaceholderIfEmpty) withPlaceholderIfEmpty = '';
+    switch (type) {
+        case "ecs.hfg8i.xlarge": return {
+            cpuf: "4x 3.9GHz",
+            ram: '16GiB',
+            cpuu: 'Platinum 6462C',
+            cpu: 'Intel Xeon(Sapphire Rapids) Platinum 6462C'
+        }
+        case "ecs.hfg7.xlarge": return {
+            cpuf: '4x 4.2GHz',
+            ram: '16GiB',
+            cpuu: 'Platinum 8369HC',
+            cpu: 'Intel Xeon Platinum 8369HC'
+        }
+        default: return {
+            cpu: withPlaceholderIfEmpty,
+            ram: withPlaceholderIfEmpty,
+            cpuu: withPlaceholderIfEmpty,
+            cpuf: withPlaceholderIfEmpty
+        }
+    }
+}
