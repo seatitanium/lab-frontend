@@ -37,7 +37,7 @@
       <p>这里显示了最近 {{ userInformation.analytics.loginRecords.length }} 次 {{ userInformation.mcid }} 玩家的登入或者登出记录，如果你发现有任何异常，请及时联系管理员。</p>
       <block class="with-bg--primary">
         <icon :path="mdiInformationOutline"/>
-        <p><strong>提示</strong>：有时会出现登入和登出不相邻的状况，这是服务器异常关闭所致，此情形可忽略。</p>
+        <p>有时会出现登入和登出不相邻（登出记录丢失）的状况，这是服务器的异常关闭所致，此情形可忽略。</p>
       </block>
       <table>
         <thead>
