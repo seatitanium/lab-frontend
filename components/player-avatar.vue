@@ -1,5 +1,5 @@
 <template>
-  <div class="player-avatar" :class="{loading: (!uuid || uuid.length === 0) && !steve, 'hover-scale': hoverScale}">
+  <div class="player-avatar" :class="{loading: (!uuid || uuid.length === 0) && !steve, 'hover-scale': hoverScale, w20}">
     <img v-if="(uuid && uuid.length > 0) || uuidLocal" :src="`https://crafatar.com/avatars/${uuid || uuidLocal}`"/>
     <img src="~/assets/images/steve.png" v-else-if="steve"/>
     <circle-spinner v-else :size="loadingSize"/>
@@ -35,6 +35,10 @@ const props = defineProps({
   hoverScale: {
     type: Boolean,
     default: false,
+  },
+  w20: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -61,6 +65,10 @@ watch(() => props.name, async v => {
       transform: scale(1.6);
       z-index: 50;
     }
+  }
+
+  &.w20 img {
+    width: 20px;
   }
 
   img {

@@ -158,7 +158,7 @@
           <div class="players" v-if="onlinePlayers.length > 0">
             <div class="player" v-for="x in onlinePlayers">
               <div class="avatar">
-                <player-avatar :name="x"/>
+                <player-avatar w20 :name="x"/>
               </div>
               {{ x }}
             </div>
