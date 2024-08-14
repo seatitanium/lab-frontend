@@ -27,7 +27,7 @@
             <div class="value">
               {{ formatSecondsDense(userInformation.playtimeTotalMillis - userInformation.playtimeAfkMillis) }}
               <span class="afk">
-            AFK = {{ formatSecondsDense(userInformation.playtimeAfkMillis) }}
+            <span class="label">AFK = </span>{{ formatSecondsDense(userInformation.playtimeAfkMillis) }}
           </span>
             </div>
           </div>
@@ -52,7 +52,7 @@
               参与周目
             </div>
             <div class="value">
-              {{ userInformation.analytics.termsInvolved.length }}<small>/{{ getTermCount() }}</small>
+              <span>{{ userInformation.analytics.termsInvolved.length }}<small>/{{ getTermCount() }}</small></span>
             </div>
           </div>
           <div class="player-a" @click="() => {
@@ -394,15 +394,25 @@ onMounted(() => {
         font-weight: bold;
         color: @primaryd;
         font-size: 38px;
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 16px;
+        align-items: baseline;
 
         @media (max-width: 1200px) {
           font-size: 32px;
+        }
+
+        @media (max-width: 1450px) {
+          align-items: center;
         }
 
         .afk {
           font-size: 12px;
           font-weight: normal;
           color: #aaa;
+          display: inline-flex;
+          flex-wrap: wrap;
 
           @media (max-width: 1200px) {
             font-size: 10px;
