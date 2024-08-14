@@ -158,7 +158,7 @@
           <div class="players" v-if="onlinePlayers.length > 0">
             <div class="player" v-for="x in onlinePlayers">
               <div class="avatar">
-                <player-avatar w20 :name="x"/>
+                <player-avatar w20 :loading-size="15" :name="x"/>
               </div>
               {{ x }}
             </div>
@@ -622,19 +622,33 @@ const serverStatus = reactive<{
 async function startRefreshServerStatus() {
   // noinspection InfiniteLoopJS
   while (true) {
-    if (enableRefreshServerStatus.value && instanceInformation.retrieved.public_ip_address) {
+    if (!enableRefreshServerStatus.value) continue;
+    if (instanceInformation.retrieved.public_ip_address) {
       const result = await get<ServerStatus>(`/server/status?ip=${instanceInformation.retrieved.public_ip_address}`);
       serverStatusLoading.value = false;
       if (result.code === BackendCodes.OK) {
         serverStatus.online = true;
         Object.assign(serverStatus.data, result.data);
+
+        // retrieve players
         const r = result.data.players.sample.map(x => x.name_clean).filter(x => x !== 'Anonymous Player');
         if (!r.every(x => onlinePlayers.value.includes(x)) || r.length === 0) onlinePlayers.value = r;
+
+        // connect websocket
+        if (instantMessageStatus.value !== 'connecting' && instantMessageStatus.value !== 'connected' && instantMessageStatus.value !== 'error' && !userInformation.value.loading) {
+          const token = useLocalStorage('tisea-auth-token', '');
+          const url = `ws://${instanceInformation.retrieved.public_ip_address}:${ServerWebSocketPort}`;
+          instantMessageStatus.value = 'connecting';
+          initializeWebSocketConnection(userInformation.value.hasBoundValidMCID ? `${url}?token=${token.value}&displayname=${userInformation.value.mcid}` : url)
+        }
       } else if (result.code === BackendCodes.Offline) {
         serverStatus.online = false;
       } else {
         console.warn("Cannot retrieve server status", result);
       }
+    } else if (instantMessageStatus.value === 'pending') {
+      addInstantMessage('The server is not created.');
+      instantMessageStatus.value = 'disconnected';
     }
     await sleep(2000);
   }
@@ -658,6 +672,8 @@ function initializeWebSocketConnection(url: string) {
   addInstantMessage("Connecting to server...");
 
   ws = new WebSocket(url);
+
+  instantMessageStatus.value = 'pending';
 
   ws.onopen = () => {
     instantMessageStatus.value = 'connected';
@@ -769,33 +785,6 @@ definePageMeta({
   requireLogin: true,
   title: '服务器管理'
 })
-
-const userLoadingOrServerLoading = reactive({
-  user: userInformation,
-  serverLoading: serverStatusLoading
-})
-const userLoadingOrServerLoadingOnce = ref(true);
-
-watch(userLoadingOrServerLoading, v => {
-  if (!userLoadingOrServerLoadingOnce.value) return;
-  if (!v.user.loading && !v.serverLoading) {
-    if (serverStatus.online) {
-      const token = useLocalStorage('tisea-auth-token', '');
-      const url = `ws://${instanceInformation.retrieved.public_ip_address}:${ServerWebSocketPort}`;
-      initializeWebSocketConnection(userInformation.value.hasBoundValidMCID ? `${url}?token=${token.value}&displayname=${userInformation.value.mcid}` : url);
-    } else {
-      instantMessageStatus.value = 'disconnected';
-      addInstantMessage("Server is not running now.")
-    }
-  } else if (!v.serverLoading) {
-    if (!serverStatus.online) {
-      instantMessageStatus.value = 'disconnected';
-      addInstantMessage("Server is not running now.")
-    }
-  }
-
-  userLoadingOrServerLoadingOnce.value = false;
-});
 </script>
 
 <style lang="less">

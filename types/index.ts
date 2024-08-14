@@ -34,7 +34,7 @@ declare global {
         | 'z';
 
     type InstanceAction = 'start' | 'reboot' | 'stop' | 'stop_force' | 'create' | 'delete' | 'delete_force';
-    type InstantMessageStatus = "connected" | "error" | "disconnected" | "pending";
+    type InstantMessageStatus = "connected" | "error" | "disconnected" | "pending" | "connecting";
     type InstanceStatus = 'Pending' | 'Running' | 'Stopping' | 'Stopped' | 'Starting'
     type DeploymentStatus =
         'Pending'
