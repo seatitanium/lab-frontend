@@ -66,6 +66,7 @@ declare global {
         mcid: string,
         createdAt: number,
         updatedAt: number,
+        // 用户的 mcid 已经验证
         mcidVerified: boolean,
         admin: boolean
     }
@@ -74,7 +75,9 @@ declare global {
         skinBase64: string,
         analytics: UserAnalytics,
         uuid: string,
+        // 用户的 mcid 存在于 MOJANG 的数据库，则为 `true`
         mcidExist: boolean,
+        // 如果用户的 mcid 当前仍然存在且已经验证，则为 `true`。相当于 `mcidExist && mcidVerified`
         hasBoundValidMCID: boolean,
         loading: boolean,
         playtimeTotalMillis: number,
