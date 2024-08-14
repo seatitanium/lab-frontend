@@ -1,5 +1,5 @@
 <template>
-  <div class="bottom-navigation-container">
+  <div :class="hidden ? 'hidden' : ''" class="bottom-navigation-container">
     <card class="narrow without-border">
       <card-content class="actions">
         <slot/>
@@ -7,6 +7,25 @@
     </card>
   </div>
 </template>
+
+<script lang="ts" setup>
+let yThreshold = 0;
+let yThresholdCandidate = 0;
+const hidden = ref(false);
+let delayedTask: any;
+
+onMounted(() => {
+  window.addEventListener('scroll', () => {
+    const delta = window.scrollY - yThreshold;
+    hidden.value = delta >= 0;
+    yThresholdCandidate = window.scrollY;
+    delayedTask = setTimeout(() => {
+      clearTimeout(delayedTask);
+      if (yThresholdCandidate === window.scrollY) yThreshold = yThresholdCandidate;
+    }, 700);
+  })
+})
+</script>
 
 <style lang="less" scoped>
 .actions {
@@ -22,7 +41,7 @@
   }
 
   100% {
-    transform: translateY(-50%, 0);
+    transform: translate(-50%, 0);
   }
 }
 
@@ -48,5 +67,10 @@
   border-radius: 20px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, .3);
   animation: FlowUp .4s ease;
+  transition: all .4s ease;
+
+  &.hidden {
+    transform: translate(-50%, 120%);
+  }
 }
 </style>
