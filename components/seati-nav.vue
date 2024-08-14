@@ -284,7 +284,6 @@ async function initUserData() {
   if (userResult.code !== BackendCodes.OK) {
     someProblemModal.value = true;
     errorInformationContent.value = JSON.stringify(userResult);
-    return;
   } else {
     Object.assign(userInformation.value, userResult.data);
 
