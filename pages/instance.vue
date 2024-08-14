@@ -639,6 +639,7 @@ async function startRefreshServerStatus() {
           const token = useLocalStorage('tisea-auth-token', '');
           const url = `ws://${instanceInformation.retrieved.public_ip_address}:${ServerWebSocketPort}`;
           addInstantMessage('This functionality is disabled temporarily due to technical failure. This will be fixed in the future.');
+          instantMessageStatus.value = 'error';
           // instantMessageStatus.value = 'connecting';
           // initializeWebSocketConnection(userInformation.value.hasBoundValidMCID ? `${url}?token=${token.value}&displayname=${userInformation.value.mcid}` : url);
         }
