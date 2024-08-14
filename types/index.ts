@@ -81,7 +81,9 @@ declare global {
         hasBoundValidMCID: boolean,
         loading: boolean,
         playtimeTotalMillis: number,
-        playtimeAfkMillis: number
+        playtimeAfkMillis: number,
+        // 如果用户具有有效的 id 值，则此项为 `true`
+        exist: boolean
     }
 
     interface UserAnalytics {

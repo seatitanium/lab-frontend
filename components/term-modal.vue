@@ -3,7 +3,7 @@
     <modal-content>
       <term-info display-turn-to-terms-page v-model:num="termModalNum">
         <template #bind-mcid-btn>
-          <btn class="with-bg--primary hover--dim" small @click="model = false; modalUserAction_mcid = true"><icon :path="mdiLinkVariantPlus"/> 立即绑定</btn>
+          <btn :disabled="!userInformation.exist" class="with-bg--primary hover--dim" small @click="model = false; modalUserAction_mcid = true"><icon :path="mdiLinkVariantPlus"/> {{ userInformation.exist ? '立即' : '登录后'}}绑定</btn>
         </template>
         <template #turn-to-terms-btn>
           <btn @click="model = false; navigateTo('/terms')" small class="turn-to-terms-page with-bg--primary hover--dim">
@@ -24,6 +24,8 @@ import {useState} from "#app";
 
 const termModalNum = useState('term-modal-num', () => '7');
 const model = useState('term-modal');
+
+const userInformation = useState<UserExtended>('user-information')
 
 const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
 </script>

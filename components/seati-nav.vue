@@ -17,7 +17,7 @@
           </div>
         </div>
         <div class="spacer"></div>
-        <div class="user-avatar" v-if="userInformation.id > 0">
+        <div class="user-avatar" v-if="userInformation.exist">
           <avatar-spinner v-if="userInformation.loading"/>
           <img @click="userActionsModal = true" draggable="false" v-else-if="userInformation.hasBoundValidMCID"
                :src="`https://crafatar.com/avatars/${userInformation.uuid}`"
@@ -225,7 +225,8 @@ const userInformation = useState<UserExtended>('user-data', () => {
     mcidVerified: false,
     playtimeAfkMillis: 0,
     playtimeTotalMillis: 0,
-    admin: false
+    admin: false,
+    exist: false
   };
 });
 
@@ -289,6 +290,8 @@ async function initUserData() {
     errorInformationContent.value = JSON.stringify(userResult);
   } else {
     Object.assign(userInformation.value, userResult.data);
+
+    userInformation.value.exist = userInformation.value.id > 0;
 
     if (userInformation.value.mcid.length > 0) {
       const ashconResp = await getAshconResponse(userInformation.value.mcid);
