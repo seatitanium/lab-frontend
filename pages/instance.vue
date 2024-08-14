@@ -758,7 +758,8 @@ function getRandomAbsence() {
 }
 
 definePageMeta({
-  requireLogin: true
+  requireLogin: true,
+  title: '服务器管理'
 })
 
 const userLoadingOrServerLoading = reactive({
@@ -787,10 +788,6 @@ watch(userLoadingOrServerLoading, v => {
 
   userLoadingOrServerLoadingOnce.value = false;
 });
-
-definePageMeta({
-  title: '服务器管理'
-})
 </script>
 
 <style lang="less">

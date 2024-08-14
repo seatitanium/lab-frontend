@@ -189,7 +189,8 @@ import getCurrentTerm from "~/utils/getCurrentTerm";
 import {definePageMeta} from "#imports";
 
 definePageMeta({
-  requireLogin: true
+  requireLogin: true,
+  title: '首页'
 })
 
 const modalForgeDesc = useState('modal-forge-description', () => false);
@@ -231,10 +232,6 @@ onMounted(() => {
   setInterval(() => {
     termTimeDelta.value = formatSeconds(currentTerm.value ? (new Date().getTime() - new Date(currentTerm.value.startAt).getTime()) : 0);
   }, 1000);
-})
-
-definePageMeta({
-  title: '首页'
 })
 </script>
 
