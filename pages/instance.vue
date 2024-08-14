@@ -639,7 +639,7 @@ async function startRefreshServerStatus() {
           const token = useLocalStorage('tisea-auth-token', '');
           const url = `ws://${instanceInformation.retrieved.public_ip_address}:${ServerWebSocketPort}`;
           instantMessageStatus.value = 'connecting';
-          initializeWebSocketConnection(userInformation.value.hasBoundValidMCID ? `${url}?token=${token.value}&displayname=${userInformation.value.mcid}` : url)
+          initializeWebSocketConnection(userInformation.value.hasBoundValidMCID ? `${url}?token=${token.value}&displayname=${userInformation.value.mcid}` : url);
         }
       } else if (result.code === BackendCodes.Offline) {
         serverStatus.online = false;
