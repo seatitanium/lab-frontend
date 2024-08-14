@@ -1,6 +1,6 @@
 <template>
   <modal v-model="model" class="with-bg--darken term-modal" with-close-btn>
-    <modal-content>
+    <modal-content overflow>
       <term-info display-turn-to-terms-page v-model:num="termModalNum">
         <template #bind-mcid-btn>
           <btn :disabled="!userInformation.exist" class="with-bg--primary hover--dim" small @click="model = false; modalUserAction_mcid = true"><icon :path="mdiLinkVariantPlus"/> {{ userInformation.exist ? '立即' : '登录后'}}绑定</btn>
@@ -30,7 +30,7 @@ const userInformation = useState<UserExtended>('user-information')
 const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .term-modal .modal {
   min-width: 800px;
 }
