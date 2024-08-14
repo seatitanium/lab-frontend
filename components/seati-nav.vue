@@ -45,7 +45,7 @@
       如果问题仍然存在，单击「<strong>错误信息</strong>」按钮查看内部错误信息，然后单击弹出的信息复制，将其传达给维护者以得到支持。
     </p>
   </error-modal>
-  <modal v-model="userActionsModal" class="with-bg--darken" with-close-btn>
+  <modal v-model="userActionsModal" class="with-bg--darken user-actions-modal" with-close-btn>
     <modal-content>
       <div class="user-actions-container">
         <div class="left" v-if="userInformation.hasBoundValidMCID">
@@ -627,6 +627,15 @@ function logout() {
 
 <style lang="less">
 @import "@/assets/var.less";
+
+.user-actions-modal {
+  .modal {
+    @media (max-width: 1450px) {
+      min-width: 800px;
+      max-width: 1200px;
+    }
+  }
+}
 
 main {
   padding-top: @navbar-height;

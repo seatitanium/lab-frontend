@@ -166,13 +166,6 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
   min-width: unset;
 }
 
-.modal-group:not(.describe) .modal {
-  @media (max-width: 1450px) {
-    min-width: 800px;
-    max-width: 1200px;
-  }
-}
-
 .modal {
   min-width: 400px;
   max-width: 800px;
