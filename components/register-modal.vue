@@ -7,8 +7,13 @@
       <p>立即注册 Lab 账号，畅享 Seati 全功能。</p>
       <block class="with-bg--primary" style="max-width: 500px">
         <icon :path="mdiInformationOutline"/>
-        <p>游戏名为<strong>选填</strong>，你可以稍后绑定。注册后，登入服务器使用指令完成绑定流程。绑定后平台所有功能可用。
-        </p>
+          <p>游戏名为<strong>选填</strong>，你可以选择稍后绑定。绑定后将可以体验完整功能，包括但不仅限于
+            <ul>
+              <li>使用网页端聊天功能</li>
+              <li>免费下载整合包与存档</li>
+              <li>抢先体验将来推出的更多功能</li>
+            </ul>
+          </p>
       </block>
       <form>
         <textfield placeholder="用户名" bg-text required v-model:input="username"
@@ -20,7 +25,6 @@
                    v-model:temp-problem="passwordProblem"/>
         <textfield placeholder="确认密码" type="password" required bg-text v-model:input="passwordConfirm"
                    v-model:temp-problem="passwordConfirmProblem"/>
-
       </form>
     </modal-content>
     <modal-actions class="right">
