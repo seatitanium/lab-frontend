@@ -11,7 +11,7 @@
       </div>
       <div class="term-a">
         <div class="name">总参与玩家<icon @click="totalInvolvingPlayersPopup = true" :path="mdiHelpCircleOutline"/></div>
-        <div class="value"><counter v-if="totalInvolvedPlayers.length" :value="totalInvolvedPlayers.length"/><span v-else>--</span></div>
+        <div class="value"><counter v-if="involvedPlayers.length" :value="involvedPlayers.length"/><span v-else>--</span></div>
       </div>
       <div class="term-a">
         <div class="name">总跨度</div>
@@ -36,8 +36,10 @@
       <ul>
         <li>平均日花费 AVGD=¥{{ (totalConsumption.sum / totalOpeningDays).toFixed(2) }}</li>
         <li>平均周目花费 AVGT=¥{{ (totalConsumption.sum /  termInformation.length).toFixed(2)}}</li>
-        <li>平均玩家花费 AVGP=¥{{ (totalConsumption.sum / totalInvolvedPlayers.length).toFixed(2) }}</li>
-        <li>平均玩家每日花费 AVGPD=¥{{ (totalConsumption.sum / (totalInvolvedPlayers.length * totalOpeningDays)).toFixed(2) }}</li>
+        <li>平均玩家花费 AVGP=¥{{ (totalConsumption.sum / involvedPlayers.length).toFixed(2) }}</li>
+        <li>平均玩家每日花费 AVGPD=¥{{
+            (totalConsumption.sum / (involvedPlayers.length * totalOpeningDays)).toFixed(2)
+          }}</li>
       </ul>
       <p><strong><icon :path="mdiShapeOutline"/>支出分类</strong></p>
       <ul>
@@ -54,6 +56,7 @@
     </anywhere-popup>
     <anywhere-popup :code="false" v-model="totalInvolvingPlayersPopup">
       <p>该数字为 ST7 以来所有登入过服务器的玩家的数量，不计重复。</p>
+      <p><player-name-list :current-term-players="involvedPlayers"/></p>
     </anywhere-popup>
   </div>
 </template>
@@ -81,7 +84,7 @@ const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
 
 const termInformation = useState<Term[]>('term-information', () => [])
 const termInformationReversed = computed(() => termInformation.value.toReversed());
-const totalInvolvedPlayers = ref<ServerPlayer[]>([]);
+const involvedPlayers = ref<ServerPlayer[]>([]);
 const totalOpeningDays = computed(() => termInformation.value.map(x => getTermPeriod(x)).reduce((a, b) => a + b, 0))
 const donations = ref<Donation[]>([]);
 const totalDonations = computed(() => donations.value.map(x => x.amount).reduce((a, b) => a + b, 0));
@@ -91,7 +94,7 @@ async function getTotalInvolvedPlayers() {
   const uniqueResult = await get<ServerPlayer[]>(`/server/involved-players?unique=true`);
 
   if (uniqueResult.code === BackendCodes.OK) {
-    totalInvolvedPlayers.value = uniqueResult.data;
+    involvedPlayers.value = uniqueResult.data;
   }
 }
 
