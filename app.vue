@@ -1,72 +1,85 @@
 <template>
   <div>
-    <Transition name="fade">
-      <NuxtLayout v-if="screenQualified">
-        <NuxtPage/>
-      </NuxtLayout>
-      <div class="not-enough-width-warn" v-else>
-        <div class="txt">
-          <h2>显示不兼容</h2>
-          <p>你的屏幕不足以显示 Lab 的界面。请在宽度<strong>大于或等于 1100px</strong>、高度<strong>大于或等于 850px</strong> 的设备或窗口上访问本页面。1500px 以上宽度、1000px 以上高度访问效果最佳。</p>
-          <p>通常情况下，1080p 及以上的显示器都可以满足该要求。</p>
-          <p>若屏幕分辨率已满足，请将窗口拉伸，直至页面可以正常显示。</p>
-          <p><a target="_blank" href="https://www.baidu.com/s?wd=1920x1080">点此 - 在百度上了解更多关于分辨率的信息</a></p>
-        </div>
-      </div>
-    </Transition>
+    <NuxtLayout>
+      <NuxtPage/>
+    </NuxtLayout>
   </div>
+  <modal v-model="screenNotQualifiedModal" :class="narrowScreenQualificationModal ? 'narrow' : ''" class="describe with-bg--blurred with-bg--darken" :allow-esc="false">
+    <modal-content>
+      <icon color="#ff9800" :path="mdiMonitorOff"/>
+      <h2>不支持的屏幕尺寸</h2>
+      <p>当前你的浏览器显示尺寸为 {{ windowSize.width }}*{{ windowSize.height}} px<sup>2</sup>。Lab 需要至少 {{ widthThreshold }}*{{ heightThreshold }} px<sup>2</sup> 的空间来正常显示。</p>
+    </modal-content>
+    <modal-actions class="right">
+      <btn class="with-bg--white hover--dim" @click="screenMoreInformationPopup = true">了解更多</btn>
+    </modal-actions>
+  </modal>
+  <anywhere-popup v-model="screenMoreInformationPopup" :code="false">
+    <p>浏览器的显示尺寸与屏幕本身的<strong>硬件</strong>参数和系统相关的<strong>软件</strong>参数均有联系，此处提示屏幕尺寸不受支持，则是指客观上屏幕当前的缩放无法正常容纳页面布局。</p>
+    <p><strong>Lab 目前不支持在手机上使用。</strong>我们将在未来推出面向手机的更加轻便的版本。</p>
+  </anywhere-popup>
 </template>
 
 <script setup>
 import "@/assets/global.less"
+import {useWindowSize} from "@vueuse/core";
+import {mdiMonitorOff} from "@mdi/js";
 
-const screenQualified = ref(true);
+const widthThreshold = 1100;
+const heightThreshold = 850;
+const windowSize = useWindowSize();
+const screenNotQualifiedModal = ref(false);
+const screenMoreInformationPopup = ref(false);
+const narrowScreenQualificationModal = ref(false);
 
-onMounted(() => {
-  screenQualified.value = window.innerWidth > 1100 && window.innerHeight > 850;
-  window.addEventListener('resize', () => {
-    screenQualified.value = window.innerWidth > 1100 && window.innerHeight > 850;
-  })
+const windowSizeReactive = reactive({
+  width: windowSize.width,
+  height: windowSize.height
+});
+
+watch(windowSizeReactive, windowSize => {
+  screenNotQualifiedModal.value = windowSize.width <= 1100 || windowSize.height <= 850
+  narrowScreenQualificationModal.value = windowSize.width <= 600;
+}, {
+  immediate: true
+});
+
+watch(screenNotQualifiedModal, v => {
+  if (v) {
+    document.body.style.height = '100%';
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.height = '';
+    document.body.style.overflow = '';
+  }
+}, {
+  immediate: true
 })
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 @import "@/assets/var.less";
-.not-enough-width-warn {
-  width: 100vw;
-  height: 100vh;
 
-  .txt {
-    width: 80%;
+.qualification-modal .modal-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.narrow {
+  .modal {
+    min-width: unset;
+    max-width: unset;
+    width: 100%;
     height: 100%;
-    margin: 0 auto;
     display: flex;
-    align-items: center;
     flex-direction: column;
     justify-content: center;
-  }
+    align-items: center;
 
-  h2 {
-    color: #f44336;
-
-    font-size: 42px;
-
-    @media (min-width: 900px) {
-      font-size: 48px;
-    }
-  }
-
-  strong {
-    color: #f44336;
-  }
-
-  p {
-    font-size: 20px;
-    text-align: center;
-    line-height: 1.8;
-
-    @media (max-width: 900px) {
-      font-size: 20px;
+    .modal-content {
+      padding: 0 32px;
+      text-align: center;
     }
   }
 }
