@@ -106,6 +106,7 @@ async function getLoginBoard() {
   const result = await get<LoginRecordBoard[]>(`/server/board/login?tag=${PeriodTag}`);
 
   if (result.code === BackendCodes.OK) {
+    result.data.sort((a, b) => b.count - a.count);
     Object.assign(loginRecordBoard, result.data);
   }
 }
