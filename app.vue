@@ -75,12 +75,17 @@ watch(screenNotQualifiedModal, v => {
   .modal {
     min-width: unset;
     max-width: unset;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    box-sizing: border-box;
+    top: 0;
+    left: 0;
+    transform: none;
+    border-radius: 0;
 
     .modal-content {
       padding: 0 32px;
