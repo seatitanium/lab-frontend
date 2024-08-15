@@ -18,7 +18,6 @@ const props = defineProps({
     type: String
   },
   loadingSize: {
-    type: String,
     default: "20"
   },
   uuid: {

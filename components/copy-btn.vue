@@ -1,5 +1,6 @@
 <template>
-  <btn v-if="hiddenIfEmpty ? (value ? value.length > 0 : false) : true" @click="copy" class="copy-btn with-bg--white with-border">
+  <btn v-if="hiddenIfEmpty ? (value ? value.length > 0 : false) : true" @click="copy"
+       class="copy-btn with-bg--white with-border">
     <icon :path="copyIcon"/>
     {{ copyText }}
   </btn>
@@ -10,7 +11,7 @@ import {mdiCheck, mdiClipboardTextOutline} from "@mdi/js";
 
 const props = defineProps({
   value: {
-    type: String,
+    default: ''
   },
   hiddenIfEmpty: {
     type: Boolean,
@@ -22,8 +23,10 @@ const copyText = ref('单击复制');
 const copyIcon = ref(mdiClipboardTextOutline);
 
 async function copy() {
-  if (!props.value) return;
-  await navigator.clipboard.writeText(props.value)
+  let target = props.value;
+  if (target.length === 0 || !props.value) return;
+  if (Array.isArray(props.value)) target = props.value[0];
+  await navigator.clipboard.writeText(target);
   copyIcon.value = mdiCheck;
   copyText.value = "复制成功";
   setTimeout(() => {

@@ -7,8 +7,7 @@ import {mdiLaunch} from "@mdi/js";
 
 const props = defineProps({
   href: {
-    type: String,
-    required: true
+    type: String
   }
 })
 
