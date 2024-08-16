@@ -2,7 +2,7 @@
   <div class="page-instance container">
     <bottom-navigation>
       <btn class="with-bg--primaryDark hover--dropShadow"
-           :disabled="instanceInformation.retrieved.status === 'Running' || !isInstanceExist || isInstanceBeingDeployed"
+           :disabled="instanceInformation.retrieved.status === 'Running'"
            @click="actionToConfirm = isInstanceExist ? 'start' : 'create'; modalConfirm = true;">
         <icon :path="mdiCreationOutline"/>
         {{ isInstanceExist ? '开启' : '创建并开启' }}
