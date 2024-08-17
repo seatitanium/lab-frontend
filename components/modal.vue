@@ -171,6 +171,8 @@ onUnmounted(() => window.removeEventListener('keydown', keypressListener));
   max-width: 800px;
   background: white;
   border-radius: 20px;
+  box-sizing: border-box;
+  max-height: 90vh;
   padding: 40px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
   position: fixed;
