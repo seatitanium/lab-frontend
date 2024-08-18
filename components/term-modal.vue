@@ -32,6 +32,6 @@ const modalUserAction_mcid = useState('modal-user-action_mcid', () => false);
 
 <style lang="less">
 .term-modal .modal {
-  min-width: 800px;
+  min-width: 900px;
 }
 </style>
