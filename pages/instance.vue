@@ -33,7 +33,7 @@
     </bottom-navigation>
     <section class="section__inst_basic_information">
       <h1 class="value ip" v-if="!firstDescribeInstanceFetchedTimeOut && !firstDescribeInstanceFetched">
-        Waiting...
+        加载中...
       </h1>
       <h1 class="value ip" v-else>
         {{

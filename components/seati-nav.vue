@@ -342,7 +342,7 @@ const afterRegisterNoticeConfig = getAfterRegisterNoticeConfig();
  * @modals registerCompleteNoticeModal, bindSuggestionModal, loginModalState
  */
 async function initPage() {
-
+  await initTermData();
   await initUserData();
 
   if (useRoute().meta.requireLogin === true) {
@@ -351,7 +351,6 @@ async function initPage() {
     }
   }
 
-  await initTermData();
   await cacheTotalConsumptions();
 
   if (afterRegisterNoticeConfig.value.ready) {

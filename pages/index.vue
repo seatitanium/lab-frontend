@@ -1,171 +1,186 @@
 <template>
   <div class="page-index container">
     <div class="page-title">
-      <h1 v-if="userLoginState">欢迎，{{ userInformation.nickname || userInformation.username }}</h1>
-      <h1 v-else>未登录</h1>
+      <h1 v-if="userInformation.loading">欢迎</h1>
+      <h1 v-else-if="!userLoginState">未登录</h1>
+      <h1 v-else-if="userInformation.nickname || userInformation.username">欢迎，{{ userInformation.nickname || userInformation.username }}</h1>
+      <h1 v-else>欢迎</h1>
       <p>要开始，请选择下列功能之一，单击以进行相关操作，或选择上方导航栏中的选项跳转至相关页面。</p>
     </div>
     <section class="section__player_analytics">
-      <div class="user-profile loading" v-if="userInformation.loading">
-        <div class="text textaligncenter">
-          <circle-spinner size="25"/>
-          <p>加载用户信息中</p>
+      <Transition name="flow" mode="out-in">
+        <div class="user-profile loading" v-if="userInformation.loading">
+          <div class="text textaligncenter">
+            <circle-spinner size="20"/>
+            <p>加载用户信息中</p>
+          </div>
         </div>
-      </div>
-      <div class="user-profile empty" v-else-if="!userLoginState">
-        <div class="text textaligncenter">
-          <h2>请登录后查看个人统计信息</h2>
-          <p>个人统计信息仅在绑定 Minecraft ID 且登录状态下可用</p>
+        <div class="user-profile empty" v-else-if="!userLoginState">
+          <div class="text textaligncenter">
+            <h2>请登录后查看个人统计信息</h2>
+            <p>个人统计信息仅在绑定 Minecraft ID 且登录状态下可用</p>
+          </div>
         </div>
-      </div>
-      <div class="user-profile" v-else-if="userInformation.hasBoundValidMCID">
-        <section class="player-analytics">
-          <div class="player-a" @click="modalPlaytime = true">
-            <div class="text">
-              游玩时长
-            </div>
-            <div class="value">
-              {{ formatSecondsDense(userInformation.playtimeTotalMillis - userInformation.playtimeAfkMillis) }}
-              <span class="afk">
+        <div class="user-profile" v-else-if="userInformation.hasBoundValidMCID">
+          <section class="player-analytics">
+            <div class="player-a" @click="modalPlaytime = true">
+              <div class="text">
+                游玩时长
+              </div>
+              <div class="value">
+                {{ formatSecondsDense(userInformation.playtimeTotalMillis - userInformation.playtimeAfkMillis) }}
+                <span class="afk">
             <span class="label">AFK = </span>{{ formatSecondsDense(userInformation.playtimeAfkMillis) }}
           </span>
+              </div>
             </div>
-          </div>
-          <div class="player-a" @click="() => {
+            <div class="player-a" @click="() => {
             if (userInformation.analytics.loginCount > 0) {
               modalLoginRecord = true
             }
           }">
-            <div class="text">
-              登入次数
+              <div class="text">
+                登入次数
+              </div>
+              <div class="value">
+                {{ userInformation.analytics.loginCount }}
+              </div>
             </div>
-            <div class="value">
-              {{ userInformation.analytics.loginCount }}
-            </div>
-          </div>
-          <div class="player-a" @click="() => {
+            <div class="player-a" @click="() => {
             if (userInformation.analytics.termsInvolved.length > 0) {
               modalTermsInvolved = true
             }
           }">
-            <div class="text">
-              参与周目
+              <div class="text">
+                参与周目
+              </div>
+              <div class="value">
+                <span>{{ userInformation.analytics.termsInvolved.length }}<small>/{{ getTermCount() }}</small></span>
+              </div>
             </div>
-            <div class="value">
-              <span>{{ userInformation.analytics.termsInvolved.length }}<small>/{{ getTermCount() }}</small></span>
-            </div>
-          </div>
-          <div class="player-a" @click="() => {
+            <div class="player-a" @click="() => {
             if (userInformation.analytics.firstLoginRecord.createdAt) {
               modalFirstLogin = true
             }
           }">
-            <div class="text">
-              首次加入
+              <div class="text">
+                首次加入
+              </div>
+              <div class="value">
+                {{
+                  userInformation.analytics.firstLoginRecord.createdAt ? formatTimeStringFromStringPartialYM(userInformation.analytics.firstLoginRecord.createdAt) : '未曾加入'
+                }}
+              </div>
             </div>
-            <div class="value">
-              {{ userInformation.analytics.firstLoginRecord.createdAt ? formatTimeStringFromStringPartialYM(userInformation.analytics.firstLoginRecord.createdAt) : '未曾加入' }}
-            </div>
-          </div>
-        </section>
-      </div>
-      <div class="user-profile empty" v-else>
-        <div class="text textaligncenter">
-          <h2>{{ !userInformation.mcidExist ? '绑定有效' : '验证' }} Minecraft ID 以查看个人统计信息</h2>
-          <p v-if="!userInformation.mcidExist">绑定后，此处会展示包括游玩时长、登入次数的个人统计信息</p>
-          <p v-else>请用 {{ userInformation.mcid }} 登入 Seati 服务器，按照提示进行操作以验证 Minecraft ID</p>
+          </section>
         </div>
-        <btn class="with-bg--primary hover--dim" @click="modalUserAction_mcid = true">
-          <icon :path="!userInformation.mcidExist ? mdiLinkVariantPlus : mdiRefresh"/>
-          {{ !userInformation.mcidExist ? '立即绑定' : '重新绑定' }}
-        </btn>
-      </div>
+        <div class="user-profile empty" v-else>
+          <div class="text textaligncenter">
+            <h2>{{ !userInformation.mcidExist ? '绑定有效' : '验证' }} Minecraft ID 以查看个人统计信息</h2>
+            <p v-if="!userInformation.mcidExist">绑定后，此处会展示包括游玩时长、登入次数的个人统计信息</p>
+            <p v-else>请用 {{ userInformation.mcid }} 登入 Seati 服务器，按照提示进行操作以验证 Minecraft ID</p>
+          </div>
+          <btn class="with-bg--primary hover--dim" @click="modalUserAction_mcid = true">
+            <icon :path="!userInformation.mcidExist ? mdiLinkVariantPlus : mdiRefresh"/>
+            {{ !userInformation.mcidExist ? '立即绑定' : '重新绑定' }}
+          </btn>
+        </div>
+      </Transition>
     </section>
-    <section v-if="currentTerm">
-      <div class="index-term-information">
-        <card class="equalp">
-          <card-right-top>
-            <div class="badges">
-              <div class="badge preset--online" @click="modalOnlineModeDesc = true">正版验证
-                <icon :path="mdiCheck"/>
-              </div>
-              <div class="badge preset--mcje" @click="modalJavaDesc = true">
-                <DukeWaving/>
-                Java 版
-              </div>
-            </div>
-          </card-right-top>
-          <card-content>
-            <div class="left">
-              <img src="~/assets/images/2023-07-20_01.08.34.jpg"/>
-            </div>
-            <div class="right">
-              <div class="term-title">
-                <div class="main">当前周目
-                  <term-icon num="13"/>
+    <Transition name="flow">
+      <section v-if="currentTerm">
+        <div class="index-term-information">
+          <card class="equalp">
+            <card-right-top>
+              <div class="badges">
+                <div class="badge preset--online" @click="modalOnlineModeDesc = true">正版验证
+                  <icon :path="mdiCheck"/>
                 </div>
-                <div class="sub">
-                  <icon color="#004d40" :path="mdiCardsPlaying"/>
-                  <strong>进行中</strong> · {{ termTimeDelta }}
+                <div class="badge preset--mcje" @click="modalJavaDesc = true">
+                  <DukeWaving/>
+                  Java 版
                 </div>
               </div>
-              <div class="term-information">
-                <ul>
-                  <li>
-                    <icon :path="mdiMinecraft"/>
-                    Minecraft 版本
-                    <slim>{{ currentTerm.version }}</slim>
-                  </li>
-                  <li>
-                    <icon :path="mdiAnvil"/>
-                    Forge 版本
-                    <slim>{{ currentTermSet.forge }}</slim>
-                  </li>
-                  <li>
-                    <icon :path="mdiMemory"/>
-                    分配内存
-                    <slim>{{ currentTermSet.ram }}GB 或以上</slim>
-                  </li>
-                  <li>
-                    <icon :path="mdiLanguageJava"/>
-                    Java 版本
-                    <slim>{{ currentTermSet.java }} 或以上</slim>
-                  </li>
-                </ul>
+            </card-right-top>
+            <card-content>
+              <div class="left">
+                <img src="~/assets/images/2023-07-20_01.08.34.jpg"/>
               </div>
-            </div>
-          </card-content>
-        </card>
-      </div>
-    </section>
-    <section v-if="currentTerm">
-      <div class="index-pack-information">
-        <card class="equalp">
-          <card-right-top>
-            <div class="badges">
-              <div class="badge preset--forge" @click="modalForgeDesc = true">Forge</div>
-            </div>
-          </card-right-top>
-          <card-content>
-            <div class="pack-title">
-              <div class="pack-name">
-                <img class="pack-logo" src="../assets/images/pack-logo.png"/>
-                <div class="right">
-                  <div class="main">{{ currentTerm.theme }} <small v-if="currentTerm.themeAlt">{{ currentTerm.themeAlt }}</small></div>
-                  <div class="sub">{{ currentTerm.type }} / {{ currentTerm.created}} 年 / {{ currentTerm.author }} 制作</div>
+              <div class="right">
+                <div class="term-title">
+                  <div class="main">当前周目
+                    <term-icon num="13"/>
+                  </div>
+                  <div class="sub">
+                    <icon color="#004d40" :path="mdiCardsPlaying"/>
+                    <strong>进行中</strong> · {{ termTimeDelta }}
+                  </div>
+                </div>
+                <div class="term-information">
+                  <ul>
+                    <li>
+                      <icon :path="mdiMinecraft"/>
+                      Minecraft 版本
+                      <slim>{{ currentTerm.version }}</slim>
+                    </li>
+                    <li>
+                      <icon :path="mdiAnvil"/>
+                      Forge 版本
+                      <slim>{{ currentTermSet.forge }}</slim>
+                    </li>
+                    <li>
+                      <icon :path="mdiMemory"/>
+                      分配内存
+                      <slim>{{ currentTermSet.ram }}GB 或以上</slim>
+                    </li>
+                    <li>
+                      <icon :path="mdiLanguageJava"/>
+                      Java 版本
+                      <slim>{{ currentTermSet.java }} 或以上</slim>
+                    </li>
+                  </ul>
                 </div>
               </div>
-            </div>
-            <div class="pack-description" v-html="currentTermSet.description"/>
-          </card-content>
-          <modal-actions v-if="currentTerm.link" style="position: absolute;bottom: 32px; right: 32px;" class="nopadding absolute">
-            <btn :href="currentTerm.link" class="without-bg--primary hover--dim">在 MCMOD 中打开
-              <icon :path="mdiLaunch"/>
-            </btn>
-          </modal-actions>
-        </card>
-      </div>
-    </section>
+            </card-content>
+          </card>
+        </div>
+      </section>
+    </Transition>
+    <Transition name="flow">
+      <section v-if="currentTerm" style="transition-delay: .2s">
+        <div class="index-pack-information">
+          <card class="equalp">
+            <card-right-top>
+              <div class="badges">
+                <div class="badge preset--forge" @click="modalForgeDesc = true">Forge</div>
+              </div>
+            </card-right-top>
+            <card-content>
+              <div class="pack-title">
+                <div class="pack-name">
+                  <img class="pack-logo" src="../assets/images/pack-logo.png"/>
+                  <div class="right">
+                    <div class="main">{{ currentTerm.theme }} <small v-if="currentTerm.themeAlt">{{
+                        currentTerm.themeAlt
+                      }}</small></div>
+                    <div class="sub">{{ currentTerm.type }} / {{ currentTerm.created }} 年 / {{ currentTerm.author }}
+                      制作
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="pack-description" v-html="currentTermSet.description"/>
+            </card-content>
+            <modal-actions v-if="currentTerm.link" style="position: absolute;bottom: 32px; right: 32px;"
+                           class="nopadding absolute">
+              <btn :href="currentTerm.link" class="without-bg--primary hover--dim">在 MCMOD 中打开
+                <icon :path="mdiLaunch"/>
+              </btn>
+            </modal-actions>
+          </card>
+        </div>
+      </section>
+    </Transition>
   </div>
   <mg-index-badges/>
   <mg-user-analytics/>
@@ -427,10 +442,11 @@ onMounted(() => {
   &.empty, &.loading {
     border-radius: 20px;
     border: 2px dashed #ddd;
-    padding: 40px;
+    height: 108px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 24px;
   }
 
