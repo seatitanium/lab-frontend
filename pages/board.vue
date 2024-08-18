@@ -13,70 +13,79 @@
       </block>
     </div>
     <section>
-      <card class="narrow">
-        <card-label>
-          <icon :path="mdiLogin"/>
-          登入次数
-        </card-label>
-        <card-content>
-          <table>
-            <thead>
-            <tr>
-              <th>名次 RANK</th>
-              <th v-for="x in Object.values(loginBoardTableHeads)">{{ x }}</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="(x, i) in loginRecordBoard">
-              <td>
-                <div class="cell">
-                  {{ i + 1 }}
-                </div>
-              </td>
-              <td v-for="y in Object.keys(loginBoardTableHeads)">
-                <div class="cell">
-                  <player-avatar v-if="y === 'player'" :name="x[y]"/>
-                  {{ y === 'lastCreatedAt' ? formatTimeStringFromString(x[y]) : x[y] }}
-                </div>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </card-content>
-      </card>
+      <div class="empty" v-if="loginRecordBoard.length === 0 && playtimeBoard.length === 0">
+        <circle-spinner size="20"/>
+      </div>
     </section>
     <section>
-      <card class="narrow">
-        <card-label>
-          <icon :path="mdiClockOutline"/>
-          游玩时长
-        </card-label>
-        <card-content>
-          <table>
-            <thead>
-            <tr>
-              <th>名次 RANK</th>
-              <th v-for="x in Object.values(playtimeBoardTableHeads)">{{ x }}</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="(x, i) in playtimeBoard">
-              <td>
-                <div class="cell">
-                  {{ i + 1 }}
-                </div>
-              </td>
-              <td v-for="y in Object.keys(playtimeBoardTableHeads)">
-                <div class="cell">
-                  <player-avatar v-if="y === 'player'" :name="x[y]"/>
-                  {{ y.startsWith('time') ? formatSecondsDense(x[y] * 1000) : x[y] }}
-                </div>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </card-content>
-      </card>
+      <transition name="flow">
+        <card class="narrow" v-if="loginRecordBoard.length > 0">
+          <card-label>
+            <icon :path="mdiLogin"/>
+            登入次数
+          </card-label>
+          <card-content>
+            <table>
+              <thead>
+              <tr>
+                <th>名次 RANK</th>
+                <th v-for="x in Object.values(loginBoardTableHeads)">{{ x }}</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="(x, i) in loginRecordBoard">
+                <td>
+                  <div class="cell">
+                    {{ i + 1 }}
+                  </div>
+                </td>
+                <td v-for="y in Object.keys(loginBoardTableHeads)">
+                  <div class="cell">
+                    <player-avatar v-if="y === 'player'" :name="x[y]"/>
+                    {{ y === 'lastCreatedAt' ? formatTimeStringFromString(x[y]) : x[y] }}
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </card-content>
+        </card>
+      </transition>
+    </section>
+    <section>
+      <transition name="flow">
+        <card class="narrow" style="transition-delay: .2s" v-if="playtimeBoard.length > 0">
+          <card-label>
+            <icon :path="mdiClockOutline"/>
+            游玩时长
+          </card-label>
+          <card-content>
+            <table>
+              <thead>
+              <tr>
+                <th>名次 RANK</th>
+                <th v-for="x in Object.values(playtimeBoardTableHeads)">{{ x }}</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="(x, i) in playtimeBoard">
+                <td>
+                  <div class="cell">
+                    {{ i + 1 }}
+                  </div>
+                </td>
+                <td v-for="y in Object.keys(playtimeBoardTableHeads)">
+                  <div class="cell">
+                    <player-avatar v-if="y === 'player'" :name="x[y]"/>
+                    {{ y.startsWith('time') ? formatSecondsDense(x[y] * 1000) : x[y] }}
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </card-content>
+        </card>
+      </transition>
     </section>
   </div>
 </template>
@@ -141,6 +150,13 @@ definePageMeta({
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 32px;
 }
 </style>
 
