@@ -15,7 +15,7 @@ export default defineNuxtConfig({
             template: {
                 compilerOptions: {
                     isCustomElement: (tag) => {
-                        return ['slim'].includes(tag)
+                        return ['slim', 'tip', 'info'].includes(tag)
                     }
                 }
             }
@@ -31,7 +31,7 @@ export default defineNuxtConfig({
         }
     },
 
-    modules: ["nuxt-route-meta", "@nuxt/image"],
+    modules: ["nuxt-route-meta", "@nuxt/image", "@nuxt/content"],
 
     app: {
         head: {
@@ -40,6 +40,18 @@ export default defineNuxtConfig({
                 type: 'image/png',
                 href: '/favicon-black.png'
             }]
+        }
+    },
+
+    content: {
+        api: {
+            baseURL: '/contentapi'
+        },
+        highlight: {
+            theme: {
+                default: 'github-light',
+                dark: 'github-dark',
+            }
         }
     }
 });
