@@ -428,7 +428,7 @@ const isInstanceExist = computed(() => instanceInformation.retrieved.exist);
 const instanceStatusLastUpdated = ref('');
 const instanceStatusName = computed(() => {
   if (!isInstanceExist.value) return '未创建';
-  if (serverStatusLoading.value) return '等待服务器响应';
+  if (serverStatusLoading.value) return '等待服务器响应...';
   return translateInstanceStatus(instanceInformation.retrieved.status, serverStatus.online);
 })
 
@@ -587,7 +587,7 @@ async function startRefreshDescribeInstanceResult() {
 }
 
 const enableRefreshServerStatus = ref(true);
-const serverStatusLoading = ref(false);
+const serverStatusLoading = ref(true);
 const serverStatus = reactive<{
   online: boolean,
   data: ServerStatus,
