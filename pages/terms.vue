@@ -72,8 +72,6 @@ import {
   mdiLinkVariantPlus, mdiPercentCircleOutline, mdiShapeOutline
 } from "@mdi/js";
 import Counter from "~/components/counter.vue";
-import {formatTimeStringFromDate} from "../.nuxt/imports";
-import {definePageMeta} from "#imports";
 
 const refreshTime = formatTimeStringFromDate(new Date());
 
