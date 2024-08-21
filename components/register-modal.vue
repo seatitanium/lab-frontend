@@ -1,5 +1,5 @@
 <template>
-  <modal v-model="registerModalState" class="with-bg--darken" :allow-esc="false">
+  <modal v-model="registerModalState" class="with-bg--darken" :allow-esc="registerModalClosable">
     <modal-title>
       注册
     </modal-title>
@@ -45,9 +45,11 @@ import {BackendCodes} from "~/consts";
 import {useLocalStorage} from "@vueuse/core";
 import getAfterRegisterNoticeConfig from "~/utils/getAfterRegisterNoticeConfig";
 import doLogin from "~/utils/requests/doLogin";
+import {useState} from "#app";
 
 const loginModalState = useState('login-modal');
 const registerModalState = useState('register-modal', () => false);
+const registerModalClosable = useState('register-modal-closable', () => false);
 
 const username = ref('');
 const usernameProblem = ref('')
@@ -115,4 +117,12 @@ async function register() {
     console.warn(result)
   }
 }
+
+onMounted(() => {
+  window.addEventListener('keydown', e => {
+    if (e.code === 'Escape') {
+      registerModalClosable.value = false;
+    }
+  })
+})
 </script>

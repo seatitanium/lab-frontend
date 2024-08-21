@@ -1,5 +1,5 @@
 <template>
-  <modal v-model="loginModalState" class="with-bg--darken with-bg--blur w400 animation--Scale" :allow-esc="false">
+  <modal v-model="loginModalState" class="with-bg--darken with-bg--blur w400 animation--Scale" :allow-esc="loginModalClosable">
     <modal-title>登录</modal-title>
     <modal-content>
       <p>Lab 的功能需要与你的服务器账号关联，登录后即可畅享所有功能。</p>
@@ -16,7 +16,7 @@
       </div>
     </modal-content>
     <modal-actions class="right">
-      <btn class="without-bg--primary hover--dim" @click="loginModalState = false" v-if="allowClose">关闭</btn>
+      <btn class="without-bg--primary hover--dim" @click="loginModalState = false; loginModalClosable = false;" v-if="allowClose">关闭</btn>
       <btn class="with-bg--primary hover--dim" :loading="loginLoading" @click="login" :disabled="!formValid">登录</btn>
     </modal-actions>
   </modal>
@@ -28,6 +28,7 @@ import {useLocalStorage} from "@vueuse/core";
 import post from "~/utils/post";
 import {BackendCodes} from "~/consts";
 import doLogin from "~/utils/requests/doLogin";
+import {useState} from "#app";
 
 const props = defineProps({
   allowClose: {
@@ -37,6 +38,7 @@ const props = defineProps({
 })
 
 const loginModalState = useState('login-modal', () => false);
+const loginModalClosable = useState('login-modal-closable', () => false);
 const registerModalState = useState('register-modal');
 const loginLoading = ref(false);
 
@@ -74,6 +76,14 @@ async function login() {
   loginLoading.value = false;
 
 }
+
+onMounted(() => {
+  window.addEventListener('keydown', e => {
+    if (e.code === 'Escape') {
+      loginModalClosable.value = false;
+    }
+  })
+})
 </script>
 
 <style lang="less" scoped>

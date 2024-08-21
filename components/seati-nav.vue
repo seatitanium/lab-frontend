@@ -133,7 +133,7 @@
       <icon :path="mdiLogout"/>
       退出登录
     </context-menu-item>
-    <context-menu-item @click="loginModalState = true">
+    <context-menu-item @click="loginModalClosable = true; loginModalState = true">
       <icon :path="mdiAccountConvertOutline "/>
       切换账户
     </context-menu-item>
@@ -232,6 +232,8 @@ const userInformation = useState<UserExtended>('user-data', () => {
 
 const someProblemModal = useState('error-modal-state', () => false);
 const loginModalState = useState('login-modal');
+const loginModalClosable = useState('login-modal-closable');
+
 const errorInformationContent = useState('error-modal-content', () => '');
 const userActionsModal = ref(false);
 const bindSuggestionModal = ref(false);
