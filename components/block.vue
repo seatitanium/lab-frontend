@@ -15,12 +15,25 @@
   align-items: center;
   gap: 16px;
 
+  svg {
+    min-width: 24px;
+  }
+
+  &.clickable {
+    cursor: pointer;
+  }
+
   &.narrow {
     padding: 8px 16px;
   }
 
   &.no-margin-bottom {
     margin-bottom: 0;
+  }
+
+  &.with-border {
+    border: 1px solid rgba(0, 0, 0, .2);
+    color: @primaryd;
   }
 
   &.with-bg--primary {
@@ -32,7 +45,7 @@
     background: @indigol;
     color: @indigo;
 
-    a {
+    a, strong {
       color: @indigod;
     }
   }
@@ -41,8 +54,17 @@
     background: @orangel;
     color: @orange;
 
-    a {
+    a, strong {
       color: @oranged;
+    }
+  }
+
+  &.with-bg--red {
+    background: #ffebee;
+    color: #f44336;
+
+    a, strong {
+      color: #b71c1c;
     }
   }
 }

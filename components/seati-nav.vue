@@ -477,10 +477,6 @@ function logout() {
   }
 }
 
-.spacer {
-  flex: 1;
-}
-
 .user-avatar {
   img {
     border-radius: 100%;
