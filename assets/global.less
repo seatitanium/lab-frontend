@@ -126,7 +126,7 @@ table {
 article {
   font-size: 16px;
 
-  tip, info {
+  tip, info, warn {
     border: 20px;
     padding: 8px 16px;
 
@@ -145,6 +145,14 @@ article {
     background: @primaryl;
   }
 
+  warn {
+    background: #fff8e1;
+
+    strong {
+      color: #ff6f00;
+    }
+  }
+
   info {
     background: #e3f2fd;
 
@@ -160,7 +168,8 @@ article {
   }
 
   h1 {
-    font-size: 200%;
+    font-size: 250%;
+    font-variation-settings: 'CASL' 1;
   }
 
   h2 {
