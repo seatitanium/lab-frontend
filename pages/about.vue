@@ -123,6 +123,12 @@
             <WechatPayEn/>
           </div>
         </div>
+        <block class="with-bg--orange">
+          <icon :path="mdiInformationOutline"/>
+          <span>
+            由于爱发电平台限制，页面上的用户名将会显示为「<strong>未认证创作者</strong>」，可忽略。
+          </span>
+        </block>
         <p>如果需要爱发电以外的其它方式来捐助，欢迎联系 <a href="mailto:i@seati.cc">i@seati.cc</a> 并附上相关要求内容，一般
           24 小时内会得到回复。</p>
       </modal-content>
@@ -220,7 +226,14 @@ import PictogrammersLogo from '~/assets/icons/pictogrammers-full.svg';
 import WechatPayEn from '~/assets/icons/wechat-pay-en.svg';
 import AlipayEn from '~/assets/icons/alipay-en.svg';
 import AfdLogo from '~/assets/icons/afd-logo.svg';
-import {mdiAlertOutline, mdiCurrencyUsd, mdiFormatFont, mdiHelpCircleOutline, mdiLaunch} from "@mdi/js";
+import {
+  mdiAlertOutline,
+  mdiCurrencyUsd,
+  mdiFormatFont,
+  mdiHelpCircleOutline,
+  mdiInformationOutline,
+  mdiLaunch
+} from "@mdi/js";
 import {definePageMeta} from "#imports";
 
 const candidateImages = [Image1, Image2, Image3, Image4, Image5, Image6];
