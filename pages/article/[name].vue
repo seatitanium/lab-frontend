@@ -14,6 +14,10 @@ import {useRoute} from "#app";
 
 const articleName = computed(() => useRoute().params.name);
 const articleRoute = computed(() => `/${articleName.value}`)
+
+definePageMeta({
+  title: '文章'
+})
 </script>
 
 <style lang="less" scoped>

@@ -28,7 +28,7 @@
           </div>
         </div>
         <div v-else>
-          <btn @click="loginModalState = true" class="with-bg--primary hover--dim" small>登录</btn>
+          <btn @click="loginModalClosable = true; loginModalState = true" class="with-bg--primary hover--dim" small>登录</btn>
         </div>
       </div>
     </nav>
