@@ -47,7 +47,7 @@ function handleClick() {
 
 .btn {
   border-radius: 50px;
-  border: none;
+  border: 1px solid transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
