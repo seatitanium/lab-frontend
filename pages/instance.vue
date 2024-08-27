@@ -32,15 +32,17 @@
       </btn>
     </bottom-navigation>
     <section class="section__inst_basic_information">
-      <h1 class="value ip" v-if="!firstDescribeInstanceFetchedTimeOut && !firstDescribeInstanceFetched">
-        加载中...
-      </h1>
-      <h1 class="value ip" v-else>
-        {{
-          instanceInformation.retrieved.public_ip_address ? (instanceInformation.retrieved.public_ip_address[0] || '暂无 IP 地址') : '暂无 IP 地址'
-        }}
-        <copy-btn hidden-if-empty :value="instanceInformation.retrieved.public_ip_address"/>
-      </h1>
+      <Transition name="flow" mode="out-in">
+        <h1 class="value ip" v-if="!firstDescribeInstanceFetchedTimeOut && !firstDescribeInstanceFetched">
+          加载中...
+        </h1>
+        <h1 class="value ip" v-else>
+          {{
+            instanceInformation.retrieved.public_ip_address ? (instanceInformation.retrieved.public_ip_address[0] || '暂无 IP 地址') : '暂无 IP 地址'
+          }}
+          <copy-btn hidden-if-empty :value="instanceInformation.retrieved.public_ip_address"/>
+        </h1>
+      </Transition>
       <metabar>
         <metabar-item class="instance-status"
                       v-if="!firstDescribeInstanceFetchedTimeOut && !firstDescribeInstanceFetched">
@@ -68,108 +70,117 @@
         </metabar-item>
       </metabar>
     </section>
-    <section class="section__instance_info">
-      <card class="narrow">
-        <card-label>
-          <icon :path="mdiCog"/>
-          实例信息
-        </card-label>
-        <card-content>
-          <h2 class="value" v-if="!firstDescribeInstanceFetchedTimeOut && !firstDescribeInstanceFetched">
-            <circle-spinner size="25"/>
-            获取中...
-          </h2>
-          <h2 class="value" v-else>
-            {{
-              isInstanceExist ? instanceInformation.local.instance_id : '暂未创建'
-            }}
-            <copy-btn hidden-if-empty :value="instanceInformation.local.instance_id"/>
-          </h2>
-          <metabar v-if="isInstanceExist">
-            <metabar-item>
+    <Transition name="flow">
+      <section class="section__instance_info">
+        <card class="narrow">
+          <card-label>
+            <icon :path="mdiCog"/>
+            实例信息
+          </card-label>
+          <card-content>
+            <h2 class="value" v-if="!firstDescribeInstanceFetchedTimeOut && !firstDescribeInstanceFetched">
+              <circle-spinner size="25"/>
+              获取中...
+            </h2>
+            <h2 class="value" v-else>
+              {{
+                isInstanceExist ? instanceInformation.local.instance_id : '暂未创建'
+              }}
+              <copy-btn hidden-if-empty :value="instanceInformation.local.instance_id"/>
+            </h2>
+            <metabar v-if="isInstanceExist">
+              <metabar-item>
               <span class="left">
                 <icon :path="mdiClockPlusOutline"/>创建时间
               </span>
-              <span class="right">
+                <span class="right">
                 {{ formatTimeString(instanceInformation.retrieved.creation_time) }}
               </span>
-            </metabar-item>
-            <metabar-item>
+              </metabar-item>
+              <metabar-item>
               <span class="left">
                 <icon :path="mdiCogBox"/>规格
               </span>
-              <span class="right">
+                <span class="right">
                 {{ instanceInformation.local.instance_type }}
               </span>
-            </metabar-item>
-            <metabar-item>
+              </metabar-item>
+              <metabar-item>
               <span class="left">
                 <icon :path="mdiNavigationVariantOutline"/>地域
               </span>
-              <span class="right">
+                <span class="right">
                 {{ instanceInformation.local.region_id }}
                 <icon
                     :path="translateLetterIcon(instanceInformation.local.zone_id ? instanceInformation.local.zone_id.slice(-1) as Letter : 'z')"/>
               </span>
-            </metabar-item>
-          </metabar>
-          <div v-if="firstDescribeInstanceFetched">
-            <div class="instance-not-exist" v-if="!isInstanceExist">
-              <p style="margin: 0">
-                暂时没有活跃的实例，因此没有相关的信息可供显示。要创建并启动一个实例，请单击控制栏的「<strong>创建并开启</strong>」按钮。
-              </p>
-            </div>
-            <screenfetch-content :instance-type="instanceInformation.local.instance_type"/>
-          </div>
-        </card-content>
-        <card-right-top>
-          <div class="badges" v-if="isInstanceExist">
-            <div class="badge" @click="modalDebianDesc = true">
-              <DebianLogo/>
-              Debian 12
-            </div>
-            <div class="badge" @click="modalJavaDesc = true">
-              <DukeWaving/>
-              OpenJDK 17 JRE
-            </div>
-            <div class="badge" @click="modalCpuDesc = true">
-              <img draggable="false" src="~/assets/icons/intel-xeon.png"/>
-              {{ instanceTypeDetail.cpuu }}
-            </div>
-            <div class="badge"
-                 :class="instanceDeployStatusIcon===mdiCheck ? 'preset--green' : (instanceDeployStatusIcon === mdiClose ? 'preset--red' : '')"
-                 v-if="isInstanceBeingDeployed" @click="modalDeploy = true">
-              <circle-spinner v-if="instanceDeployStatusIcon === 'wait'" size="15"/>
-              <icon v-else :path="instanceDeployStatusIcon"/>
-              {{ instanceDeployStatusName }}
-            </div>
-          </div>
-        </card-right-top>
-      </card>
-    </section>
-    <section class="section__online_players">
-      <card class="narrow">
-        <card-label>
-          <icon :path="mdiAccountGroupOutline"/>
-          在线玩家 ({{ onlinePlayers.length }})
-          <small>ST13 历史最高 · {{ peakServerOnlineSnapshot.count }}</small>
-        </card-label>
-        <card-content>
-          <div class="players" v-if="onlinePlayers.length > 0">
-            <div class="player" v-for="x in onlinePlayers">
-              <div class="avatar">
-                <player-avatar w20 :loading-size="15" :name="x"/>
+              </metabar-item>
+            </metabar>
+            <div v-if="firstDescribeInstanceFetched">
+              <div class="instance-not-exist" v-if="!isInstanceExist">
+                <p style="margin: 0">
+                  暂时没有活跃的实例，因此没有相关的信息可供显示。要创建并启动一个实例，请单击控制栏的「<strong>创建并开启</strong>」按钮。
+                </p>
               </div>
-              {{ x }}
+              <screenfetch-content :instance-type="instanceInformation.local.instance_type"/>
             </div>
-          </div>
-          <div class="no-players" v-else>
-            <div class="wtf">{{ randomExclamation }}</div>
-            <div class="text">{{ randomAbsence }}</div>
-          </div>
-        </card-content>
-      </card>
-    </section>
+          </card-content>
+          <card-right-top>
+            <div class="badges" v-if="isInstanceExist">
+              <div class="badge" @click="modalDebianDesc = true">
+                <DebianLogo/>
+                Debian 12
+              </div>
+              <div class="badge" @click="modalJavaDesc = true">
+                <DukeWaving/>
+                OpenJDK 17 JRE
+              </div>
+              <div class="badge" @click="modalCpuDesc = true">
+                <img draggable="false" src="~/assets/icons/intel-xeon.png"/>
+                {{ instanceTypeDetail.cpuu }}
+              </div>
+              <div class="badge"
+                   :class="instanceDeployStatusIcon===mdiCheck ? 'preset--green' : (instanceDeployStatusIcon === mdiClose ? 'preset--red' : '')"
+                   v-if="isInstanceBeingDeployed" @click="modalDeploy = true">
+                <circle-spinner v-if="instanceDeployStatusIcon === 'wait'" size="15"/>
+                <icon v-else :path="instanceDeployStatusIcon"/>
+                {{ instanceDeployStatusName }}
+              </div>
+            </div>
+          </card-right-top>
+        </card>
+      </section>
+    </Transition>
+    <Transition name="flow" mode="out-in">
+      <section class="section__online_players" v-if="!serverStatusLoading">
+        <card class="narrow">
+          <card-label>
+            <icon :path="mdiAccountGroupOutline"/>
+            在线玩家 ({{ onlinePlayers.length }})
+            <small>ST13 历史最高 · {{ peakServerOnlineSnapshot.count }}</small>
+          </card-label>
+          <card-content>
+            <div class="players" v-if="onlinePlayers.length > 0">
+              <div class="player" v-for="x in onlinePlayers">
+                <div class="avatar">
+                  <player-avatar w20 :loading-size="15" :name="x"/>
+                </div>
+                {{ x }}
+              </div>
+            </div>
+            <div class="no-players" v-else>
+              <div class="wtf">{{ randomExclamation }}</div>
+              <div class="text">{{ randomAbsence }}</div>
+            </div>
+          </card-content>
+        </card>
+      </section>
+      <loading-section v-else>
+        <template #loading-text>
+          加载玩家中
+        </template>
+      </loading-section>
+    </Transition>
     <section class="section__instant_message">
       <card class="narrow">
         <card-right-top>
@@ -356,6 +367,7 @@ import {
   translateLetterIcon
 } from "~/translation";
 import CopyBtn from "~/components/copy-btn.vue";
+import LoadingSection from "~/components/loading-section.vue";
 
 const instanceTypeDetail = computed(() => translateInstanceType(instanceInformation.local.instance_type));
 
