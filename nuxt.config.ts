@@ -52,6 +52,7 @@ export default defineNuxtConfig({
                 default: 'github-light',
                 dark: 'github-dark',
             }
-        }
+        },
+        contentHead: false
     }
 });
