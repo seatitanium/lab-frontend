@@ -6,11 +6,15 @@
           TiLab
         </div>
         <div class="navigation">
-          <div class="navigation-item" v-for="x in navigation">
+          <div class="navigation-item" v-for="x in navigation.filter(y => !y.hidden || isCurrentPage(y))">
             <btn class="nav-btn hover--dim"
-                 :class="useRoute().fullPath === x.route ? 'with-bg--primary' : 'with-bg--white'"
-                 v-if="!x.hidden || useRoute().fullPath === x.route"
-                 @click="navigateTo(x.route)">
+                 :class="{
+                  'with-bg--primary': isCurrentPage(x),
+                  'with-bg--white': !isCurrentPage(x),
+                 }"
+                 @click="() => {
+                   if (x.clickable !== false) navigateTo(x.route)
+                 }">
               <icon :path="x.icon"/>
               {{ x.name }}
             </btn>
@@ -28,7 +32,9 @@
           </div>
         </div>
         <div v-else>
-          <btn @click="loginModalClosable = true; loginModalState = true" class="with-bg--primary hover--dim" small>登录</btn>
+          <btn @click="loginModalClosable = true; loginModalState = true" class="with-bg--primary hover--dim" small>
+            登录
+          </btn>
         </div>
       </div>
     </nav>
@@ -153,7 +159,7 @@ import setLocation from "~/utils/setLocation";
 import {
   mdiAccountConvertOutline,
   mdiAccountHeartOutline,
-  mdiAccountOffOutline, mdiAlertOutline, mdiCardsPlaying, mdiCreation, mdiCreationOutline,
+  mdiAccountOffOutline, mdiAlertOutline, mdiBook, mdiCardsPlaying, mdiCreation, mdiCreationOutline,
   mdiEmailEditOutline,
   mdiHome, mdiInformation, mdiInformationVariant, mdiInformationVariantCircle, mdiInformationVariantCircleOutline,
   mdiLinkVariant, mdiLinkVariantPlus, mdiLockReset, mdiLogout,
@@ -178,6 +184,10 @@ import {useLocalStorage} from "@vueuse/core";
 
 const username = getUsername();
 const token = getToken();
+
+function isCurrentPage(x: { route: string }) {
+  return useRoute().fullPath === x.route || (x.route !== '/' && useRoute().fullPath.startsWith(x.route));
+}
 
 const contextMenuEnabled = ref(false);
 const contextMenuX = ref(0);
@@ -384,7 +394,8 @@ const navigation: {
   name: string,
   route: string,
   icon: string,
-  hidden?: boolean
+  hidden?: boolean,
+  clickable?: false,
 }[] = [
   {
     name: "主页",
@@ -417,6 +428,13 @@ const navigation: {
     route: "/about",
     icon: mdiInformationVariantCircle,
     hidden: true
+  },
+  {
+    name: '文章',
+    route: '/article',
+    icon: mdiBook,
+    hidden: true,
+    clickable: false
   }
 ]
 
