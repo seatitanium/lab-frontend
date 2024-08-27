@@ -2,14 +2,10 @@
   <div class="page-board container">
     <div class="page-title">
       <h1>排行榜</h1>
-      <p>在这里查看本周目所有玩家的排行数据汇总</p>
+      <p>在这里查看当前周目（{{ PeriodTag.toUpperCase() }}）所有玩家的排行数据汇总</p>
       <block class="with-bg--primary no-margin-bottom">
         <icon :path="mdiCheckDecagramOutline"/>
         此页面的数据准确性截至 {{ formatTimeStringFromDate(new Date()) }}
-      </block>
-      <block class="with-bg--indigo no-margin-bottom">
-        <icon :path="mdiTagOutline"/>
-        此页面记录的是 {{ PeriodTag }} 下的数据
       </block>
     </div>
     <section>
