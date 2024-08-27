@@ -70,10 +70,10 @@
                     {{ i + 1 }}
                   </div>
                 </td>
-                <td v-for="y in Object.keys(playtimeBoardTableHeads)">
+                <td v-for="y in Object.keys(loginBoardTableHeads)">
                   <div class="cell">
                     <player-avatar v-if="y === 'player'" :name="x[y]"/>
-                    {{ y.startsWith('time') ? formatSecondsDense(x[y] * 1000) : x[y] }}
+                    {{ y === 'lastCreatedAt' ? formatTimeStringFromString(x[y]) : x[y] }}
                   </div>
                 </td>
               </tr>
