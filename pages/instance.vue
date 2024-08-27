@@ -122,7 +122,7 @@
                 <icon :path="mdiClockPlusOutline"/>创建时间
               </span>
                 <span class="right">
-                {{ formatTimeString(instanceInformation.retrieved.creation_time) }}
+                {{ instanceLastCreate }}
               </span>
               </metabar-item>
               <metabar-item>
@@ -369,6 +369,7 @@ import {
 } from "~/translation";
 import CopyBtn from "~/components/copy-btn.vue";
 import LoadingSection from "~/components/loading-section.vue";
+import formatTimeAgoFromString from "../utils/formatTimeAgoFromString";
 
 const instanceTypeDetail = computed(() => translateInstanceType(instanceInformation.local.instance_type));
 
@@ -450,6 +451,14 @@ const instanceStatusIcon = computed(() => {
   if (serverStatusLoading.value) return 'wait';
   return translateInstanceStatusIcon(instanceInformation.retrieved.status, serverStatus.online);
 })
+
+const instanceLastCreate = ref('N/A');
+
+function startRefreshInstanceLastCreate() {
+  setInterval(() => {
+    instanceLastCreate.value = instanceInformation.retrieved.creation_time ? formatTimeAgoFromString(instanceInformation.retrieved.creation_time) + '前' : 'N/A';
+  }, 10000);
+}
 
 async function confirmAction() {
   confirmActionLoading.value = true;
@@ -590,6 +599,8 @@ async function startRefreshDescribeInstanceResult() {
     if (result.code === BackendCodes.OK) {
       instanceStatusLastUpdated.value = formatTimeStringFromDate(new Date());
       Object.assign(instanceInformation, result.data);
+      // instanceLastCreate initialization
+      instanceLastCreate.value = instanceInformation.retrieved.creation_time ? formatTimeAgoFromString(instanceInformation.retrieved.creation_time) + '前' : 'N/A';
     } else {
       if (result.code !== BackendCodes.NotFound) {
         console.warn('Unexpected error received.', result);
@@ -747,6 +758,7 @@ onMounted(async () => {
 
   startRefreshDescribeInstanceResult().finally();
   startRefreshServerStatus().finally();
+  startRefreshInstanceLastCreate();
 
   const deploymentStatusResp = await get<DeploymentStatus>('/ecs/deploy-status');
 
