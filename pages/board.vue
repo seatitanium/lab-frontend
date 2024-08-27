@@ -70,10 +70,10 @@
                     {{ i + 1 }}
                   </div>
                 </td>
-                <td v-for="y in Object.keys(loginBoardTableHeads)">
+                <td v-for="y in Object.keys(playtimeBoardTableHeads)">
                   <div class="cell">
                     <player-avatar v-if="y === 'player'" :name="x[y]"/>
-                    {{ y === 'lastCreatedAt' ? formatTimeStringFromString(x[y]) : x[y] }}
+                    {{ y.startsWith('time') ? formatSecondsDense(x[y] * 1000) : x[y] }}
                   </div>
                 </td>
               </tr>
@@ -100,8 +100,8 @@ const loginBoardTableHeads = {
 const playtimeBoardTableHeads = {
   'player': '玩家',
   'timeValid': '有效时长',
-  'timeTotal': '总游玩时长',
   'timeAfk': '挂机时长',
+  'timeTotal': '总游玩时长',
 }
 
 const loginRecordBoard = reactive<LoginRecordBoard[]>([]);
