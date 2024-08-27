@@ -17,20 +17,24 @@
 
 <script lang="ts" setup>
 import {useRoute} from "#app";
-import {mdiCheck, mdiClose, mdiPlus, mdiWheelchairAccessibility} from "@mdi/js";
+import {mdiCheck, mdiClose} from "@mdi/js";
 
-const articleName = computed(() => useRoute().params.name);
+const articleName = computed(() => useRoute().params.name as string);
 const articleRoute = computed(() => `/${articleName.value}`)
-
-definePageMeta({
-  title: '文章'
-});
 
 const isLayerIndicatorEnabled = useCookie('tisea-article-enable-layer-indicator', {
   default() {
       return false;
   },
 });
+
+const articleTitleMap: Dict<string> = {
+  'faq': '常见问题 FAQ'
+}
+
+useHead({
+  title: articleTitleMap[articleName.value] + ' | TiLab'
+})
 </script>
 
 <style lang="less" scoped>

@@ -13,8 +13,8 @@ import {useRoute} from "#app";
 
 const firstAccess = useLocalStorage('tisea-first-access-lab', () => true);
 const route = useRoute();
-const titleWithPrefix = computed(() => `TiLab - ${route.meta.title}`);
-const titleWithSuffix = computed(() => `${route.meta.title} | TiLab`)
+const titleWithPrefix = computed(() => route.meta.title ? `TiLab - ${route.meta.title}` : '');
+const titleWithSuffix = computed(() => route.meta.title ? `${route.meta.title} | TiLab` : 'Loading...')
 
 useHead({
   meta: [
