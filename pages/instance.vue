@@ -7,21 +7,24 @@
         <icon :path="mdiCreationOutline"/>
         {{ isInstanceExist ? '开启' : '创建并开启' }}
       </btn>
-      <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running' || !userInformation.admin || isInstanceBeingDeployed"
-           class="with-bg--white hover--dim"
-           @click="actionToConfirm = 'reboot'; modalConfirm = true;">
+      <btn
+          :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running' || !userInformation.admin || isInstanceBeingDeployed"
+          class="with-bg--white hover--dim"
+          @click="actionToConfirm = 'reboot'; modalConfirm = true;">
         <icon :path="mdiRestart"/>
         重启
       </btn>
-      <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running' || !userInformation.admin || isInstanceBeingDeployed"
-           class="with-bg--white hover--dim"
-           @click="actionToConfirm = 'stop'; modalConfirm = true;">
+      <btn
+          :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running' || !userInformation.admin || isInstanceBeingDeployed"
+          class="with-bg--white hover--dim"
+          @click="actionToConfirm = 'stop'; modalConfirm = true;">
         <icon :path="mdiClose"/>
         关机
       </btn>
-      <btn :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running' || !userInformation.admin || isInstanceBeingDeployed"
-           class="with-bg--white hover--dim"
-           @click="actionToConfirm = 'stop_force'; modalConfirm = true;">
+      <btn
+          :disabled="!isInstanceExist || instanceInformation.retrieved.status !== 'Running' || !userInformation.admin || isInstanceBeingDeployed"
+          class="with-bg--white hover--dim"
+          @click="actionToConfirm = 'stop_force'; modalConfirm = true;">
         <icon :path="mdiCloseOctagonOutline"/>
         强制停机
       </btn>
@@ -70,19 +73,44 @@
         </metabar-item>
       </metabar>
     </section>
-    <Transition name="flow">
-      <section class="section__instance_info">
+    <Transition name="flow" mode="out-in">
+      <section class="section__online_players" v-if="!serverStatusLoading">
+        <card class="narrow">
+          <card-label>
+            <icon :path="mdiAccountGroupOutline"/>
+            在线玩家 ({{ onlinePlayers.length }})
+            <small>ST13 历史最高 · {{ peakServerOnlineSnapshot.count }}</small>
+          </card-label>
+          <card-content>
+            <div class="players" v-if="onlinePlayers.length > 0">
+              <div class="player" v-for="x in onlinePlayers">
+                <div class="avatar">
+                  <player-avatar w20 :loading-size="15" :name="x"/>
+                </div>
+                {{ x }}
+              </div>
+            </div>
+            <div class="no-players" v-else>
+              <div class="wtf">{{ randomExclamation }}</div>
+              <div class="text">{{ randomAbsence }}</div>
+            </div>
+          </card-content>
+        </card>
+      </section>
+      <loading-section v-else>
+        加载玩家中
+      </loading-section>
+    </Transition>
+    <Transition name="flow" mode="out-in">
+      <section class="section__instance_info"
+               v-if="firstDescribeInstanceFetchedTimeOut || firstDescribeInstanceFetched">
         <card class="narrow">
           <card-label>
             <icon :path="mdiCog"/>
             实例信息
           </card-label>
           <card-content>
-            <h2 class="value" v-if="!firstDescribeInstanceFetchedTimeOut && !firstDescribeInstanceFetched">
-              <circle-spinner size="25"/>
-              获取中...
-            </h2>
-            <h2 class="value" v-else>
+            <h2 class="value">
               {{
                 isInstanceExist ? instanceInformation.local.instance_id : '暂未创建'
               }}
@@ -150,35 +178,8 @@
           </card-right-top>
         </card>
       </section>
-    </Transition>
-    <Transition name="flow" mode="out-in">
-      <section class="section__online_players" v-if="!serverStatusLoading">
-        <card class="narrow">
-          <card-label>
-            <icon :path="mdiAccountGroupOutline"/>
-            在线玩家 ({{ onlinePlayers.length }})
-            <small>ST13 历史最高 · {{ peakServerOnlineSnapshot.count }}</small>
-          </card-label>
-          <card-content>
-            <div class="players" v-if="onlinePlayers.length > 0">
-              <div class="player" v-for="x in onlinePlayers">
-                <div class="avatar">
-                  <player-avatar w20 :loading-size="15" :name="x"/>
-                </div>
-                {{ x }}
-              </div>
-            </div>
-            <div class="no-players" v-else>
-              <div class="wtf">{{ randomExclamation }}</div>
-              <div class="text">{{ randomAbsence }}</div>
-            </div>
-          </card-content>
-        </card>
-      </section>
       <loading-section v-else>
-        <template #loading-text>
-          加载玩家中
-        </template>
+        加载实例信息中
       </loading-section>
     </Transition>
     <section class="section__instant_message">

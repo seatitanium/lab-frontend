@@ -1,7 +1,7 @@
 <template>
   <section class="loading-section" :style="{height}">
     <circle-spinner size="20px"/>
-    <span><slot name="loading-text"/></span>
+    <span><slot/></span>
   </section>
 </template>
 <script setup lang="ts">
@@ -15,7 +15,7 @@ const props = defineProps({
 
 <style lang="less" scoped>
 .loading-section {
-  border: 2px dashed rgba(0, 0, 0, .2);
+  border: 1px dashed rgba(0, 0, 0, .2);
   border-radius: 20px;
   padding: 32px;
   display: flex;
