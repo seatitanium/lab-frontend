@@ -672,7 +672,8 @@ async function startRefreshServerStatus() {
       } else {
         console.warn("Cannot retrieve server status", result);
       }
-    } else if (instantMessageStatus.value === 'pending') {
+    } else {
+      serverStatusLoading.value = false;
       addInstantMessage('The server is not created.');
       instantMessageStatus.value = 'disconnected';
     }
@@ -756,13 +757,13 @@ onMounted(async () => {
   randomExclamation.value = getRandomExclamation();
   randomAbsence.value = getRandomAbsence();
 
+  addInstantMessage('Loading WebSocket module...');
+
   startRefreshDescribeInstanceResult().finally();
   startRefreshServerStatus().finally();
   startRefreshInstanceLastCreate();
 
   const deploymentStatusResp = await get<DeploymentStatus>('/ecs/deploy-status');
-
-  if (userInformation.value.loading || serverStatusLoading.value) addInstantMessage('Loading WebSocket module...');
 
   if (deploymentStatusResp.code === BackendCodes.OK) {
     switch (deploymentStatusResp.data) {
